@@ -1,3 +1,6 @@
+from tool import Tool
+from construction import Construction
+from worker import Worker
 
 class NonWorkingComponent(Exception):
     '''
@@ -7,6 +10,21 @@ class NonWorkingComponent(Exception):
     на рабочий.
     '''
     pass
+
+
+class BlankFields(Exception):
+    '''
+    Вызывается, если попытаться использовать
+    незаполненный экземпляр класса. Для избежания вызова
+    следует заполнить пустые поля.
+    '''
+    pass
+
+
+def checking_fields_filled(field_list:list) -> None:
+        for field in field_list:
+            if field==None:
+                raise BlankFields("Важные поля не заполнены")            
 
 
 def checking_incoming_objects(annotations:dict, obtained_values:list) -> None:
