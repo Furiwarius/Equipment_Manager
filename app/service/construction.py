@@ -1,4 +1,14 @@
 from datetime import datetime
+import enum
+
+
+class ConstructionStatus(enum.Enum):
+    '''
+    Статус объекта
+    '''
+    under_construction = True
+    stopped = True
+    finished = False
 
 class Construction():
     '''
@@ -23,7 +33,7 @@ class Construction():
         # список инструментов
         self.__tools = []
         # статус объекта
-        self.__status = True
+        self.__status = ConstructionStatus.under_construction
         # дата создания
         self.__date_creation = datetime.now()
 
