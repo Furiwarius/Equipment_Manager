@@ -1,31 +1,14 @@
 from datetime import datetime
+import enum
 
-class ToolStatus():
+class ToolStatus(enum.Enum):
     '''
     Описание статуса инструмента
     '''
-    
-    def __init__(self) -> None:
-        self.status = self.on_the_object()
-
-    def __nonzero__(self) -> bool:
-        '''
-        Возвращение статуса
-        '''
-        return self.status
-
-
-    def on_the_object(self) -> bool:
-        '''
-        Статус на объекте
-        '''
-        return True
-    
-    def faulty(self) -> bool:
-        '''
-        Статус в ремонте или неисправен
-        '''
-        return False
+    # Работает
+    works = True
+    # Сломан
+    faulty = False
 
 
 class Tool():
@@ -44,7 +27,7 @@ class Tool():
         self.__name = name
         # дата перемещения
         self.__import_date = datetime.now()
-        self.__status = ToolStatus()
+        self.__status = ToolStatus.works
 
         # для обхода ошибки взаимного импорта описание возвращаемого объекта не указано
         # при создании экземпляра класса Tool, 
@@ -102,3 +85,17 @@ class Tool():
         Изменение ответственного лица, за которым закреплен инструмент
         '''
         self.__responsible = new_responsible
+
+
+    def break_tool(self):
+        '''
+        Сломать инструмент
+        '''
+        self.__status = ToolStatus.faulty
+    
+
+    def fix_tool(self):
+        '''
+        Починить инструмент
+        '''
+        self.__status = ToolStatus.works
