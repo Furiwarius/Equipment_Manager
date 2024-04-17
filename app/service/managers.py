@@ -32,7 +32,6 @@ class ToolManager():
         responsible.add_tool(self)
 
         
-
     def set_construction(self, new_construction:Construction) -> None:
         '''
         Изменение объекта,
@@ -57,7 +56,7 @@ class ToolManager():
             # смена ответственного лица у инструмента
             self.tool.change_responsible(new_construction.get_responsible())
             # добавление в список инструментов к новому ответственному
-            new_construction.get_responsible().add_tool()
+            new_construction.get_responsible().add_tool(self)
         
 
     def set_responsible(self, new_responsible:Worker) -> None:
@@ -81,11 +80,11 @@ class ToolManager():
             # Смена ответственного лица
             self.tool.change_responsible(new_responsible)
             # Удаление из списка инструментов у текущего объекта
-            self.tool.get_construction.delete_tool(self)
+            self.tool.get_construction().delete_tool(self)
             # Смена объекта
             self.tool.change_construction(new_responsible.get_construction())
             # Добавление в список инструментов в новом объекте
-            self.tool.get_construction.add_tool(self)
+            self.tool.get_construction().add_tool(self)
 
 
 class WorkerManager():
@@ -131,12 +130,4 @@ class ConstructionManager():
         self.construction.change_responsible(responsible)
         
 
-
-
-tol = Tool(name="Какой-то инструмент")
-workr = Worker(name="Vasiliy", surname="Trunov")
-constr = Construction(name="Стройка 1", project="112-3224fdre")
-
-tolman = ToolManager(tool=tol)
-tolman.filling_fields(construction=constr, responsible=workr)
 
