@@ -9,7 +9,6 @@ class NonWorkingComponent(Exception):
     следует изменить статус используемого экземпляра 
     на рабочий.
     '''
-    pass
 
 
 class BlankFields(Exception):
@@ -18,7 +17,12 @@ class BlankFields(Exception):
     незаполненный экземпляр класса. Для избежания вызова
     следует заполнить пустые поля.
     '''
-    pass
+    
+
+class MethodError(Exception):
+    '''
+    Вызывается при использовании неподходящего метода.
+    '''
 
 
 def checking_fields_filled(field_list:list) -> None:
