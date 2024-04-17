@@ -90,11 +90,25 @@ class Worker():
         self.__tools.append(tool)
     
 
+    def add_tools(self, tools:list) -> None:
+        '''
+        Добавление списка инструментов
+        '''
+        self.__tools.extend(tools)
+
+
     def delete_tool(self, tool) -> None:
         '''
         Удаление инструмента
         '''
         self.__tools.remove(tool)
+
+
+    def clear_tools(self) -> None:
+        '''
+        Очистка списка инструментов
+        '''
+        self.__tools.clear()
 
     
     def change_job_title(self, new_job_title:str) -> None:
@@ -118,6 +132,13 @@ class Worker():
         '''
         self.__construction = new_construction
     
+
+    def delete_construction(self) -> None:
+        '''
+        Удаление объекта строительства
+        '''
+        self.__construction = None
+
 
     def change_start_date_work(self, new_date:datetime) -> None:
         '''
