@@ -1,4 +1,20 @@
 from datetime import datetime
+import enum
+
+class WorkerTool(enum.Enum):
+    '''
+    Статус работника
+    '''
+    # Работает
+    works = True
+    # Уволен
+    fired = False
+    # В отпуске
+    on_holiday = False
+    # болеет
+    sick = False
+    
+
 
 class Worker():
     '''
@@ -18,7 +34,7 @@ class Worker():
         # Дата начала работы на объекте
         self.__start_date_work = datetime.now()
         # Статус работника
-        self.__status = True
+        self.__status = WorkerTool.works
         # список инструментов, который закреплен за лицом
         self.__tools = []
         # Объект на котором находится ответственное лицо
