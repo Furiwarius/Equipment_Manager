@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class Сonstruction():
+class Construction():
     '''
     Объект
 
@@ -29,11 +29,11 @@ class Сonstruction():
 
 
     def __nonzero__(self) -> bool:
-        return self.__status
+        return {self.__status}
     
 
     def __str__(self) -> str:
-        return self.__name
+        return f"{self.__name} {self.__project}"
 
 
     def get_tools(self) -> list:
