@@ -35,8 +35,6 @@ class Worker():
         self.__start_date_work = datetime.now()
         # Статус работника
         self.__status = WorkerTool.works
-        # список инструментов, который закреплен за лицом
-        self.__tools = []
         # Объект на котором находится ответственное лицо
         self.__construction = None
 
@@ -59,14 +57,6 @@ class Worker():
         Получение объекта, на котором находится работник
         '''
         return self.__construction
-    
-
-    def get_tools(self) -> list:
-        '''
-        Получение списка инструментов,
-        который закреплен за работником
-        '''
-        return self.__tools
 
 
     def get_phone_number(self) -> str:
@@ -81,34 +71,6 @@ class Worker():
         Получение даты начала работы на объекте
         '''
         return self.__start_date_work
-    
-
-    def add_tool(self, tool) -> None:
-        '''
-        Добавление инструмента
-        '''
-        self.__tools.append(tool)
-    
-
-    def add_tools(self, tools:list) -> None:
-        '''
-        Добавление списка инструментов
-        '''
-        self.__tools.extend(tools)
-
-
-    def delete_tool(self, tool) -> None:
-        '''
-        Удаление инструмента
-        '''
-        self.__tools.remove(tool)
-
-
-    def clear_tools(self) -> None:
-        '''
-        Очистка списка инструментов
-        '''
-        self.__tools.clear()
 
     
     def change_job_title(self, new_job_title:str) -> None:
