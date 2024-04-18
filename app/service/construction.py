@@ -80,6 +80,13 @@ class Construction():
         self.__tools.append(new_tool)
 
 
+    def add_tools(self, tools_list:list) -> None:
+        '''
+        Добавление списка инструментов
+        '''
+        self.__tools.extend(tools_list)
+
+
     def tool_check(self, tools:list) -> bool:
         '''
         Проверка наличия инструмента
