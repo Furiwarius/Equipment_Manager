@@ -95,6 +95,14 @@ class Construction():
         Удаление инструмента
         '''
         self.__tools.remove(remove_tool)
+    
+
+    def delete_tools(self, remove_tools:list) -> None:
+        '''
+        Удаление инструментов
+        '''
+        for tool in remove_tools:
+            self.__tools.remove(tool)
 
 
     def change_responsible(self, new_responsible) -> None:
