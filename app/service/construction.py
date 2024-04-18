@@ -79,6 +79,16 @@ class Construction():
         '''
         self.__tools.append(new_tool)
 
+
+    def tool_check(self, tools:list) -> bool:
+        '''
+        Проверка наличия инструмента
+        '''
+        for tool in tools:
+            if tool not in self.__tools:
+                return False
+        return True
+            
     
     def delete_tool(self, remove_tool) -> None:
         '''
