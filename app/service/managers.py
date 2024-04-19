@@ -1,6 +1,6 @@
 from tool import Tool
 from construction import Construction
-from worker import Worker, WorkerStatus
+from worker import Worker
 from my_exception import checking_incoming_objects, checking_class, MethodError
 
 
@@ -17,17 +17,16 @@ class ToolManager():
         self.tool = tool
 
 
-    def filling_fields (self, construction:Construction, responsible:Worker) -> None:
+    def filling_fields (self, construction:Construction) -> None:
         '''
         Первоначальное заполненние полей инструмента.
         Другие методы по измененнию полей и зависимостей
         не будут работать до вызова этого метода
         '''
         # Проверка передаваемых значений
-        checking_incoming_objects(self.filling_fields.__annotations__, [construction, responsible])
+        checking_incoming_objects(self.filling_fields.__annotations__, [construction])
         
         self.tool.change_construction(construction)
-        self.tool.change_responsible(responsible)
 
         # Добавление этого инструмента на объект
         construction.add_tool(self.tool)
@@ -47,8 +46,9 @@ class WorkerManager():
 
     def set_construction(self, construction:Construction) -> None:
         '''
-        Присвоение работнику зоны ответственности 
-        При вызове этого метода у работника не должно быть объекта строительства
+        Присвоение работнику зоны ответственности. Первоначальная настройка.
+        При вызове этого метода у работника не должно быть объекта строительства,
+        и у объекта строительства также не должно быть ответственного.
         '''
         # Проверка передаваемых значений
         checking_incoming_objects(self.set_construction.__annotations__, [construction])
@@ -56,8 +56,6 @@ class WorkerManager():
         if self.worker.get_construction()==None:
             # Объект строительства добавляется к работнику
             self.worker.change_construction(construction)
-            # Удаление объекта строительства у предыдущего ответственного
-            construction.get_responsible().delete_construction()
             # Смена ответственного лица у объекта строительства
             construction.change_responsible(self.worker)
         else:
@@ -106,7 +104,6 @@ class ConstructionManager():
             self.construction.delete_tool(tool)
 
         
-
     def replace_person_responsible(self, new_responsible:Worker) -> None:
         '''
         Заменить ответственного лицо. 
@@ -125,3 +122,21 @@ class ConstructionManager():
         self.construction.change_responsible(new_responsible)
         # Заполняем новому ответственному поле с объектом
         new_responsible.change_construction(self.construction)
+    
+
+    def close_object(self, tool_storage_location:Construction) -> None:
+        '''
+        Закрыть объект
+        '''
+        # Проверка передаваемых значений
+        checking_incoming_objects(self.close_object.__annotations__, [tool_storage_location])
+        
+        # Получение списка инструменов у текущего объекта
+        tools = self.construction.get_tools()
+        # Переача инструментов новому объекту
+        for tool in tools:
+            tool.change_construction(tool_storage_location)
+        tool_storage_location.add_tools(tools)
+        # Удаление инструментов у текущего объекта
+        self.construction.delete_tools(tools)
+        self.construction.close_construction()

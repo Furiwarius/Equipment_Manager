@@ -138,3 +138,17 @@ class Construction():
         Изменение номера проекта или договора
         '''
         self.__project = new_project
+    
+
+    def close_construction(self) -> None:
+        '''
+        Закрытие объекта строительства
+        '''
+        self.__status = ConstructionStatus.finished
+    
+
+    def resumption_construction(self):
+        '''
+        Возобновление строительства
+        '''
+        self.__status = ConstructionStatus.under_construction
