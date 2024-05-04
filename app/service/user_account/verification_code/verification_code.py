@@ -11,9 +11,12 @@ class SenderVerificationCode():
     
     setting_path=r"app\service\user_account\verification_code\setting\email.ini"
 
-    def __init__(self, to_email:str) -> bool:
+    def __init__(self, __to_email:str) -> bool:
 
-        self.to = to_email
+        self.sender_settings()
+        self.__verification_code=None
+        self.to = __to_email
+
 
 
     def sender_settings(self) -> None:
@@ -45,7 +48,7 @@ class SenderVerificationCode():
         '''
 
         body = "\r\n".join((f"From: {self.user}", f"To: {self.to}", 
-        f"Subject: {self.subject}", self.mime, self.charset, "", message))
+        f"Subject: {self.subject}", self.mime, self.charset, "", str(message)))
 
         return body
     
@@ -69,7 +72,7 @@ class SenderVerificationCode():
         Метод генерирующий проверочный код
         '''
         # пятизначный код
-        self.verification_code = random.randrange(10000, 99999)
+        self.__verification_code = random.randrange(10000, 99999)
         # время генерации кода, выраженное в секундах с начала эпохи
         self.code_generation_time = time.time()
     
@@ -78,9 +81,9 @@ class SenderVerificationCode():
         '''
         Метод сравнения проверочного кода
         '''
-        if time.time()-self.code_generation_time>=self.code_lifetime:
+        if self.__verification_code==None or time.time()-self.code_generation_time>=self.code_lifetime:
             return False
-        if self.verification_code==code:
+        if self.__verification_code==code:
             return True
         return False
 
@@ -91,4 +94,4 @@ class SenderVerificationCode():
         Главный метод-менеджер, генерирующий код, и отправляющий его на почту
         '''
         self.verification_code_generator()
-        self.send_bid(self.setting_letter(self.verification_code))
+        self.send_bid(self.setting_letter(self.__verification_code))
