@@ -16,7 +16,7 @@ class UniqueSymbol():
         self.symbols = set(UniqueSymbol.symbols)
 
 
-    def get_symbol(self) -> str:
+    def generation(self) -> str:
         '''
         Возвращает уникальный символ
         '''

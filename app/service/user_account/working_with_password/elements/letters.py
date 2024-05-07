@@ -16,7 +16,7 @@ class UniqueLetter():
         self.letters = set(UniqueLetter.letters)
 
 
-    def get_letter(self) -> str:
+    def generation(self) -> str:
         '''
         Возвращает букву уникальную букву,
         если уникальные буквы кончились, обновляет 

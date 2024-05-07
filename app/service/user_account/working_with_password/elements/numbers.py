@@ -11,7 +11,7 @@ class UniqueNumber():
         pass
 
     
-    def get_number(self) -> str:
+    def generation(self) -> str:
         '''
         Возвращает случайную цифру
         '''
