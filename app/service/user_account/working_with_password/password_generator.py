@@ -64,11 +64,11 @@ class UniqueNumber():
         pass
 
     
-    def get_number(self):
+    def get_number(self) -> str:
         '''
         Возвращает случайную цифру
         '''
-        return randint(0, 9)
+        return str(randint(0, 9))
 
 
 
@@ -76,6 +76,42 @@ class UniqueSymbol():
     '''
     Символ
     '''
+
+    symbols = ('.', ',', '*', '!', '?', ']', '[', 
+               ':', ';', '#', '№', '@', '%', '(',
+               ')', '+', '=', '-', '_', '&', '~')
+
+
+    def __init__(self) -> None:
+        
+        self.symbols = set(UniqueSymbol.symbols)
+
+
+    def get_symbol(self) -> str:
+        '''
+        Возвращает уникальный символ
+        '''
+        self.replenishment()
+        return self.random_symbol()
+    
+
+    def random_symbol(self) -> str:
+        '''
+        Случайный символ
+        '''
+        result = tuple(self.symbols)[randint(0, len(self.symbols)-1)]
+        self.symbols.discard(result)
+        return result
+
+
+    def replenishment(self) -> None:
+        '''
+        Восполняет множество символов, в случае,
+        если оно пустое
+        '''
+        if len(self.symbols)==0:
+            self.symbols = set(UniqueSymbol.symbols)
+
 
 class PasswordGenerator():
     '''
