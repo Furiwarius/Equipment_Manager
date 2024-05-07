@@ -45,7 +45,7 @@ class UniqueLetter():
         return letter.lower()
     
 
-    def replenishment(self):
+    def replenishment(self) -> None:
         '''
         Восполняет множество букв, в случае,
         если оно пустое
@@ -58,6 +58,19 @@ class UniqueNumber():
     '''
     Цифра
     '''
+
+    def __init__(self) -> None:
+        
+        pass
+
+    
+    def get_number(self):
+        '''
+        Возвращает случайную цифру
+        '''
+        return randint(0, 9)
+
+
 
 class UniqueSymbol():
     '''
