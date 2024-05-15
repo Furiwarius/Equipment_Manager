@@ -18,30 +18,21 @@ class Account():
         '''
         Проверка логина
         '''
-        if to_hash(transmitted_login)==self.__login:
-            return True
-        else:
-            return False
+        return to_hash(transmitted_login)==self.__login
 
 
     def check_password(self, transmitted_password:str) -> bool:
         '''
         Проверка пароля
         '''
-        if to_hash(transmitted_password)==self.__password:
-            return True
-        else:
-            return False
+        return to_hash(transmitted_password)==self.__password
 
 
     def check_email(self, transmitted_email:str) -> bool:
         '''
         Проверка электронной почты
         '''
-        if to_hash(transmitted_email)==self.__email:
-            return True
-        else:
-            return False
+        return to_hash(transmitted_email)==self.__email
     
 
     def change_password(self, new_password:str):
