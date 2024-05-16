@@ -59,7 +59,6 @@ class SenderCode():
         return False
 
 
-
     def send_code (self) -> None:
         '''
         Главный метод-менеджер, генерирующий код, и отправляющий его на почту
