@@ -7,6 +7,8 @@ class EmailClient():
     Отправитель сообщений
     '''
 
+    default_template = "template_letter\default_template.txt"
+
     def __init__(self, 
                  setting=r"app\service\email_client\setting\setting.ini") -> None:
         # Если не был передан путь с настройками
@@ -33,7 +35,6 @@ class EmailClient():
         self.passwd = config.get("personal data", "passwd")
 
         self.subject = config.get("setting letter", "subject")
-        self.path_to_letter = config.get("setting letter", "path_to_letter")
 
 
 
@@ -62,14 +63,12 @@ class EmailClient():
         smtp.quit()
 
 
-    def render_letter(self, message:str) -> str:
+    def __render_letter(self, message:str) -> str:
         '''
         Вставка данных в шаблон
         '''
 
-        filename = self.path_to_letter
-
-        with open(filename, 'r', encoding='utf-8') as template_file:
+        with open(self.filename, 'r', encoding='utf-8') as template_file:
             template_file_content = template_file.read()
         environment = jinja2.Environment()
         template = environment.from_string(template_file_content)
@@ -78,13 +77,17 @@ class EmailClient():
         return letter
 
 
-    def send (self, user_to:str, message:str) -> None:
+    def send (self, user_to:str, message:str,
+              template="template_letter\default_template.txt", ) -> None:
         '''
-        Главный метод-менеджер, генерирующий код, и отправляющий его на почту
+        Главный метод-менеджер, принимающий почту,
+        на которую нужно отправить сообщение, само сообщение
+        и шаблон для письма
         
         template - текстровый шаблон (путь до него), в который будет вставляться сообщение
         message - тест сообщения
         '''
         self.to = user_to
-        text_letter = self.render_letter(message)
+        self.filename = template
+        text_letter = self.__render_letter(message)
         self.__send_bid(self.__setting_letter(text_letter))
