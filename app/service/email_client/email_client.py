@@ -48,7 +48,7 @@ class EmailClient():
         return body
     
 
-    def __send_bid(self, to, body_message:str) -> None:
+    def __send_bid(self, body_message:str) -> None:
         '''
         Отправка сообщения на почту
         '''
@@ -58,11 +58,11 @@ class EmailClient():
         # логинимся на почтовом сервере
         smtp.login(self.user, self.passwd)
         # пробуем послать письмо
-        smtp.sendmail(self.user, to, body_message.encode('utf-8'))
+        smtp.sendmail(self.user, self.to, body_message.encode('utf-8'))
         smtp.quit()
 
 
-    def render_letter(self, template:str, message:str) -> str:
+    def render_letter(self, message:str) -> str:
         '''
         Вставка данных в шаблон
         '''
@@ -85,5 +85,6 @@ class EmailClient():
         template - текстровый шаблон (путь до него), в который будет вставляться сообщение
         message - тест сообщения
         '''
+        self.to = user_to
         text_letter = self.render_letter(message)
-        self.__send_bid(user_to, self.__setting_letter(text_letter))
+        self.__send_bid(self.__setting_letter(text_letter))
