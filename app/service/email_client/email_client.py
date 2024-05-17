@@ -1,6 +1,7 @@
 import smtplib
 from configparser import ConfigParser
 import jinja2
+from app.settings import EMAIL, PASSWORD
 
 class EmailClient():
     '''
@@ -15,6 +16,8 @@ class EmailClient():
         # то используется путь по умолчанию
         self.setting = setting
         self.__sender_settings()
+        self.user = EMAIL
+        self.passwd = PASSWORD
 
 
 
@@ -25,14 +28,11 @@ class EmailClient():
 
         config = ConfigParser()
         config.read(self.setting)
-            # Настройки
+        # Настройки
         self.mime = config.get("setting", "mime")
         self.charset = config.get("setting", "charset")
         self.server = config.get("setting", "server")
         self.port = config.get("setting", "port")
-
-        self.user = config.get("personal data", "email")
-        self.passwd = config.get("personal data", "passwd")
 
         self.subject = config.get("setting letter", "subject")
 
