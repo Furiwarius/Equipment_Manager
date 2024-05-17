@@ -1,4 +1,7 @@
+import dotenv
 import os
 
-email = os.environ.get("EMAIL")
-password = os.environ.get("PASSWORD")
+dotenv.load_dotenv()
+
+EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
