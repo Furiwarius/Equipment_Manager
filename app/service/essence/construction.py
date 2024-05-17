@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 import enum
 
@@ -10,145 +11,80 @@ class ConstructionStatus(enum.Enum):
     stopped = True
     finished = False
 
+
+@dataclass
 class Construction():
     '''
     Объект
-
-    Для обхода ошибки взаимного импорта описание возвращаемого объекта
-    не указано у полей __responsible.
-    При создании экземпляра класса Сonstruction это поле заполняется 
-    методом get_responsible. 
-    Возвращаемые и получаемые значения у методов, связанных с этими полями не указаны.
     '''
-    
-    def __init__(self, name:str, project:str) -> None:
-        
-        # название объекта
-        self.__name = name
-        # номер проекта или договора подряда
-        self.__project = project
 
-        # Ответственное лицо, отвечающее за объект строительства
-        self.__responsible = None
-        # список инструментов
-        self.__tools = []
-        # статус объекта
-        self.__status = ConstructionStatus.under_construction
-        # дата создания
-        self.__date_creation = datetime.now()
+    id: int
+    # название объекта
+    name: str
+    # номер проекта или договора подряда
+    project: str
+    # статус объекта
+    status: ConstructionStatus
+    # дата создания
+    date_creation: datetime
 
 
     def __nonzero__(self) -> bool:
-        return {self.__status}
+        return {self.status}
     
 
     def __str__(self) -> str:
-        return f"{self.__name} {self.__project}"
+        return f"{self.name} {self.project}"
 
 
-    def get_tools(self) -> list:
+    def get_id(self) -> int:
         '''
-        Получение списка инструментов
+        Получение id
         '''
-        return self.__tools
+        return self.id
 
 
-    # для обхода ошибки взаимного импорта описание возвращаемого объекта не указано
-    # возвращаемыый класс Worker
-    def get_responsible(self):
-        '''
-        Получение ответственного лица на данном объекте
-        '''
-        return self.__responsible
-    
-
-    def get_date_creation(self) -> datetime:
+    def get_date(self) -> datetime:
         '''
         Получение даты начала работ на объекте
         '''
-        return self.__date_creation
+        return self.date_creation
     
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,
     # в методах изменения она отсутствует
-
-
-    def add_tool(self, new_tool) -> None:
-        '''
-        Добавление инструмента
-        '''
-        self.__tools.append(new_tool)
-
-
-    def add_tools(self, tools_list:list) -> None:
-        '''
-        Добавление списка инструментов
-        '''
-        self.__tools.extend(tools_list)
-
-
-    def tool_check(self, tools:list) -> bool:
-        '''
-        Проверка наличия инструмента
-        '''
-        for tool in tools:
-            if tool not in self.__tools:
-                return False
-        return True
-            
-    
-    def delete_tool(self, remove_tool) -> None:
-        '''
-        Удаление инструмента
-        '''
-        self.__tools.remove(remove_tool)
     
 
-    def delete_tools(self, remove_tools:list) -> None:
-        '''
-        Удаление инструментов
-        '''
-        for tool in remove_tools:
-            self.__tools.remove(tool)
-
-
-    def change_responsible(self, new_responsible) -> None:
-        '''
-        Изменение ответственного лица
-        '''
-        self.__responsible = new_responsible
-    
-
-    def change_date_creation(self, new_date:datetime) -> None:
+    def change_date(self, new_date:datetime) -> None:
         '''
         Изменение даты начала работ на объекте
         '''
-        self.__date_creation = new_date
+        self.date_creation = new_date
 
 
     def change_name(self, new_name:str) -> None:
         '''
         Изменение названия объекта
         '''
-        self.__name = new_name
+        self.name = new_name
     
 
     def change_project(self, new_project:str) -> None:
         '''
         Изменение номера проекта или договора
         '''
-        self.__project = new_project
+        self.project = new_project
     
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
-        self.__status = ConstructionStatus.finished
+        self.status = ConstructionStatus.finished
     
 
-    def resumption_construction(self):
+    def open_construction(self):
         '''
         Возобновление строительства
         '''
-        self.__status = ConstructionStatus.under_construction
+        self.status = ConstructionStatus.under_construction
