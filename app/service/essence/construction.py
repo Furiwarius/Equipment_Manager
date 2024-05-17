@@ -12,6 +12,14 @@ class ConstructionStatus(enum.Enum):
     finished = False
 
 
+class Warehouse(enum.Enum):
+    '''
+    Является ли объект складом
+    '''
+    warehouse = True
+    not_warehouse = False
+
+
 @dataclass
 class Construction():
     '''
@@ -25,6 +33,8 @@ class Construction():
     project: str
     # статус объекта
     status: ConstructionStatus
+    # Является ли складом
+    warehouse: Warehouse
     # дата создания
     date_creation: datetime
 
@@ -42,6 +52,13 @@ class Construction():
         Получение id
         '''
         return self.id
+
+
+    def warehouse(self) -> bool:
+        '''
+        Является ли объект складом
+        '''
+        return self.warehouse
 
 
     def get_date(self) -> datetime:
