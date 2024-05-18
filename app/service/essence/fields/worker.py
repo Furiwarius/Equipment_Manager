@@ -1,6 +1,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 import enum
+from construction import Construction
 
 class StatusWorker(enum.Enum):
     '''
@@ -35,6 +36,12 @@ class Worker():
     start_work: datetime
     # Статус работника
     status: StatusWorker
+    # Объект, на котором работник ответветственный
+    # Изначально None, тк работник
+    # может просто храниться в бд 
+    # и не находится на объете
+    # В бд этот атрибут хранится не будет
+    construction: Construction = None
 
 
     def __nonzero__(self) -> bool:
@@ -70,6 +77,16 @@ class Worker():
         '''
         return self.start_work
 
+
+    def get_construction(self) -> Construction:
+        '''
+        Получить объект, за который отвечает этот работник
+
+        Возвращает None, если не прикреплен к объекту
+        '''
+
+        return self.construction
+
     
     def change_title(self, new_job_title:str) -> None:
         '''
@@ -92,8 +109,30 @@ class Worker():
         self.start_work = new_date
 
 
-    def change_status(self) -> None:
+    def get_sick(self) -> None:
         '''
-        Изменение статуса работника
+        Работник заболевает
         '''
-        pass
+        self.status = StatusWorker.sick  
+
+
+    def  dismiss(self) -> None:
+        '''
+        Уволить работника
+        '''
+        self.status = StatusWorker.fired
+        self.construction = None
+        
+
+    def get_well(self) -> None:
+        '''
+        Работник выздоравливает
+        '''     
+        self.status = StatusWorker.works
+
+
+    def change_construction(self, construction: Construction) -> None:
+        '''
+        Сменить объект
+        '''
+        self.construction = construction
