@@ -28,6 +28,13 @@ class Construction():
     # дата создания
     date_creation: datetime
 
+    # Ответственный
+    # Для обхода ошибки взаимного
+    # класс Worker не указывается
+    worker: None
+    # Список инструментов
+    tools: list
+
 
     def __nonzero__(self) -> bool:
         return {self.status}
@@ -51,9 +58,55 @@ class Construction():
         return self.date_creation
     
 
-    # ВАЖНО! Так как, валидация данных происходит в другом классе,
-    # в методах изменения она отсутствует
+    def get_worker(self):
+        '''
+        Получить ответственного за этот объект
+
+        Вернет None, если ответственный не назначен
+        '''
+        return self.worker
     
+
+    def get_tools(self) -> list:
+        '''
+        Получение списка инструментов
+        '''
+        return self.tools
+    
+
+    # ВАЖНО! Так как, валидация данных происходит в другом классе,
+    # в методах изменения она отсутствует.
+    # Если в методах отсутствует анотация типа,
+    # то это сделано для избежания ошибки взаимного импорта
+    
+
+    def add_worker(self, worker) -> None:
+        '''
+        Назначить ответственного
+        '''
+        self.worker = worker
+
+
+    def add_tool(self, tool) -> None:
+        '''
+        Добавить инструмент
+
+        Если не назначен ответственный
+        работник или он не может работать, 
+        то вызывает исключение
+        '''
+        if self.worker:
+            self.tools.append(tool)
+        else:
+            raise ValueError("У объекта отсутствует ответственное лицо или оно нерабочее")
+    
+
+    def delete_tool(self, tool) -> None:
+        '''
+        Удалить объект
+        '''
+        self.tools.remove(tool)
+
 
     def change_date(self, new_date:datetime) -> None:
         '''
