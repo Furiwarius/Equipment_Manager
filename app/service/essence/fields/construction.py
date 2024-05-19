@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 import enum
+from tool import Tool
+from worker import Worker
 
 
 class ConstructionStatus(enum.Enum):
@@ -29,9 +31,7 @@ class Construction():
     date_creation: datetime
 
     # Ответственный
-    # Для обхода ошибки взаимного
-    # класс Worker не указывается
-    worker: None
+    worker: Worker = None
     # Список инструментов
     tools: list
 
@@ -58,7 +58,7 @@ class Construction():
         return self.date_creation
     
 
-    def get_worker(self):
+    def get_worker(self) -> Worker:
         '''
         Получить ответственного за этот объект
 
@@ -76,18 +76,16 @@ class Construction():
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,
     # в методах изменения она отсутствует.
-    # Если в методах отсутствует анотация типа,
-    # то это сделано для избежания ошибки взаимного импорта
     
 
-    def add_worker(self, worker) -> None:
+    def add_worker(self, worker:Worker) -> None:
         '''
         Назначить ответственного
         '''
         self.worker = worker
 
 
-    def add_tool(self, tool) -> None:
+    def add_tool(self, tool:Tool) -> None:
         '''
         Добавить инструмент
 
@@ -101,7 +99,7 @@ class Construction():
             raise ValueError("У объекта отсутствует ответственное лицо или оно нерабочее")
     
 
-    def delete_tool(self, tool) -> None:
+    def delete_tool(self, tool:Tool) -> None:
         '''
         Удалить объект
         '''
