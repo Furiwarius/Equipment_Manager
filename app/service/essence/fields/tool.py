@@ -1,7 +1,6 @@
 from datetime import datetime
 from dataclasses import dataclass
 import enum
-from construction import Construction
 
 class ToolStatus(enum.Enum):
     '''
@@ -25,7 +24,8 @@ class Tool():
     status: ToolStatus
     # Информация об объекте не храниться в бд
     # Нужна для более простого изменения взаимосвязей между классами
-    construction: Construction
+    # id Объекта строительства
+    construction: int
 
 
     def __nonzero__(self) -> bool:
@@ -40,7 +40,7 @@ class Tool():
         return self.import_date
     
 
-    def get_construction(self) -> Construction:
+    def get_construction(self) -> int:
         '''
         Возвращает объект, склад на котором находится инструмент
         '''
@@ -56,7 +56,7 @@ class Tool():
         self.import_date = new_date
 
 
-    def move_tool(self, construction: Construction) -> None:
+    def move_tool(self, construction: int) -> None:
         '''
         Переместить инструмент
         '''
