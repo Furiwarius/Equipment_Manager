@@ -17,34 +17,28 @@ class Storekeeper():
     # id аккаунта к которому будет 
     # прикреплена информация в таблице belonging
     user_id: int
-    # Хранение взаимосвязей
-    belonging:list
+    # Объекты хранятся в словарях в виде {id:object}
     # Инструменты
-    tools: list
+    tools: dict
     # Работники
-    workers: list
-    
+    workers: dict
     # Отличие объектов от складов в плане хранения
     # в том, что на склады можно перемещать сломанный инструмент
     # Объекты
-    constructions: list
+    constructions: dict
     # Склады
-    storages: list
+    storages: dict
 
 
-    def add_tool(self, new_tool:Tool, storage:Storage, worker:Worker) -> None:
+    def add_tool(self, new_tool:Tool, storage:Storage) -> None:
         '''
         Добавление нового инструмента на склад
         '''
         # если этот инструмент еще не добавлен, и работник и склад есть в списках
-        if worker in self.workers and storage in self.storages and new_tool not in self.tools:
+        if storage in self.storages and new_tool not in self.tools:
 
-            self.tools.append(new_tool)
-            
-            new_belonging = Belonging(user_id=self.user_id,
-                                                construction_id=storage.id,
-                                                worker_id=worker.id)
-            self.belonging.append(new_belonging)
+            self.tools[new_tool.get_id()] = new_tool
+            storage.add_tool(new_tool)
 
 
     def move_tool(self, tool:Tool, where) -> None:
@@ -55,8 +49,19 @@ class Storekeeper():
         where - новое место (Construction или Storage)
         '''
         if tool in self.tools and where in self.storages or where in self.constructions:
-            if isinstance(where, Construction) and where:
-                pass
+            if isinstance(where, Construction) and where and tool:
+                self.__operations_moving_tool(tool, where)
+            elif isinstance(where, Storage):
+                self.__operations_moving_tool(tool, where)
+
+
+    def __operations_moving_tool(self, tool:Tool, where) -> None:
+        '''
+        Операции по перемещению инструмента
+        '''
+        self.constructions[tool.get_construction()].delete_tool(tool)
+        tool.move_tool(where.get_id())
+        where.add_tool(tool)
 
     
 
