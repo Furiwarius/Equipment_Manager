@@ -1,7 +1,6 @@
 from datetime import datetime
 from dataclasses import dataclass
 import enum
-from construction import Construction
 
 class StatusWorker(enum.Enum):
     '''
@@ -36,12 +35,12 @@ class Worker():
     start_work: datetime
     # Статус работника
     status: StatusWorker
-    # Объект, на котором работник ответветственный
+    # Id объекта, на котором работник ответветственный
     # Изначально None, тк работник
     # может просто храниться в бд 
     # и не находится на объете
     # В бд этот атрибут хранится не будет
-    construction: Construction = None
+    construction: int = None
 
 
     def __nonzero__(self) -> bool:
@@ -78,7 +77,7 @@ class Worker():
         return self.start_work
 
 
-    def get_construction(self) -> Construction:
+    def get_construction(self) -> int:
         '''
         Получить объект, за который отвечает этот работник
 
@@ -131,7 +130,7 @@ class Worker():
         self.status = StatusWorker.works
 
 
-    def change_construction(self, construction: Construction) -> None:
+    def change_construction(self, construction: int) -> None:
         '''
         Сменить объект
         '''
