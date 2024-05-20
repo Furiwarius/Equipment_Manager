@@ -10,7 +10,7 @@ class SenderCode():
     Отправитель сообщений
     '''
 
-    setting_code = r"setting\setting_code.ini"
+    setting_code = r"app\setting\setting_code.ini"
 
 
     def __init__(self, __to_email:str) -> bool:

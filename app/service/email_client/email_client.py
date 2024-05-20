@@ -1,7 +1,7 @@
 import smtplib
 from configparser import ConfigParser
 import jinja2
-from app.settings import EMAIL, PASSWORD
+from app.settings.settings import EMAIL, PASSWORD
 
 class EmailClient():
     '''
@@ -11,7 +11,7 @@ class EmailClient():
     default_template = "template_letter\default_template.txt"
 
     def __init__(self, 
-                 setting=r"app\service\email_client\setting\setting.ini") -> None:
+                 setting=r"app\setting\defoult_setting_email_client.ini") -> None:
         # Если не был передан путь с настройками
         # то используется путь по умолчанию
         self.setting = setting
