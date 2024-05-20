@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from tool import Tool
+from app.service.essence.fields.tool import Tool
 
 @dataclass
 class Storage():

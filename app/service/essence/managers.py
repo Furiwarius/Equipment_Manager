@@ -14,20 +14,29 @@ class Storekeeper():
     Класс, который занимается организацией
     '''
 
-    # id аккаунта к которому будет 
-    # прикреплена информация в таблице belonging
-    user_id: int
-    # Объекты хранятся в словарях в виде {id:object}
-    # Инструменты
-    tools: dict
-    # Работники
-    workers: dict
-    # Отличие объектов от складов в плане хранения
-    # в том, что на склады можно перемещать сломанный инструмент
-    # Объекты
-    constructions: dict
-    # Склады
-    storages: dict
+    def __init__(self, user_id:int) -> None:
+        # id аккаунта к которому будет 
+        # прикреплена информация в таблице belonging
+        self.user_id = user_id
+
+        # Объекты хранятся в словарях в виде {id:object}
+        # Инструменты
+        self.tools = dict()
+        # Работники
+        self.workers = dict()
+        # Отличие объектов от складов в плане хранения
+        # в том, что на склады можно перемещать сломанный инструмент
+        # Объекты
+        self.constructions = dict()
+        # Склады
+        self.storages = dict()
+
+
+    def filling_data(self) -> None:
+        '''
+        Метод, заполняющий поля tools, workers и тд,
+        данными из базы данных.
+        '''
 
 
     def add_tool(self, tool:Tool, storage:Storage) -> None:

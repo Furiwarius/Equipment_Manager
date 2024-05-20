@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
 import enum
-from tool import Tool
-from worker import Worker
+from app.service.essence.fields.tool import Tool
+from app.service.essence.fields.worker import Worker
 
 
 class ConstructionStatus(enum.Enum):
@@ -31,7 +31,7 @@ class Construction():
     date_creation: datetime
 
     # Ответственный
-    worker: int = None
+    worker: int
     # Список инструментов
     tools: list
 
