@@ -42,7 +42,7 @@ class Tool():
 
     def get_construction(self) -> int:
         '''
-        Возвращает объект, склад на котором находится инструмент
+        Возвращает id объекта, склада на котором находится инструмент
         '''
         return self.construction
 

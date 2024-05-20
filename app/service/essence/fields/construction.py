@@ -31,7 +31,7 @@ class Construction():
     date_creation: datetime
 
     # Ответственный
-    worker: Worker = None
+    worker: int = None
     # Список инструментов
     tools: list
 
@@ -58,9 +58,9 @@ class Construction():
         return self.date_creation
     
 
-    def get_worker(self) -> Worker:
+    def get_worker(self) -> int:
         '''
-        Получить ответственного за этот объект
+        Получить id ответственного за этот объект
 
         Вернет None, если ответственный не назначен
         '''

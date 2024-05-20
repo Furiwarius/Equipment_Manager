@@ -20,6 +20,12 @@ class Storage():
         Получить список инструментов со склада
         '''
         return self.tools
+    
+    def get_id(self) -> int:
+        '''
+        Получить id склада
+        '''
+        return self.id
 
 
     def add_tool(self, tool: Tool) -> None:

@@ -130,8 +130,11 @@ class Worker():
         self.status = StatusWorker.works
 
 
-    def change_construction(self, construction: int) -> None:
+    def change_construction(self, construction: int = None) -> None:
         '''
         Сменить объект
+
+        Если необходимо удалить объект у работника,
+        то вызывается этот метод без атрибутов
         '''
         self.construction = construction
