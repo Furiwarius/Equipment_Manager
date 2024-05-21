@@ -1,29 +1,4 @@
-from tool import Tool
-from construction import Construction
-from worker import Worker
-
-class NonWorkingComponent(Exception):
-    '''
-    Вызывается, если попытаться использовать
-    неактивный экземпляр класса. Для избежания вызова
-    следует изменить статус используемого экземпляра 
-    на рабочий.
-    '''
-
-
-class BlankFields(Exception):
-    '''
-    Вызывается, если попытаться использовать
-    незаполненный экземпляр класса. Для избежания вызова
-    следует заполнить пустые поля.
-    '''
-    
-
-class MethodError(Exception):
-    '''
-    Вызывается при использовании неподходящего метода.
-    '''
-
+from my_exception import *
 
 def checking_fields_filled(field_list:list) -> None:
         for field in field_list:

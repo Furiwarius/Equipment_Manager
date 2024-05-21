@@ -1,142 +1,209 @@
-from tool import Tool
-from construction import Construction
-from worker import Worker
-from my_exception import checking_incoming_objects, checking_class, MethodError
+from dataclasses import dataclass
+from app.service.essence.fields.tool import Tool 
+from app.service.essence.fields.worker import Worker 
+from app.service.essence.fields.construction import Construction
+from app.service.essence.fields.belonging import Belonging
+from app.service.essence.fields.warehouse import Storage
 
 
-class ToolManager():
+@dataclass
+class Storekeeper():
     '''
-    Менеджер инструмента
-    '''
+    Кладовщик
 
-    def __init__(self, tool: Tool) -> None:
-
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.__init__.__annotations__, [tool])
-
-        self.tool = tool
-
-
-    def filling_fields (self, construction:Construction) -> None:
-        '''
-        Первоначальное заполненние полей инструмента.
-        Другие методы по измененнию полей и зависимостей
-        не будут работать до вызова этого метода
-        '''
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.filling_fields.__annotations__, [construction])
-        
-        self.tool.change_construction(construction)
-
-        # Добавление этого инструмента на объект
-        construction.add_tool(self.tool)
-
-
-class WorkerManager():
-    '''
-    Менеджер работников
+    Класс, который занимается организацией
     '''
 
-    def __init__(self, worker: Worker) -> None:
+    def __init__(self, user_id:int) -> None:
+        # id аккаунта к которому будет 
+        # прикреплена информация в таблице belonging
+        self.user_id = user_id
 
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.__init__.__annotations__, [worker])
-        self.worker = worker
+        # Объекты хранятся в словарях в виде {id:object}
+        # Инструменты
+        self.tools = dict()
+        # Работники
+        self.workers = dict()
+        # Отличие объектов от складов в плане хранения
+        # в том, что на склады можно перемещать сломанный инструмент
+        # Объекты
+        self.constructions = dict()
+        # Склады
+        self.storages = dict()
 
 
-    def set_construction(self, construction:Construction) -> None:
+    def filling_data(self) -> None:
         '''
-        Присвоение работнику зоны ответственности. Первоначальная настройка.
-        При вызове этого метода у работника не должно быть объекта строительства,
-        и у объекта строительства также не должно быть ответственного.
-        '''
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.set_construction.__annotations__, [construction])
-
-        if self.worker.get_construction()==None:
-            # Объект строительства добавляется к работнику
-            self.worker.change_construction(construction)
-            # Смена ответственного лица у объекта строительства
-            construction.change_responsible(self.worker)
-        else:
-            raise MethodError("У этого работника есть закрепленный за ним объект. Используйте метод employee_relocation")
-
-
-
-class ConstructionManager():
-    '''
-    Менеджер объектов
-    '''
-
-    def __init__(self, construction: Construction) -> None:
-        
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.__init__.__annotations__, [construction])
-
-        self.construction = construction
-
-
-
-    def moving_tool_from_object(self, tools:list, new_construction:Construction) -> None:
-        '''
-        Перемещение инструмента с текущего объекта на другой объект
-        '''
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.moving_tool_from_object.__annotations__, [tools, new_construction])
-
-        if self.construction.tool_check(tools):
-            self.construction.delete_tools(tools)
-            new_construction.add_tools(tools)
-            for tool in tools:
-                tool.change_construction(new_construction)
-        else:
-            raise AttributeError("Не все перемещаемые инструменты находятся на текущем объекте")
-
-
-    def removing_tool(self, tool:Tool) -> None:
-        '''
-        Удаление инструмента
-        '''
-        # Проверка передаваемых значений
-        checking_class(self.removing_tool.__annotations__, [tool])
-
-        if self.construction.tool_check([tool]):
-            self.construction.delete_tool(tool)
-
-        
-    def replace_person_responsible(self, new_responsible:Worker) -> None:
-        '''
-        Заменить ответственного лицо. 
-        У нового ответственного не должно быть закрепленного объекта.
+        Метод, заполняющий поля tools, workers и тд,
+        данными из базы данных.
         '''
 
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.replace_person_responsible.__annotations__, [new_responsible])
 
-        if new_responsible.get_construction()!=None:
-            raise MethodError("У нового ответственного есть закрепленный за ним объект")
-        
-        # Очищаем поле с объектом у текущего ответственного
-        self.construction.get_responsible().delete_construction()
-        # Добавляем нового ответственного на объект
-        self.construction.change_responsible(new_responsible)
-        # Заполняем новому ответственному поле с объектом
-        new_responsible.change_construction(self.construction)
+    def get_id_storages(self) -> list:
+        '''
+        Получение списка id складов
+        '''
+        return list(self.storages.keys())
     
 
-    def close_object(self, tool_storage_location:Construction) -> None:
+    def get_storage_by_id(self, id_storage:int) -> Storage:
         '''
-        Закрыть объект
+        Получение склада по id
         '''
-        # Проверка передаваемых значений
-        checking_incoming_objects(self.close_object.__annotations__, [tool_storage_location])
-        
-        # Получение списка инструменов у текущего объекта
-        tools = self.construction.get_tools()
-        # Переача инструментов новому объекту
-        for tool in tools:
-            tool.change_construction(tool_storage_location)
-        tool_storage_location.add_tools(tools)
-        # Удаление инструментов у текущего объекта
-        self.construction.delete_tools(tools)
-        self.construction.close_construction()
+        return self.storages.get(id_storage)
+    
+
+    def get_id_tools(self) -> list:
+        '''
+        Получение списка id инструментов
+        '''
+        return list(self.storages.keys())
+    
+
+    def get_tool_by_id(self, id_tool:int) -> Tool:
+        '''
+        Получение инструмента по id
+        '''
+        return self.tools.get(id_tool)
+
+
+    def get_id_workers(self) -> list:
+        '''
+        Получение списка id работников
+        '''
+        return list(self.workers.keys())
+
+
+    def get_worker_by_id(self, id_worker:int) -> Worker:
+        '''
+        Получение работника по id
+        '''
+        return self.workers.get(id_worker)
+
+
+    def get_id_construction(self) -> list:
+        '''
+        Получение списка id объектов строительства
+        '''
+        return list(self.constructions.keys())
+
+
+    def get_construction_by_id(self, id_constr:int) -> Construction:
+        '''
+        Получение объекта строительства по id
+        '''
+        return self.constructions.get(id_constr)
+
+
+    def add_tool(self, tool:Tool, storage:Storage) -> None:
+        '''
+        Добавление нового инструмента на склад
+        '''
+        # если этот инструмент еще не добавлен, и склад есть в списках
+        if storage.get_id() in self.get_id_storages() and tool.get_id() not in self.get_id_tools():
+            self.tools[tool.get_id()] = tool
+            storage.add_tool(tool)
+            tool.move_tool(storage.get_id())
+
+
+    def move_tool(self, tool:Tool, where) -> None:
+        '''
+        Перемещение инструмента
+
+        tool - перемещаемый инструмент
+        where - новое место (Construction или Storage)
+        На Storage можно перемещать нерабочий инструмент.
+        '''
+        if tool in self.tools and where in self.storages or where in self.constructions:
+            if isinstance(where, Construction) and where and tool and where.get_worker():
+                self.__operations_moving_tool(tool, where)
+
+            elif not isinstance(where.get_worker(), int):
+                raise AttributeError("На объекте не назначен ответственный")
+            
+            elif isinstance(where, Storage):
+                self.__operations_moving_tool(tool, where)
+        else:
+            raise AttributeError("Передаваемые атрибуты не добавлены")
+
+
+    def __operations_moving_tool(self, tool:Tool, where:Construction) -> None:
+        '''
+        Операции по перемещению инструмента
+        '''
+        self.constructions.get(tool.get_construction()).delete_tool(tool)
+        tool.move_tool(where.get_id())
+        where.add_tool(tool)
+
+
+    def delete_tool(self, tool: Tool) -> None:
+        '''
+        Удаление инструмента
+
+        Удалить инструмент можно, только 
+        если он находится на складе
+        '''
+        if tool.get_id() in self.tools and tool.get_construction() in self.storages:
+            self.storages.get(tool.get_construction()).delete_tool(tool)
+            self.tools.pop(tool.get_id())
+        else:
+            raise AttributeError("Инструмент находится на объекте. Переместите на склад.")
+
+
+    def add_construction(self, construction:Construction) -> None:
+        '''
+        Добавить объект строительства
+        '''
+        if construction.get_id() not in self.constructions:
+            self.constructions[construction.get_id()] = construction
+
+
+    def delete_construction(self, construction:Construction) -> None:
+        '''
+        Удалить объект строительства
+        '''
+        if construction.get_id() in self.constructions:
+            if not construction.get_tools():
+                # Если у объекта нет инструментов, то можем его удалять
+                self.constructions.pop(construction.get_id())
+                if construction.get_worker():
+                    # Если у объекта есть ответственный, то удаляем этот объект у него
+                    self.workers.get(construction.get_worker()).change_construction()
+
+
+    def add_storage(self, storage:Storage) -> None:
+        '''
+        Добавить склад
+        '''
+        if storage.get_id() not in self.storages:
+            self.storages[storage.get_id()] = storage
+
+    
+    def add_worker(self, worker:Worker) -> None:
+        '''
+        Добавить работника
+        '''
+        if worker.get_id() not in self.workers:
+            self.workers[worker.get_id()] = worker
+
+
+    def delete_worker(self, worker:Worker) -> None:
+        '''
+        Удалить работника
+        '''
+        if worker.get_id() in self.workers:
+            if not worker.get_construction():
+                raise AttributeError("Работник является ответственным лицом на объекте.")
+            else:
+                self.workers.pop(worker.get_id())
+
+
+    def appointment_responsible(self, worker:Worker, construction:Construction) -> None:
+        '''
+        Назначить ответственного на объект
+        '''
+        if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
+            self.add_worker(worker)
+            self.add_construction(construction)
+        construction.add_worker(worker)
+        worker.change_construction(construction.get_id())
