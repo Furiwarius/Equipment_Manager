@@ -12,10 +12,10 @@ class Storage():
     name: str
 
     # список инструментов
-    tools: list
+    tools: dict
 
 
-    def get_tools(self) -> list:
+    def get_tools(self) -> dict:
         '''
         Получить список инструментов со склада
         '''
@@ -32,11 +32,11 @@ class Storage():
         '''
         Добавить инструмент на склад
         '''
-        self.tools.append(tool)
+        self.tools[tool.get_id()] = tool
     
 
     def delete_tool(self, tool: Tool) -> None:
         '''
         Удалить инструмент со склада
         '''
-        self.tools.remove(tool)
+        self.tools.pop(tool.get_id())

@@ -100,7 +100,7 @@ class Storekeeper():
         Добавление нового инструмента на склад
         '''
         # если этот инструмент еще не добавлен, и склад есть в списках
-        if storage.get_id() in self.storages and tool.get_id() not in self.tools:
+        if storage.get_id() in self.get_id_storages() and tool.get_id() not in self.get_id_tools():
             self.tools[tool.get_id()] = tool
             storage.add_tool(tool)
             tool.move_tool(storage.get_id())

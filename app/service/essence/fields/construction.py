@@ -33,7 +33,7 @@ class Construction():
     # Ответственный
     worker: int
     # Список инструментов
-    tools: list
+    tools: dict
 
 
     def __nonzero__(self) -> bool:
@@ -94,7 +94,7 @@ class Construction():
         то вызывает исключение
         '''
         if self.worker:
-            self.tools.append(tool)
+            self.tools[tool.get_id()] = tool
         else:
             raise ValueError("У объекта отсутствует ответственное лицо или оно нерабочее")
     
@@ -103,7 +103,7 @@ class Construction():
         '''
         Удалить объект
         '''
-        self.tools.remove(tool)
+        self.tools.pop(tool.get_id())
 
 
     def change_date(self, new_date:datetime) -> None:
