@@ -39,11 +39,67 @@ class Storekeeper():
         '''
 
 
+    def get_id_storages(self) -> list:
+        '''
+        Получение списка id складов
+        '''
+        return list(self.storages.keys())
+    
+
+    def get_storage_by_id(self, id_storage:int) -> Storage:
+        '''
+        Получение склада по id
+        '''
+        return self.storages.get(id_storage)
+    
+
+    def get_id_tools(self) -> list:
+        '''
+        Получение списка id инструментов
+        '''
+        return list(self.storages.keys())
+    
+
+    def get_tool_by_id(self, id_tool:int) -> Tool:
+        '''
+        Получение инструмента по id
+        '''
+        return self.tools.get(id_tool)
+
+
+    def get_id_workers(self) -> list:
+        '''
+        Получение списка id работников
+        '''
+        return list(self.workers.keys())
+
+
+    def get_worker_by_id(self, id_worker:int) -> Worker:
+        '''
+        Получение работника по id
+        '''
+        return self.workers.get(id_worker)
+
+
+    def get_id_construction(self) -> list:
+        '''
+        Получение списка id объектов строительства
+        '''
+        return list(self.constructions.keys())
+
+
+    def get_construction_by_id(self, id_constr:int) -> Construction:
+        '''
+        Получение объекта строительства по id
+        '''
+        return self.constructions.get(id_constr)
+
+
     def add_tool(self, tool:Tool, storage:Storage) -> None:
         '''
         Добавление нового инструмента на склад
         '''
-        # если этот инструмент еще не добавлен, и работник и склад есть в списках
+        # если этот инструмент еще не добавлен, и склад есть в списках
         if storage.get_id() in self.storages and tool.get_id() not in self.tools:
             self.tools[tool.get_id()] = tool
             storage.add_tool(tool)
