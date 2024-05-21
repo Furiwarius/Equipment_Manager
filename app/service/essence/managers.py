@@ -120,7 +120,7 @@ class Storekeeper():
         Добавить склад
         '''
         if storage.get_id() not in self.storages:
-            self.constructions[storage.get_id()] = storage
+            self.storages[storage.get_id()] = storage
 
     
     def add_worker(self, worker:Worker) -> None:
