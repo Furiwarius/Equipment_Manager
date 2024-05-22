@@ -43,3 +43,13 @@ class TestSK():
         TestSK.storekeeper.add_worker(worker=worker)
         
         assert worker.get_id() in TestSK.storekeeper.get_id_workers()
+    
+
+    def test_add_construction(self):
+        '''
+        Тестирование метода по добавлению объекта строительства
+        '''
+        construction = TestSK.generator.constr_generator()
+        TestSK.storekeeper.add_construction(construction=construction)
+
+        assert construction.get_id() in TestSK.storekeeper.get_id_construction()
