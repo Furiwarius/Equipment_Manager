@@ -33,3 +33,13 @@ class TestSK():
         TestSK.storekeeper.add_tool(tool=tool, storage=storage)
         assert tool.get_construction()
         assert tool.get_id() in storage.get_tools() and tool.get_id() in TestSK.storekeeper.get_id_tools()
+
+    
+    def test_add_worker(self):
+        '''
+        Тестирование метода по добавлению работника
+        '''
+        worker = TestSK.generator.worker_generator()
+        TestSK.storekeeper.add_worker(worker=worker)
+        
+        assert worker.get_id() in TestSK.storekeeper.get_id_workers()
