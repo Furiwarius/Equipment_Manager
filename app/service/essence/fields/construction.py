@@ -71,7 +71,7 @@ class Construction():
         '''
         Получение списка инструментов
         '''
-        return self.tools
+        return self.tools.keys()
     
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,
@@ -82,7 +82,7 @@ class Construction():
         '''
         Назначить ответственного
         '''
-        self.worker = worker
+        self.worker = worker.get_id()
 
 
     def add_tool(self, tool:Tool) -> None:

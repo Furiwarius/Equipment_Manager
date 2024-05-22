@@ -57,7 +57,7 @@ class Storekeeper():
         '''
         Получение списка id инструментов
         '''
-        return list(self.storages.keys())
+        return list(self.tools.keys())
     
 
     def get_tool_by_id(self, id_tool:int) -> Tool:
@@ -106,7 +106,7 @@ class Storekeeper():
             tool.move_tool(storage.get_id())
 
 
-    def move_tool(self, tool:Tool, where) -> None:
+    def move_tool(self, tool:Tool, where:Construction) -> None:
         '''
         Перемещение инструмента
 
@@ -114,7 +114,7 @@ class Storekeeper():
         where - новое место (Construction или Storage)
         На Storage можно перемещать нерабочий инструмент.
         '''
-        if tool in self.tools and where in self.storages or where in self.constructions:
+        if tool.get_id() in self.tools and where.get_id() in self.storages or where.get_id() in self.constructions:
             if isinstance(where, Construction) and where and tool and where.get_worker():
                 self.__operations_moving_tool(tool, where)
 
@@ -127,11 +127,15 @@ class Storekeeper():
             raise AttributeError("Передаваемые атрибуты не добавлены")
 
 
-    def __operations_moving_tool(self, tool:Tool, where:Construction) -> None:
+    def __operations_moving_tool(self, tool:Tool, where:Storage) -> None:
         '''
         Операции по перемещению инструмента
         '''
-        self.constructions.get(tool.get_construction()).delete_tool(tool)
+        constr_id = tool.get_construction()
+        if constr_id in self.get_id_construction():
+            self.get_construction_by_id(tool.get_construction()).delete_tool(tool)
+        elif constr_id in self.get_id_storages():
+            self.get_storage_by_id(tool.get_construction()).delete_tool(tool)
         tool.move_tool(where.get_id())
         where.add_tool(tool)
 
@@ -205,5 +209,17 @@ class Storekeeper():
         if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
             self.add_worker(worker)
             self.add_construction(construction)
+        self.__remove_construction(construction)
+        
         construction.add_worker(worker)
         worker.change_construction(construction.get_id())
+
+    
+    def __remove_construction(self, construction:Construction) -> None:
+        '''
+        Убрать объект у работника,
+        который отвечает за данных объект
+        '''
+        if construction.get_worker():
+            worker = self.get_worker_by_id(construction.get_worker())
+            worker.change_construction()

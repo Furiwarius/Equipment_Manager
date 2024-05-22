@@ -115,7 +115,7 @@ class Worker():
         self.status = StatusWorker.sick  
 
 
-    def  dismiss(self) -> None:
+    def dismiss(self) -> None:
         '''
         Уволить работника
         '''
