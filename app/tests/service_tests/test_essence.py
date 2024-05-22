@@ -29,9 +29,9 @@ class TestSK():
         storage = TestSK.generator.storage_generator()
         TestSK.storekeeper.add_storage(storage=storage)
         
-        tool = TestSK.generator.tool_renerator()
+        tool = TestSK.generator.tool_generator()
         TestSK.storekeeper.add_tool(tool=tool, storage=storage)
-        assert tool.get_construction()
+        assert tool.get_construction()==storage.get_id()
         assert tool.get_id() in storage.get_tools() and tool.get_id() in TestSK.storekeeper.get_id_tools()
 
     
@@ -65,3 +65,16 @@ class TestSK():
         TestSK.storekeeper.appointment_responsible(worker=worker, construction=construction)
 
         assert worker.get_id()==construction.get_worker() and worker.get_construction()==construction.get_id()
+    
+
+    def test_move_tool(self):
+        '''
+        Тестирование метода по перемещению инструмента
+        '''
+        tool = TestSK.storekeeper.get_tool_by_id(TestSK.storekeeper.get_id_tools()[0])
+        construction = TestSK.storekeeper.get_construction_by_id(TestSK.storekeeper.get_id_construction()[0])
+
+        TestSK.storekeeper.move_tool(tool=tool, where=construction)
+
+        assert tool.get_construction()==construction.get_id()
+        assert tool.get_id() in construction.get_tools()
