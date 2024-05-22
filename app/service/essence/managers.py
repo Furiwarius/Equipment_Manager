@@ -205,5 +205,17 @@ class Storekeeper():
         if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
             self.add_worker(worker)
             self.add_construction(construction)
+        self.__remove_construction(construction)
+        
         construction.add_worker(worker)
         worker.change_construction(construction.get_id())
+
+    
+    def __remove_construction(self, construction:Construction) -> None:
+        '''
+        Убрать объект у работника,
+        который отвечает за данных объект
+        '''
+        if construction.get_worker():
+            worker = self.get_worker_by_id(construction.get_worker())
+            worker.change_construction()
