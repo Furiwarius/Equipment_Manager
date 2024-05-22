@@ -82,7 +82,7 @@ class Construction():
         '''
         Назначить ответственного
         '''
-        self.worker = worker
+        self.worker = worker.get_id()
 
 
     def add_tool(self, tool:Tool) -> None:

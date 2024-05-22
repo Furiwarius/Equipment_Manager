@@ -53,3 +53,15 @@ class TestSK():
         TestSK.storekeeper.add_construction(construction=construction)
 
         assert construction.get_id() in TestSK.storekeeper.get_id_construction()
+    
+
+    def test_appointment_responsible(self):
+        '''
+        Тестирование метода по назначению ответственного лица на объект
+        '''
+        construction = TestSK.storekeeper.get_construction_by_id(TestSK.storekeeper.get_id_construction()[0])
+        worker = TestSK.storekeeper.get_worker_by_id(TestSK.storekeeper.get_id_workers()[0])
+        
+        TestSK.storekeeper.appointment_responsible(worker=worker, construction=construction)
+
+        assert worker.get_id()==construction.get_worker() and worker.get_construction()==construction.get_id()
