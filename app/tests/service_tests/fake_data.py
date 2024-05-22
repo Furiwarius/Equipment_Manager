@@ -63,7 +63,7 @@ class DataGenerator():
         status = ConstructionStatus.under_construction
         date = datetime.now()
         worker = None
-        tools = []
+        tools = dict()
 
         new_construction = Construction(id=random_id,
                                         name=name,
@@ -81,7 +81,7 @@ class DataGenerator():
         '''
         random_id = randrange(1, 100)
         name = f"storage{random_id}"
-        tools = []
+        tools = dict()
 
         new_storage = Storage(id=random_id,
                               name=name,

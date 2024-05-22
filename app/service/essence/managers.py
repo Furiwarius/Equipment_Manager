@@ -57,7 +57,7 @@ class Storekeeper():
         '''
         Получение списка id инструментов
         '''
-        return list(self.storages.keys())
+        return list(self.tools.keys())
     
 
     def get_tool_by_id(self, id_tool:int) -> Tool:
