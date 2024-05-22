@@ -71,7 +71,7 @@ class Construction():
         '''
         Получение списка инструментов
         '''
-        return self.tools
+        return self.tools.keys()
     
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,

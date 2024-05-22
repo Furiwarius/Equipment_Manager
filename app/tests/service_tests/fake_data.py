@@ -35,7 +35,7 @@ class DataGenerator():
         return new_worker
     
 
-    def tool_renerator(self) -> Tool:
+    def tool_generator(self) -> Tool:
         '''
         Генератор инструментов
         '''
