@@ -206,13 +206,15 @@ class Storekeeper():
         '''
         Назначить ответственного на объект
         '''
-        if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
-            self.add_worker(worker)
-            self.add_construction(construction)
-        self.__remove_construction(construction)
+        if worker:
+            # Если работник в состоянии работать, то:
+            if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
+                self.add_worker(worker)
+                self.add_construction(construction)
+            self.__remove_construction(construction)
         
-        construction.add_worker(worker)
-        worker.change_construction(construction.get_id())
+            construction.add_worker(worker)
+            worker.change_construction(construction.get_id())
 
     
     def __remove_construction(self, construction:Construction) -> None:
