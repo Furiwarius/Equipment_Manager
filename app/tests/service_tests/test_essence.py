@@ -55,9 +55,9 @@ class TestSK():
         assert construction.get_id() in TestSK.storekeeper.get_id_construction()
     
 
-    def test_appointment_responsible(self):
+    def test_appointment_healthy_responsible(self):
         '''
-        Тестирование метода по назначению ответственного лица на объект
+        Тестирование метода по назначению ответственного лица на объект (Работник здоров)
         '''
         construction = TestSK.storekeeper.get_construction_by_id(TestSK.storekeeper.get_id_construction()[0])
         worker = TestSK.storekeeper.get_worker_by_id(TestSK.storekeeper.get_id_workers()[0])
@@ -65,6 +65,20 @@ class TestSK():
         TestSK.storekeeper.appointment_responsible(worker=worker, construction=construction)
 
         assert worker.get_id()==construction.get_worker() and worker.get_construction()==construction.get_id()
+    
+
+    def test_appointment_sick_responsible(self):
+        '''
+        Тестирование метода по назначению ответственного лица на объект (Работник болен)
+        '''
+        sick_worker = TestSK.generator.worker_generator()
+        sick_worker.get_sick()
+        construction = TestSK.storekeeper.get_construction_by_id(TestSK.storekeeper.get_id_construction()[0])
+        
+        TestSK.storekeeper.appointment_responsible(worker=sick_worker, construction=construction)
+
+        assert sick_worker.get_id()!=construction.get_worker()
+        assert sick_worker.get_construction()!=construction.get_id()
     
 
     def test_move_tool(self):
