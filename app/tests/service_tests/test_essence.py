@@ -104,11 +104,13 @@ class TestSK():
         '''
         tool = TestSK.stock.get_tool_by_id(TestSK.stock.get_id_tools()[0])
         construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
+        storage = TestSK.stock.get_storage_by_id(tool.get_construction())
 
         TestSK.stock.move_tool(tool=tool, where=construction)
 
         assert tool.get_construction()==construction.get_id()
         assert tool.get_id() in construction.get_tools()
+        assert tool.get_id() not in storage.get_tools()
     
 
     def test_move_broken_tool(self):
@@ -128,3 +130,16 @@ class TestSK():
         assert broken_tool.get_id() in storage.get_tools()
         assert broken_tool.get_id() not in construction.get_tools()
         assert broken_tool.get_construction()==storage.get_id()
+
+
+    def test_move_broken_tool_to_storage(self):
+        '''
+        Тестирование метода по перемещению сломанного
+        инструмента со объекта на склад
+        '''
+        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
+        tool = TestSK.stock.get_tool_by_id(construction.get_tools()[0])
+        tool.break_tool()
+        storage = TestSK.stock.get_storage_by_id(TestSK.stock.get_id_storages()[0])
+        
+        TestSK.stock.move_tool(tool=tool, where=storage)

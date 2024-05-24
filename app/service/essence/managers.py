@@ -118,10 +118,6 @@ class Storekeeper():
             condition = tool.get_status()==ToolStatus.works and where.get_status()==ConstructionStatus.works
             if isinstance(where, Construction) and condition and where.get_worker():
                 self.__operations_moving_tool(tool, where)
-
-            elif not isinstance(where.get_worker(), int):
-                raise AttributeError("На объекте не назначен ответственный")
-            
             elif isinstance(where, Storage):
                 self.__operations_moving_tool(tool, where)
         else:
