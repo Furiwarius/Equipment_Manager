@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from app.service.essence.fields.tool import Tool 
-from app.service.essence.fields.worker import Worker 
+from app.service.essence.fields.worker import Worker, StatusWorker
 from app.service.essence.fields.construction import Construction
 from app.service.essence.fields.belonging import Belonging
 from app.service.essence.fields.warehouse import Storage
@@ -206,7 +206,7 @@ class Storekeeper():
         '''
         Назначить ответственного на объект
         '''
-        if worker:
+        if worker.get_status() is StatusWorker.works:
             # Если работник в состоянии работать, то:
             if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
                 self.add_worker(worker)

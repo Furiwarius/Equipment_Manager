@@ -45,7 +45,7 @@ class Worker():
 
     def __nonzero__(self) -> bool:
 
-        return self.status
+        return self.status 
     
 
     def __str__(self) -> str:
@@ -61,6 +61,13 @@ class Worker():
         Получение id
         '''
         return self.id
+
+
+    def get_status(self) -> StatusWorker:
+        '''
+        Получение статуса работника
+        '''
+        return self.status
 
 
     def get_phone_number(self) -> str:
