@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from app.service.essence.fields.tool import Tool 
+from app.service.essence.fields.tool import Tool, ToolStatus
 from app.service.essence.fields.worker import Worker, StatusWorker
-from app.service.essence.fields.construction import Construction
+from app.service.essence.fields.construction import Construction, ConstructionStatus
 from app.service.essence.fields.belonging import Belonging
 from app.service.essence.fields.warehouse import Storage
 
@@ -115,7 +115,8 @@ class Storekeeper():
         На Storage можно перемещать нерабочий инструмент.
         '''
         if tool.get_id() in self.tools and where.get_id() in self.storages or where.get_id() in self.constructions:
-            if isinstance(where, Construction) and where and tool and where.get_worker():
+            condition = tool.get_status()==ToolStatus.works and where.get_status()==ConstructionStatus.works
+            if isinstance(where, Construction) and condition and where.get_worker():
                 self.__operations_moving_tool(tool, where)
 
             elif not isinstance(where.get_worker(), int):

@@ -9,7 +9,7 @@ class ConstructionStatus(enum.Enum):
     '''
     Статус объекта
     '''
-    under_construction = True
+    works = True
     stopped = True
     finished = False
 
@@ -34,10 +34,6 @@ class Construction():
     worker: int
     # Список инструментов
     tools: dict
-
-
-    def __nonzero__(self) -> bool:
-        return {self.status}
     
 
     def __str__(self) -> str:
@@ -50,6 +46,13 @@ class Construction():
         '''
         return self.id
 
+
+    def get_status(self) -> ConstructionStatus:
+        '''
+        Получение статуса объекта
+        '''
+        return self.status
+    
 
     def get_date(self) -> datetime:
         '''
@@ -138,4 +141,4 @@ class Construction():
         '''
         Возобновление строительства
         '''
-        self.status = ConstructionStatus.under_construction
+        self.status = ConstructionStatus.works

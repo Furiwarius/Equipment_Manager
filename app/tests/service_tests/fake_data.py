@@ -60,7 +60,7 @@ class DataGenerator():
         random_id = randrange(1, 100)
         name = f"construction{random_id}"
         project = f"project{random_id}"
-        status = ConstructionStatus.under_construction
+        status = ConstructionStatus.works
         date = datetime.now()
         worker = None
         tools = dict()

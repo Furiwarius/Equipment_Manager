@@ -41,15 +41,9 @@ class Worker():
     # и не находится на объете
     # В бд этот атрибут хранится не будет
     construction: int = None
-
-
-    def __nonzero__(self) -> bool:
-
-        return self.status 
     
 
     def __str__(self) -> str:
-
         if self.job_title:
             return f"{self.name} {self.surname} {self.job_title}"
         
