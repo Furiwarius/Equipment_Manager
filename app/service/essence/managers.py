@@ -206,7 +206,7 @@ class Storekeeper():
         '''
         Назначить ответственного на объект
         '''
-        if worker.get_status() is StatusWorker.works:
+        if worker.get_status() is StatusWorker.works and not worker.get_construction():
             # Если работник в состоянии работать, то:
             if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
                 self.add_worker(worker)
