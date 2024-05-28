@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from app.service.essence.fields.tool import Tool, ToolStatus
 from app.service.essence.fields.worker import Worker, StatusWorker
 from app.service.essence.fields.construction import Construction, ConstructionStatus
@@ -104,6 +105,7 @@ class Storekeeper():
             self.tools[tool.get_id()] = tool
             storage.add_tool(tool)
             tool.move_tool(storage.get_id())
+            tool.change_date(datetime.now())
 
 
     def move_tool(self, tool:Tool, where:Construction) -> None:
@@ -134,6 +136,7 @@ class Storekeeper():
         elif constr_id in self.get_id_storages():
             self.get_storage_by_id(tool.get_construction()).delete_tool(tool)
         tool.move_tool(where.get_id())
+        tool.change_date(datetime.now())
         where.add_tool(tool)
 
 
@@ -212,11 +215,12 @@ class Storekeeper():
         
             construction.add_worker(worker)
             worker.change_construction(construction.get_id())
+            worker.change_date_work(datetime.now())
 
     
     def __remove_construction(self, construction:Construction) -> None:
         '''
-        Убрать объект у работника,
+        Убрать объект у предыдущего работника,
         который отвечает за данных объект
         '''
         if construction.get_worker():
