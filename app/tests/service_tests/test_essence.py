@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 from app.service.essence.managers import Storekeeper
 from app.tests.service_tests.fake_data import DataGenerator
 
@@ -33,6 +34,7 @@ class TestSK():
         TestSK.stock.add_tool(tool=tool, storage=storage)
         assert tool.get_construction()==storage.get_id()
         assert tool.get_id() in storage.get_tools() and tool.get_id() in TestSK.stock.get_id_tools()
+        assert datetime.now()==tool.get_import_date()
 
     
     def test_add_worker(self):
@@ -65,6 +67,7 @@ class TestSK():
         TestSK.stock.appointment_responsible(worker=worker, construction=construction)
 
         assert worker.get_id()==construction.get_worker() and worker.get_construction()==construction.get_id()
+        assert datetime.now()==worker.get_date_work()
     
 
     def test_appointment_sick_responsible(self):
@@ -111,6 +114,7 @@ class TestSK():
         assert tool.get_construction()==construction.get_id()
         assert tool.get_id() in construction.get_tools()
         assert tool.get_id() not in storage.get_tools()
+        assert datetime.now()==tool.get_import_date()
     
 
     def test_move_broken_tool(self):
