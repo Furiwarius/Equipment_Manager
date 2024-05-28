@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from app.service.essence.fields.tool import Tool 
-from app.service.essence.fields.worker import Worker 
-from app.service.essence.fields.construction import Construction
+from datetime import datetime
+from app.service.essence.fields.tool import Tool, ToolStatus
+from app.service.essence.fields.worker import Worker, StatusWorker
+from app.service.essence.fields.construction import Construction, ConstructionStatus
 from app.service.essence.fields.belonging import Belonging
 from app.service.essence.fields.warehouse import Storage
 
@@ -104,6 +105,7 @@ class Storekeeper():
             self.tools[tool.get_id()] = tool
             storage.add_tool(tool)
             tool.move_tool(storage.get_id())
+            tool.change_date(datetime.now())
 
 
     def move_tool(self, tool:Tool, where:Construction) -> None:
@@ -115,12 +117,9 @@ class Storekeeper():
         На Storage можно перемещать нерабочий инструмент.
         '''
         if tool.get_id() in self.tools and where.get_id() in self.storages or where.get_id() in self.constructions:
-            if isinstance(where, Construction) and where and tool and where.get_worker():
+            condition = tool.get_status()==ToolStatus.works and where.get_status()==ConstructionStatus.works
+            if isinstance(where, Construction) and condition and where.get_worker():
                 self.__operations_moving_tool(tool, where)
-
-            elif not isinstance(where.get_worker(), int):
-                raise AttributeError("На объекте не назначен ответственный")
-            
             elif isinstance(where, Storage):
                 self.__operations_moving_tool(tool, where)
         else:
@@ -137,6 +136,7 @@ class Storekeeper():
         elif constr_id in self.get_id_storages():
             self.get_storage_by_id(tool.get_construction()).delete_tool(tool)
         tool.move_tool(where.get_id())
+        tool.change_date(datetime.now())
         where.add_tool(tool)
 
 
@@ -206,7 +206,7 @@ class Storekeeper():
         '''
         Назначить ответственного на объект
         '''
-        if worker:
+        if worker.get_status() is StatusWorker.works and not worker.get_construction():
             # Если работник в состоянии работать, то:
             if construction.get_id() not in self.constructions or worker.get_id() not in self.workers:
                 self.add_worker(worker)
@@ -215,11 +215,12 @@ class Storekeeper():
         
             construction.add_worker(worker)
             worker.change_construction(construction.get_id())
+            worker.change_date_work(datetime.now())
 
     
     def __remove_construction(self, construction:Construction) -> None:
         '''
-        Убрать объект у работника,
+        Убрать объект у предыдущего работника,
         который отвечает за данных объект
         '''
         if construction.get_worker():

@@ -9,7 +9,7 @@ class ConstructionStatus(enum.Enum):
     '''
     Статус объекта
     '''
-    under_construction = True
+    works = True
     stopped = True
     finished = False
 
@@ -20,7 +20,7 @@ class Construction():
     Объект
     '''
 
-    id: int
+    id: str
     # название объекта
     name: str
     # номер проекта или договора подряда
@@ -34,22 +34,27 @@ class Construction():
     worker: int
     # Список инструментов
     tools: dict
-
-
-    def __nonzero__(self) -> bool:
-        return {self.status}
     
 
     def __str__(self) -> str:
         return f"{self.name} {self.project}"
 
 
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         '''
         Получение id
+        
+        У объекта строительства у id имеется приписка 'C'
         '''
         return self.id
 
+
+    def get_status(self) -> ConstructionStatus:
+        '''
+        Получение статуса объекта
+        '''
+        return self.status
+    
 
     def get_date(self) -> datetime:
         '''
@@ -71,7 +76,7 @@ class Construction():
         '''
         Получение списка инструментов
         '''
-        return self.tools.keys()
+        return list(self.tools.keys())
     
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,
@@ -138,4 +143,4 @@ class Construction():
         '''
         Возобновление строительства
         '''
-        self.status = ConstructionStatus.under_construction
+        self.status = ConstructionStatus.works

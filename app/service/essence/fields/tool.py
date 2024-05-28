@@ -26,17 +26,26 @@ class Tool():
     # Нужна для более простого изменения взаимосвязей между классами
     # id Объекта строительства
     construction: int
-
-
-    def __nonzero__(self) -> bool:
-        return self.status
     
 
     def get_id(self) -> int:
+        '''
+        Получение id объекта
+        '''
         return self.id
 
 
+    def get_status(self) -> ToolStatus:
+        '''
+        Получение статуса объекта
+        '''
+        return self.status
+
+
     def get_import_date(self) -> datetime:
+        '''
+        Получение даты перемещения объекта
+        '''
         return self.import_date
     
 
