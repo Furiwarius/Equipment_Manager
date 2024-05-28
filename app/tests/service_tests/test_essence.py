@@ -169,3 +169,18 @@ class TestSK():
 
         assert tool.get_id() not in storage.get_tools()
         assert tool.get_id() not in self.stock.get_id_tools()
+
+    
+    def test_remove_tool_from_construction(self):
+        '''
+        Удаление инструмента с объекта строительства
+        '''
+        constr = self.stock.get_construction_by_id((self.stock.get_id_construction()[0]))
+        tool = self.stock.get_tool_by_id(self.stock.get_id_tools()[0])
+        self.stock.move_tool(tool=tool, where=constr)
+        
+        try:
+            self.stock.delete_tool(tool)
+            assert False
+        except AttributeError: 
+            assert True
