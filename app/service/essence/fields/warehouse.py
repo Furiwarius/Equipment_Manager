@@ -7,7 +7,7 @@ class Storage():
     Склад
     '''
 
-    id: int
+    id: str
     # название склада
     name: str
 
@@ -21,9 +21,11 @@ class Storage():
         '''
         return self.tools
     
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         '''
         Получить id склада
+
+        У склада id имеет приписку 'S'
         '''
         return self.id
 

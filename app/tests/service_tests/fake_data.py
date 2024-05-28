@@ -57,7 +57,7 @@ class DataGenerator():
         '''
         Генератор объектов
         '''
-        random_id = randrange(1, 100)
+        random_id = f"C{randrange(1, 100)}"
         name = f"construction{random_id}"
         project = f"project{random_id}"
         status = ConstructionStatus.works
@@ -79,7 +79,7 @@ class DataGenerator():
         '''
         Генератор данных склада
         '''
-        random_id = randrange(1, 100)
+        random_id = f"S{randrange(1, 100)}"
         name = f"storage{random_id}"
         tools = dict()
 

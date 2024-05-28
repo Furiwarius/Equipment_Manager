@@ -20,7 +20,7 @@ class Construction():
     Объект
     '''
 
-    id: int
+    id: str
     # название объекта
     name: str
     # номер проекта или договора подряда
@@ -40,9 +40,11 @@ class Construction():
         return f"{self.name} {self.project}"
 
 
-    def get_id(self) -> int:
+    def get_id(self) -> str:
         '''
         Получение id
+        
+        У объекта строительства у id имеется приписка 'C'
         '''
         return self.id
 

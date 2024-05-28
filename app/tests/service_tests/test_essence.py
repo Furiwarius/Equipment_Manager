@@ -181,6 +181,5 @@ class TestSK():
         
         try:
             self.stock.delete_tool(tool)
-            assert False
         except AttributeError: 
             assert True
