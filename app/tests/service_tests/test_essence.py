@@ -147,3 +147,7 @@ class TestSK():
         storage = TestSK.stock.get_storage_by_id(TestSK.stock.get_id_storages()[0])
         
         TestSK.stock.move_tool(tool=tool, where=storage)
+
+        assert tool.get_id() in storage.get_tools() and tool.get_construction() is storage.get_id()
+        assert tool.get_id() not in construction.get_tools()
+        assert tool.get_import_date()==datetime.now()
