@@ -151,3 +151,21 @@ class TestSK():
         assert tool.get_id() in storage.get_tools() and tool.get_construction() is storage.get_id()
         assert tool.get_id() not in construction.get_tools()
         assert tool.get_import_date()==datetime.now()
+
+
+    def test_remove_tool_from_stock(self):
+        '''
+        Удаление инструмента со склада
+        '''
+        tool = self.generator.tool_generator()
+        storage = self.generator.storage_generator()
+        self.stock.add_storage(storage)
+        self.stock.add_tool(tool=tool, storage=storage)
+
+        assert tool.get_id() in self.stock.get_id_tools() 
+        assert storage.get_id() is tool.get_construction()
+
+        self.stock.delete_tool(tool)
+
+        assert tool.get_id() not in storage.get_tools()
+        assert tool.get_id() not in self.stock.get_id_tools()
