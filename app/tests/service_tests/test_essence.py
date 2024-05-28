@@ -17,23 +17,23 @@ class TestSK():
         '''
         Тестрирование метода по добавлению склада
         '''
-        storage = TestSK.generator.storage_generator()
-        TestSK.stock.add_storage(storage=storage)
+        storage = self.generator.storage_generator()
+        self.stock.add_storage(storage=storage)
 
-        assert storage.get_id() in TestSK.stock.storages.keys()
+        assert storage.get_id() in self.stock.storages.keys()
     
     
     def test_add_tool(self):
         '''
         Тестирование метода по добавлению инструмента
         '''
-        storage = TestSK.generator.storage_generator()
-        TestSK.stock.add_storage(storage=storage)
+        storage = self.generator.storage_generator()
+        self.stock.add_storage(storage=storage)
         
-        tool = TestSK.generator.tool_generator()
-        TestSK.stock.add_tool(tool=tool, storage=storage)
+        tool = self.generator.tool_generator()
+        self.stock.add_tool(tool=tool, storage=storage)
         assert tool.get_construction()==storage.get_id()
-        assert tool.get_id() in storage.get_tools() and tool.get_id() in TestSK.stock.get_id_tools()
+        assert tool.get_id() in storage.get_tools() and tool.get_id() in self.stock.get_id_tools()
         assert datetime.now()==tool.get_import_date()
 
     
@@ -41,30 +41,30 @@ class TestSK():
         '''
         Тестирование метода по добавлению работника
         '''
-        worker = TestSK.generator.worker_generator()
-        TestSK.stock.add_worker(worker=worker)
+        worker = self.generator.worker_generator()
+        self.stock.add_worker(worker=worker)
         
-        assert worker.get_id() in TestSK.stock.get_id_workers()
+        assert worker.get_id() in self.stock.get_id_workers()
     
 
     def test_add_construction(self):
         '''
         Тестирование метода по добавлению объекта строительства
         '''
-        construction = TestSK.generator.constr_generator()
-        TestSK.stock.add_construction(construction=construction)
+        construction = self.generator.constr_generator()
+        self.stock.add_construction(construction=construction)
 
-        assert construction.get_id() in TestSK.stock.get_id_construction()
+        assert construction.get_id() in self.stock.get_id_construction()
     
 
     def test_appointment_healthy_responsible(self):
         '''
         Тестирование метода по назначению ответственного лица на объект (Работник здоров)
         '''
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
-        worker = TestSK.stock.get_worker_by_id(TestSK.stock.get_id_workers()[0])
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
+        worker = self.stock.get_worker_by_id(self.stock.get_id_workers()[0])
         
-        TestSK.stock.appointment_responsible(worker=worker, construction=construction)
+        self.stock.appointment_responsible(worker=worker, construction=construction)
 
         assert worker.get_id()==construction.get_worker() and worker.get_construction()==construction.get_id()
         assert datetime.now()==worker.get_date_work()
@@ -74,11 +74,11 @@ class TestSK():
         '''
         Тестирование метода по назначению ответственного лица на объект (Работник болен)
         '''
-        sick_worker = TestSK.generator.worker_generator()
+        sick_worker = self.generator.worker_generator()
         sick_worker.get_sick()
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
         
-        TestSK.stock.appointment_responsible(worker=sick_worker, construction=construction)
+        self.stock.appointment_responsible(worker=sick_worker, construction=construction)
 
         assert sick_worker.get_id()!=construction.get_worker()
         assert sick_worker.get_construction()!=construction.get_id()
@@ -89,11 +89,11 @@ class TestSK():
         Тестирование метода по назначению на объект ответственного 
         лица с уже имеющимся объектом и инструментами на нем
         '''
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
-        worker = TestSK.stock.get_worker_by_id(construction.get_worker())
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
+        worker = self.stock.get_worker_by_id(construction.get_worker())
 
-        new_constr = TestSK.generator.constr_generator()
-        TestSK.stock.appointment_responsible(worker=worker,construction=new_constr)
+        new_constr = self.generator.constr_generator()
+        self.stock.appointment_responsible(worker=worker,construction=new_constr)
 
         assert construction.get_worker()==worker.get_id()
         assert worker.get_construction()==construction.get_id()
@@ -105,11 +105,11 @@ class TestSK():
         Тестирование метода по перемещению работающего 
         инструмента со склада на объект
         '''
-        tool = TestSK.stock.get_tool_by_id(TestSK.stock.get_id_tools()[0])
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
-        storage = TestSK.stock.get_storage_by_id(tool.get_construction())
+        tool = self.stock.get_tool_by_id(self.stock.get_id_tools()[0])
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
+        storage = self.stock.get_storage_by_id(tool.get_construction())
 
-        TestSK.stock.move_tool(tool=tool, where=construction)
+        self.stock.move_tool(tool=tool, where=construction)
 
         assert tool.get_construction()==construction.get_id()
         assert tool.get_id() in construction.get_tools()
@@ -122,14 +122,14 @@ class TestSK():
         Тестирование метода по перемещению сломанного
         инструмента со склада на объект
         '''
-        broken_tool = TestSK.generator.tool_generator()
+        broken_tool = self.generator.tool_generator()
         broken_tool.break_tool()
         
-        storage = TestSK.stock.get_storage_by_id(TestSK.stock.get_id_storages()[0])
-        TestSK.stock.add_tool(tool=broken_tool, storage=storage)
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
+        storage = self.stock.get_storage_by_id(self.stock.get_id_storages()[0])
+        self.stock.add_tool(tool=broken_tool, storage=storage)
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
 
-        TestSK.stock.move_tool(tool=broken_tool, where=construction)
+        self.stock.move_tool(tool=broken_tool, where=construction)
 
         assert broken_tool.get_id() in storage.get_tools()
         assert broken_tool.get_id() not in construction.get_tools()
@@ -141,12 +141,12 @@ class TestSK():
         Тестирование метода по перемещению сломанного
         инструмента со объекта на склад
         '''
-        construction = TestSK.stock.get_construction_by_id(TestSK.stock.get_id_construction()[0])
-        tool = TestSK.stock.get_tool_by_id(construction.get_tools()[0])
+        construction = self.stock.get_construction_by_id(self.stock.get_id_construction()[0])
+        tool = self.stock.get_tool_by_id(construction.get_tools()[0])
         tool.break_tool()
-        storage = TestSK.stock.get_storage_by_id(TestSK.stock.get_id_storages()[0])
+        storage = self.stock.get_storage_by_id(self.stock.get_id_storages()[0])
         
-        TestSK.stock.move_tool(tool=tool, where=storage)
+        self.stock.move_tool(tool=tool, where=storage)
 
         assert tool.get_id() in storage.get_tools() and tool.get_construction() is storage.get_id()
         assert tool.get_id() not in construction.get_tools()
