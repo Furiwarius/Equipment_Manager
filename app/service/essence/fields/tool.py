@@ -26,8 +26,10 @@ class Tool():
     # Нужна для более простого изменения взаимосвязей между классами
     # id Объекта строительства
     construction: int
-    
 
+
+    # В этом нет необходимости,
+    # можно просто обратиться к параметру tool.id
     def get_id(self) -> int:
         '''
         Получение id объекта
@@ -47,7 +49,7 @@ class Tool():
         Получение даты перемещения объекта
         '''
         return self.import_date
-    
+
 
     def get_construction(self) -> int:
         '''
@@ -77,7 +79,7 @@ class Tool():
         Сломать инструмент
         '''
         self.status = ToolStatus.faulty
-    
+
 
     def fix_tool(self) -> None:
         '''

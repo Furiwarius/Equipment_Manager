@@ -13,6 +13,23 @@ class ConstructionStatus(enum.Enum):
     stopped = True
     finished = False
 
+"""
+class ConstructionStatus(str, enum.Enum):
+    works = "works"
+    stopped = "stopped"
+    finished = "finished"
+
+>>> data = {... "status": "works"}
+>>> c = Construction(**data)
+>>> c.status == ConstructionStatus.works
+True
+>>> c.status == "works"
+True
+
+Енум нужен для того, чтобы ты смог передать в статус одно из вышеперечилсленных
+состояний, если придет что-то другое, то вызовется ошибка
+"""
+
 
 @dataclass
 class Construction():
@@ -34,7 +51,7 @@ class Construction():
     worker: int
     # Список инструментов
     tools: dict
-    
+
 
     def __str__(self) -> str:
         return f"{self.name} {self.project}"
@@ -43,7 +60,7 @@ class Construction():
     def get_id(self) -> str:
         '''
         Получение id
-        
+
         У объекта строительства у id имеется приписка 'C'
         '''
         return self.id
@@ -54,14 +71,14 @@ class Construction():
         Получение статуса объекта
         '''
         return self.status
-    
+
 
     def get_date(self) -> datetime:
         '''
         Получение даты начала работ на объекте
         '''
         return self.date_creation
-    
+
 
     def get_worker(self) -> int:
         '''
@@ -70,18 +87,18 @@ class Construction():
         Вернет None, если ответственный не назначен
         '''
         return self.worker
-    
+
 
     def get_tools(self) -> list:
         '''
         Получение списка инструментов
         '''
         return list(self.tools.keys())
-    
+
 
     # ВАЖНО! Так как, валидация данных происходит в другом классе,
     # в методах изменения она отсутствует.
-    
+
 
     def add_worker(self, worker:Worker) -> None:
         '''
@@ -95,14 +112,14 @@ class Construction():
         Добавить инструмент
 
         Если не назначен ответственный
-        работник или он не может работать, 
+        работник или он не может работать,
         то вызывает исключение
         '''
         if self.worker:
             self.tools[tool.get_id()] = tool
         else:
             raise ValueError("У объекта отсутствует ответственное лицо или оно нерабочее")
-    
+
 
     def delete_tool(self, tool:Tool) -> None:
         '''
@@ -123,21 +140,21 @@ class Construction():
         Изменение названия объекта
         '''
         self.name = new_name
-    
+
 
     def change_project(self, new_project:str) -> None:
         '''
         Изменение номера проекта или договора
         '''
         self.project = new_project
-    
+
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
         self.status = ConstructionStatus.finished
-    
+
 
     def open_construction(self):
         '''

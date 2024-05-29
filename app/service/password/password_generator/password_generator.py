@@ -1,3 +1,7 @@
+# Лучше использовать либо полный путь, чтобы было единообразно
+# или from .elements import ...
+# Это надо для того, чтобы питон не перепутал стороннюю библиотеку с твоим модулем
+# https://realpython.com/absolute-vs-relative-python-imports/
 from elements.letters import UniqueLetter
 from elements.numbers import UniqueNumber
 from elements.symbols import UniqueSymbol
@@ -9,7 +13,7 @@ class PasswordGenerator():
     '''
 
     def __init__(self) -> None:
-        
+
         self.kit = (UniqueLetter(), UniqueNumber(), UniqueSymbol())
 
 

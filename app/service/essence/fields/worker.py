@@ -14,7 +14,7 @@ class StatusWorker(enum.Enum):
     on_holiday = False
     # болеет
     sick = False
-    
+
 
 @dataclass
 class Worker():
@@ -28,7 +28,7 @@ class Worker():
     # Фамилия
     surname: str
     # Номер телефона
-    phone_number: int
+    phone_number: int  # Лучше в str инта много места жрет
     # Должность работника
     job_title: str
     # Дата начала работы на объекте
@@ -37,19 +37,21 @@ class Worker():
     status: StatusWorker
     # Id объекта, на котором работник ответветственный
     # Изначально None, тк работник
-    # может просто храниться в бд 
+    # может просто храниться в бд
     # и не находится на объете
     # В бд этот атрибут хранится не будет
     construction: int = None
-    
+    # лучше сразу указать, что это id будет понятнее
+    # construction_id: int = None
+
 
     def __str__(self) -> str:
         if self.job_title:
             return f"{self.name} {self.surname} {self.job_title}"
-        
+
         return f"{self.name}{self.surname}"
-        
-    
+
+
     def get_id(self) -> int:
         '''
         Получение id
@@ -69,7 +71,7 @@ class Worker():
         Получение номера работника
         '''
         return self.phone_number
-    
+
 
     def get_date_work(self) -> datetime:
         '''
@@ -87,20 +89,20 @@ class Worker():
 
         return self.construction
 
-    
+
     def change_title(self, new_job_title:str) -> None:
         '''
         Добавление должности
         '''
         self.job_title = new_job_title
 
-    
+
     def change_phone(self, new_number:str) -> None:
         '''
         Изменение номера телефона
         '''
         self.phone_number = new_number
-    
+
 
     def change_date_work(self, new_date:datetime) -> None:
         '''
@@ -113,7 +115,7 @@ class Worker():
         '''
         Работник заболевает
         '''
-        self.status = StatusWorker.sick  
+        self.status = StatusWorker.sick
 
 
     def dismiss(self) -> None:
@@ -122,12 +124,12 @@ class Worker():
         '''
         self.status = StatusWorker.fired
         self.construction = None
-        
+
 
     def get_well(self) -> None:
         '''
         Работник выздоравливает
-        '''     
+        '''
         self.status = StatusWorker.works
 
 

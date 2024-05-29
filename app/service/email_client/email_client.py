@@ -1,3 +1,7 @@
+"""Это клиент, он ходит в другие сервисы, и делает запросы на внешние сервисы.
+Для клиентов лучше сделать отдельный модуль:
+    app/clients/mail.py
+"""
 import smtplib
 from configparser import ConfigParser
 import jinja2
@@ -10,7 +14,7 @@ class EmailClient():
 
     default_template = "template_letter\default_template.txt"
 
-    def __init__(self, 
+    def __init__(self,
                  setting=r"app\setting\defoult_setting_email_client.ini") -> None:
         # Если не был передан путь с настройками
         # то используется путь по умолчанию
@@ -43,11 +47,11 @@ class EmailClient():
         Настройка содержания пиьсма
         '''
 
-        body = "\r\n".join((f"From: {self.user}", f"To: {self.to}", 
+        body = "\r\n".join((f"From: {self.user}", f"To: {self.to}",
         f"Subject: {self.subject}", self.mime, self.charset, "", str(message)))
 
         return body
-    
+
 
     def __send_bid(self, body_message:str) -> None:
         '''
@@ -73,7 +77,7 @@ class EmailClient():
         environment = jinja2.Environment()
         template = environment.from_string(template_file_content)
         letter = template.render(message=message)
-        
+
         return letter
 
 
@@ -83,7 +87,7 @@ class EmailClient():
         Главный метод-менеджер, принимающий почту,
         на которую нужно отправить сообщение, само сообщение
         и шаблон для письма
-        
+
         template - текстровый шаблон (путь до него), в который будет вставляться сообщение
         message - тест сообщения
         '''

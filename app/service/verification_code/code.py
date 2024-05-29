@@ -1,3 +1,8 @@
+"""В отличие от email_client это сервис, он хранится тут.
+
+Не будет ли удобнее все шаблоны хранить в одном месте?
+Например можно в корне проекта email_templates/
+"""
 from configparser import ConfigParser
 from app.service.email_client.email_client import EmailClient
 import random
@@ -29,7 +34,7 @@ class SenderCode():
         config = ConfigParser()
         config.read(SenderCode.setting_code)
 
-            # Настройки
+        # Настройки
         self.__code_lifetime = config.get("verification code", "code_lifetime")
 
         # в настройках хранятся относительные пути к файлам
@@ -46,7 +51,7 @@ class SenderCode():
         self.__code = random.randrange(10000, 99999)
         # время генерации кода, выраженное в секундах с начала эпохи
         self.code_generation_time = time.time()
-    
+
 
     def check_code(self, code:int) -> bool:
         '''
@@ -63,6 +68,6 @@ class SenderCode():
         '''
         Главный метод-менеджер, генерирующий код, и отправляющий его на почту
         '''
-        self.__email.send(user_to=self.__to, 
+        self.__email.send(user_to=self.__to,
                           message=self.__code,
                           template=path.abspath(self.__template))

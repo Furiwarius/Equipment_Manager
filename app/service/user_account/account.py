@@ -1,9 +1,9 @@
 from app.service.utilities.hashing import to_hash
 
 class Account():
-    
+
     def __init__(self, login:str, password:str, account_name:str, email:str) -> None:
-        
+
         # логин
         self.__login = to_hash(login)
         # пароль от аккаунта
@@ -14,6 +14,11 @@ class Account():
         self.__account_name = account_name
 
 
+    # В целом ок, но идеологически чтобы получить ответ да или нет, надо задать вопрос
+    # Логин правильный?
+    # Было бы правильнее переименовать на is_login_correct
+    # Это на твое усмотрение
+    # https://stackabuse.com/python-naming-conventions-for-variables-functions-and-classes/
     def check_login(self, transmitted_login:str) -> bool:
         '''
         Проверка логина
@@ -33,7 +38,7 @@ class Account():
         Проверка электронной почты
         '''
         return to_hash(transmitted_email)==self.__email
-    
+
 
     def change_password(self, new_password:str):
         '''
@@ -41,7 +46,7 @@ class Account():
         '''
         if self.__password == new_password:
             raise ValueError("Новый пароль не должен совпадать со старым")
-        
+
         self.__password = new_password
 
 
