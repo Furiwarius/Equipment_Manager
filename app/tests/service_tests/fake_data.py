@@ -10,12 +10,24 @@ class DataGenerator():
     '''
     Генератор данных
     '''
+    # набор цифр, которые будут использоваться как id
+    id = set([number for number in range(1000)])
+
+
+    def __generate_id(self) -> int:
+        '''
+        Генерация уникального id
+        '''
+        value = tuple(self.id)[randrange(0, len(self.id)-1)]
+        self.id.discard(value)
+        return value
+
 
     def worker_generator(self) -> Worker:
         '''
         Генератор работников
         '''
-        random_id = randrange(1, 100)
+        random_id = self.__generate_id()
         name = f"name{random_id}"
         surname = f"surname{random_id}"
         phone = randrange(89000000000, 89999999999)
@@ -39,7 +51,7 @@ class DataGenerator():
         '''
         Генератор инструментов
         '''
-        random_id = randrange(1, 100)
+        random_id = self.__generate_id()
         name = f"tool{random_id}"
         date = datetime.now()
         status = ToolStatus.works
@@ -57,7 +69,7 @@ class DataGenerator():
         '''
         Генератор объектов
         '''
-        random_id = f"C{randrange(1, 100)}"
+        random_id = f"C{self.__generate_id()}"
         name = f"construction{random_id}"
         project = f"project{random_id}"
         status = ConstructionStatus.works
@@ -79,7 +91,7 @@ class DataGenerator():
         '''
         Генератор данных склада
         '''
-        random_id = f"S{randrange(1, 100)}"
+        random_id = f"S{self.__generate_id()}"
         name = f"storage{random_id}"
         tools = dict()
 
