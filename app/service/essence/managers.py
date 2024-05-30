@@ -1,10 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
-from app.service.essence.fields.tool import Tool, ToolStatus
-from app.service.essence.fields.worker import Worker, StatusWorker
-from app.service.essence.fields.construction import Construction, ConstructionStatus
-from app.service.essence.fields.belonging import Belonging
-from app.service.essence.fields.warehouse import Storage
+from app.service.tool.tool import Tool, ToolStatus
+from app.service.worker.worker import Worker, StatusWorker
+from app.service.construction.construction import Construction, ConstructionStatus
+from app.service.storage.warehouse import Storage
 
 
 @dataclass
