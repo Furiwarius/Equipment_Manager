@@ -8,6 +8,8 @@ class WorkerTable():
     '''
 
     id: int
+    # id аккаунта, к которому привязан этот работник
+    account_id: int
     # Имя
     name: str
     # Фамилия
