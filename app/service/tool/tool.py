@@ -42,7 +42,7 @@ class ToolManager():
             pass
 
         # Если все нормально, то выполняет операции по перемещению
-        toolCRUD.move_to_construction(self, constr)
+        toolCRUD.move_to_construction(self.tool, constr)
 
     
     def move_tool_to_storage(self, storage: Storage) -> None:
@@ -53,14 +53,14 @@ class ToolManager():
             # Если склад закрыт,
             # то вызывает исключение
             pass
-        toolCRUD.move_to_storage(self, storage)
+        toolCRUD.move_to_storage(self.tool, storage)
 
 
     def break_tool(self) -> None:
         '''
         Сломать инструмент
         '''
-        toolCRUD.break_tool(self)
+        toolCRUD.break_tool(self.tool)
     
 
 
@@ -68,4 +68,4 @@ class ToolManager():
         '''
         Починить инструмент
         '''
-        toolCRUD.fix_tool(self)
+        toolCRUD.fix_tool(self.tool)
