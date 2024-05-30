@@ -20,38 +20,35 @@ class ConstructionManager():
     
     def __init__(self, constr:Construction) -> None:
 
-        self.constr = constr
-        self.responsible: int
-        self.workers = []
-        self.tools = []
-       
+        self.constr = constr       
+
 
     def appointment_responsible(self, worker:Worker) -> None:
         '''
         Назначить ответственного
-
-        Идет в бд в таблицу works_on_constructions.
-        Если этот работник уже является ответственным
-        на другом объекте, то бросает исключение.
-        Если нет, то создает новую запись
-        с полем is_brigadir = True
         '''
         self.__works_check()
-        self.responsible = worker.id
+        if not worker.status:
+            # Если работник не работает,
+            # вызывает исключение
+            pass
+
+        constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=True)
     
 
-    def add_warker(self, worker:Worker) -> None:
+    def add_worker(self, worker:Worker) -> None:
         '''
         Добавить работника
-
-        Идет в бд в таблицу works_on_constructions.
-        Если у последней записи с этим работником
-        в пункте DT_end стоит None, то ставим текущую дату.
-        После чего создаем новую запись с текущим объектом
-        и работником с полем is_brigadir = False.
         '''
+
         self.__works_check()
-        self.workers.append(worker.id)
+
+        if not worker.status:
+            # Если работник не работает,
+            # вызывает исключение
+            pass
+
+        constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=False)
 
 
     def add_tool(self, tool:Tool) -> None:
@@ -60,63 +57,61 @@ class ConstructionManager():
         '''
 
         self.__works_check()
+
         if not tool.status:
             # Если инструмент не рабочий,
             # то вызываем исключение
             pass
 
-        if not self.responsible:
+        if constructionCRUD.get_responsible(self.constr) is None:
             # Если не назначен ответственный,
             # то вызываем исключение 
             pass
 
-        self.tools.append(tool.id)
+        constructionCRUD.add_tool(self.constr, tool)
         
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
         Перевезти инструмент с объекта на склад
-
-        Идет в бд и в таблице tool_on_constructions 
-        меняет DT_end на текущую. После чего, в таблице
-        tools_on_storage  создает новую запись.
         '''
-        self.tools.remove(tool.id)
+        if not where.status:
+            # Если склад закрыт,
+            # вызывает исключение.
+            pass
+
+        toolCRUD.move_to_storage(tool, where)
     
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
         Перевезти инструмент с объекта на объект
-
-        Идет в бд и в таблице tool_on_constructions 
-        меняет DT_end на текущую. После чего, в этой же
-        таблице создает новую запись с новым объектом.
         '''
-        if where.status:
-            self.tools.remove(tool.id)
-        else:
+        if not where.status:
             # Кастомное исключение
             # Если объект не рабочий
             pass
+
+        toolCRUD.move_to_construction(tool, where)
 
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
-        if self.tools: 
+        if constructionCRUD.get_tools(): 
             # Если на объекте есть инструмент,
             # то вызывается кастомное исключение
             pass
         
-        self.constr.status= ConstructionStatus.finished
+        constructionCRUD.close_construction(self.constr)
     
 
     def open_construction(self):
         '''
         Возобновление строительства
         '''
-        self.constr.status = ConstructionStatus.works
+        constructionCRUD.open_construction(self.constr)
     
 
     def __works_check(self) -> None:
