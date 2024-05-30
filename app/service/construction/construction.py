@@ -1,8 +1,8 @@
 import enum
-from app.entities.construction import ConstructionTable
-from app.entities.worker import WorkerTable
-from app.entities.tool import ToolTable
-from app.entities.storage import StorageTable
+from app.entities.construction import Construction
+from app.entities.worker import Worker
+from app.entities.tool import Tool
+from app.entities.storage import Storage
 
 
 class ConstructionStatus(enum.Enum):
@@ -18,7 +18,7 @@ class ConstructionManager():
     Управляющий класс для стройки
     '''
     
-    def __init__(self, constr:ConstructionTable) -> None:
+    def __init__(self, constr:Construction) -> None:
 
         self.constr = constr
         self.responsible: int
@@ -26,7 +26,7 @@ class ConstructionManager():
         self.tools = []
        
 
-    def appointment_responsible(self, worker:WorkerTable) -> None:
+    def appointment_responsible(self, worker:Worker) -> None:
         '''
         Назначить ответственного
 
@@ -40,7 +40,7 @@ class ConstructionManager():
         self.responsible = worker.id
     
 
-    def add_warker(self, worker:WorkerTable) -> None:
+    def add_warker(self, worker:Worker) -> None:
         '''
         Добавить работника
 
@@ -54,8 +54,7 @@ class ConstructionManager():
         self.workers.append(worker.id)
 
 
-
-    def add_tool(self, tool:ToolTable) -> None:
+    def add_tool(self, tool:Tool) -> None:
         '''
         Добавить инструмент на объект
         '''
@@ -74,7 +73,7 @@ class ConstructionManager():
         self.tools.append(tool.id)
         
 
-    def move_tool_to_storage(self, tool:ToolTable, where:StorageTable) -> None:
+    def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
         Перевезти инструмент с объекта на склад
 
@@ -85,7 +84,7 @@ class ConstructionManager():
         self.tools.remove(tool.id)
     
 
-    def move_tool_to_construction(self, tool:ToolTable, where:ConstructionTable) -> None:
+    def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
         Перевезти инструмент с объекта на объект
 
