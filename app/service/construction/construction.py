@@ -1,8 +1,8 @@
-from dataclasses import dataclass
-from datetime import datetime
 import enum
-from app.service.tool.tool import Tool
-from app.service.worker.worker import Worker
+from app.entities.construction import ConstructionTable
+from app.entities.worker import WorkerTable
+from app.entities.tool import ToolTable
+from app.entities.storage import StorageTable
 
 
 class ConstructionStatus(enum.Enum):
@@ -10,137 +10,125 @@ class ConstructionStatus(enum.Enum):
     Статус объекта
     '''
     works = True
-    stopped = True
     finished = False
 
 
-@dataclass
-class Construction():
+class ConstructionManager():
     '''
-    Объект
+    Управляющий класс для стройки
     '''
-
-    id: str
-    # название объекта
-    name: str
-    # номер проекта или договора подряда
-    project: str
-    # статус объекта
-    status: ConstructionStatus
-    # дата создания
-    date_creation: datetime
-
-    # Ответственный
-    worker: int
-    # Список инструментов
-    tools: dict
     
+    def __init__(self, constr:ConstructionTable) -> None:
 
-    def __str__(self) -> str:
-        return f"{self.name} {self.project}"
+        self.constr = constr
+        self.responsible: int
+        self.workers = []
+        self.tools = []
+       
 
-
-    def get_id(self) -> str:
-        '''
-        Получение id
-        
-        У объекта строительства у id имеется приписка 'C'
-        '''
-        return self.id
-
-
-    def get_status(self) -> ConstructionStatus:
-        '''
-        Получение статуса объекта
-        '''
-        return self.status
-    
-
-    def get_date(self) -> datetime:
-        '''
-        Получение даты начала работ на объекте
-        '''
-        return self.date_creation
-    
-
-    def get_worker(self) -> int:
-        '''
-        Получить id ответственного за этот объект
-
-        Вернет None, если ответственный не назначен
-        '''
-        return self.worker
-    
-
-    def get_tools(self) -> list:
-        '''
-        Получение списка инструментов
-        '''
-        return list(self.tools.keys())
-    
-
-    # ВАЖНО! Так как, валидация данных происходит в другом классе,
-    # в методах изменения она отсутствует.
-    
-
-    def add_worker(self, worker:Worker) -> None:
+    def appointment_responsible(self, worker:WorkerTable) -> None:
         '''
         Назначить ответственного
+
+        Идет в бд в таблицу works_on_constructions.
+        Если этот работник уже является ответственным
+        на другом объекте, то бросает исключение.
+        Если нет, то создает новую запись
+        с полем is_brigadir = True
         '''
-        self.worker = worker.get_id()
+        self.__works_check()
+        self.responsible = worker.id
+    
+
+    def add_warker(self, worker:WorkerTable) -> None:
+        '''
+        Добавить работника
+
+        Идет в бд в таблицу works_on_constructions.
+        Если у последней записи с этим работником
+        в пункте DT_end стоит None, то ставим текущую дату.
+        После чего создаем новую запись с текущим объектом
+        и работником с полем is_brigadir = False.
+        '''
+        self.__works_check()
+        self.workers.append(worker.id)
 
 
-    def add_tool(self, tool:Tool) -> None:
-        '''
-        Добавить инструмент
 
-        Если не назначен ответственный
-        работник или он не может работать, 
-        то вызывает исключение
+    def add_tool(self, tool:ToolTable) -> None:
         '''
-        if self.worker:
-            self.tools[tool.get_id()] = tool
+        Добавить инструмент на объект
+        '''
+
+        self.__works_check()
+        if not tool.status:
+            # Если инструмент не рабочий,
+            # то вызываем исключение
+            pass
+
+        if not self.responsible:
+            # Если не назначен ответственный,
+            # то вызываем исключение 
+            pass
+
+        self.tools.append(tool.id)
+        
+
+    def move_tool_to_storage(self, tool:ToolTable, where:StorageTable) -> None:
+        '''
+        Перевезти инструмент с объекта на склад
+
+        Идет в бд и в таблице tool_on_constructions 
+        меняет DT_end на текущую. После чего, в таблице
+        tools_on_storage  создает новую запись.
+        '''
+        self.tools.remove(tool.id)
+    
+
+    def move_tool_to_construction(self, tool:ToolTable, where:ConstructionTable) -> None:
+        '''
+        Перевезти инструмент с объекта на объект
+
+        Идет в бд и в таблице tool_on_constructions 
+        меняет DT_end на текущую. После чего, в этой же
+        таблице создает новую запись с новым объектом.
+        '''
+        if where.status:
+            self.tools.remove(tool.id)
         else:
-            raise ValueError("У объекта отсутствует ответственное лицо или оно нерабочее")
-    
+            # Кастомное исключение
+            # Если объект не рабочий
+            pass
 
-    def delete_tool(self, tool:Tool) -> None:
-        '''
-        Удалить объект
-        '''
-        self.tools.pop(tool.get_id())
-
-
-    def change_date(self, new_date:datetime) -> None:
-        '''
-        Изменение даты начала работ на объекте
-        '''
-        self.date_creation = new_date
-
-
-    def change_name(self, new_name:str) -> None:
-        '''
-        Изменение названия объекта
-        '''
-        self.name = new_name
-    
-
-    def change_project(self, new_project:str) -> None:
-        '''
-        Изменение номера проекта или договора
-        '''
-        self.project = new_project
-    
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
-        self.status = ConstructionStatus.finished
+        if self.tools: 
+            # Если на объекте есть инструмент,
+            # то вызывается кастомное исключение
+            pass
+        
+        self.constr.status= ConstructionStatus.finished
     
 
     def open_construction(self):
         '''
         Возобновление строительства
         '''
-        self.status = ConstructionStatus.works
+        self.constr.status = ConstructionStatus.works
+    
+
+    def __works_check(self) -> None:
+        '''
+        Проверка на работоспособность объекта
+        
+        Если объект закрыт, то вызывает исключение,
+        если работает, то ничего не происходит
+        '''
+        
+        if self.constr.status is ConstructionStatus.finished:
+            # КАСТОМНОЕ ИСКЛЮЧЕНИЕ
+            pass
+
