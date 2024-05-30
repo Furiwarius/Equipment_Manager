@@ -1,6 +1,8 @@
-from datetime import datetime
-from dataclasses import dataclass
 import enum
+from app.entities.construction import Construction
+from app.entities.tool import Tool
+from app.entities.storage import Storage
+
 
 class ToolStatus(enum.Enum):
     '''
@@ -12,75 +14,58 @@ class ToolStatus(enum.Enum):
     faulty = False
 
 
-@dataclass
-class Tool():
+class ToolManager():
     '''
     Инструмент
     '''
 
-    id: int
-    name: str
-    import_date: datetime
-    status: ToolStatus
-    # Информация об объекте не храниться в бд
-    # Нужна для более простого изменения взаимосвязей между классами
-    # id Объекта строительства
-    construction: int
+    def __init__(self, tool:Tool) -> None:
+        
+        self.tool = tool
+            
+
+    def move_tool_to_construction(self, constr: Construction) -> None:
+        '''
+        Переместить инструмент на объект
+        '''
+        if not constr.status:
+            # Если обьект закрыт,
+            # то вызывает исключение
+            pass
+        elif self.tool.status is ToolStatus.faulty:
+            # Если инструмент не работает,
+            # то вызывает исключение
+            pass
+        elif constructionCRUD.get_responsible(constr) is None:
+            # Если у объекта нет ответственного,
+            # то вызывает исключение
+            pass
+
+        # Если все нормально, то выполняет операции по перемещению
+        toolCRUD.move_to_construction(self, constr)
+
     
-
-    def get_id(self) -> int:
+    def move_tool_to_storage(self, storage: Storage) -> None:
         '''
-        Получение id объекта
+        Переместить инструмент на склад
         '''
-        return self.id
-
-
-    def get_status(self) -> ToolStatus:
-        '''
-        Получение статуса объекта
-        '''
-        return self.status
-
-
-    def get_import_date(self) -> datetime:
-        '''
-        Получение даты перемещения объекта
-        '''
-        return self.import_date
-    
-
-    def get_construction(self) -> int:
-        '''
-        Возвращает id объекта, склада на котором находится инструмент
-        '''
-        return self.construction
-
-    # ВАЖНО! Так как, валидация данных происходит в другом классе,
-    # в методах изменения она отсутствует
-
-    def change_date(self, new_date:datetime) -> None:
-        '''
-        Измененние даты перемещения инструмента
-        '''
-        self.import_date = new_date
-
-
-    def move_tool(self, construction: int) -> None:
-        '''
-        Переместить инструмент
-        '''
-        self.construction = construction
+        if not storage.status:
+            # Если склад закрыт,
+            # то вызывает исключение
+            pass
+        toolCRUD.move_to_storage(self, storage)
 
 
     def break_tool(self) -> None:
         '''
         Сломать инструмент
         '''
-        self.status = ToolStatus.faulty
+        toolCRUD.break_tool(self)
     
+
 
     def fix_tool(self) -> None:
         '''
         Починить инструмент
         '''
-        self.status = ToolStatus.works
+        toolCRUD.fix_tool(self)
