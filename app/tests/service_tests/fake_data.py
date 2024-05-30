@@ -1,7 +1,7 @@
-from app.service.construction.construction import Construction, ConstructionStatus
+from app.service.construction.construction import ConstructionManager, ConstructionStatus
 from app.service.worker.worker import StatusWorker, Worker
 from app.service.tool.tool import  Tool, ToolStatus
-from app.service.storage.warehouse import  Storage
+from app.service.storage.storage import  Storage
 from datetime import datetime
 from random import randrange
 
@@ -65,7 +65,7 @@ class DataGenerator():
         return new_tool
     
 
-    def constr_generator(self) -> Construction:
+    def constr_generator(self) -> ConstructionManager:
         '''
         Генератор объектов
         '''
@@ -77,7 +77,7 @@ class DataGenerator():
         worker = None
         tools = dict()
 
-        new_construction = Construction(id=random_id,
+        new_construction = ConstructionManager(id=random_id,
                                         name=name,
                                         project=project,
                                         status=status,

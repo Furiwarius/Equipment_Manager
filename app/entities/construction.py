@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 @dataclass
-class ConstructionTable():
+class Construction():
     '''
     Объект
     '''

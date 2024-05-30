@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class StorageTable():
+class Storage():
     '''
     Склад
     '''
