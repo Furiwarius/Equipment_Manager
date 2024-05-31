@@ -1,7 +1,6 @@
 from app.entities.construction import Construction
-from app.entities.tool import Tool
-from app.entities.storage import Storage
 from app.entities.worker import Worker
+from app.errors.service_error.worker_error import ImpossibleDismiss
 import enum
 
 
@@ -41,9 +40,8 @@ class WorkerManager():
         Уволить работника
         '''
         if workerCRUD.is_brigadir(self.worker):
-            # Если работник являтеся ответственным на объекте,
-            # то вызывает исключение
-            pass
+            raise ImpossibleDismiss
+        
         workerCRUD.dismiss(self.worker)
         
 
