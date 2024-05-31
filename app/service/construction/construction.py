@@ -4,6 +4,8 @@ from app.entities.worker import Worker
 from app.entities.tool import Tool
 from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed
+from app.errors.service_error.tool_error import ToolBroken
+from app.errors.service_error.construction_error import ImpossibleCloseConstruction, ConstructionClosed, ResponsibleAbsent
 
 
 class ConstructionStatus(enum.Enum):
@@ -60,14 +62,10 @@ class ConstructionManager():
         self.__works_check()
 
         if not tool.status:
-            # Если инструмент не рабочий,
-            # то вызываем исключение
-            pass
+            raise ToolBroken
 
-        if constructionCRUD.get_responsible(self.constr) is None:
-            # Если не назначен ответственный,
-            # то вызываем исключение 
-            pass
+        elif constructionCRUD.get_responsible(self.constr) is None:
+            raise ResponsibleAbsent
 
         constructionCRUD.add_tool(self.constr, tool)
         
@@ -87,9 +85,10 @@ class ConstructionManager():
         Перевезти инструмент с объекта на объект
         '''
         if not where.status:
-            # Кастомное исключение
-            # Если объект не рабочий
-            pass
+            raise ConstructionClosed
+        
+        elif not tool.status:
+            raise ToolBroken
 
         toolCRUD.move_to_construction(tool, where)
 
@@ -99,9 +98,7 @@ class ConstructionManager():
         Закрытие объекта строительства
         '''
         if constructionCRUD.get_tools(): 
-            # Если на объекте есть инструмент,
-            # то вызывается кастомное исключение
-            pass
+            raise ImpossibleCloseConstruction
         
         constructionCRUD.close_construction(self.constr)
     
@@ -122,6 +119,5 @@ class ConstructionManager():
         '''
         
         if self.constr.status is ConstructionStatus.finished:
-            # КАСТОМНОЕ ИСКЛЮЧЕНИЕ
-            pass
+            raise ConstructionClosed
 

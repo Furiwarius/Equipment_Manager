@@ -4,6 +4,7 @@ from app.entities.tool import Tool
 from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock
 from app.errors.service_error.tool_error import ToolBroken
+from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
 
 
 class StorageStatus(enum.Enum):
@@ -57,17 +58,13 @@ class StorageManager():
         tool_on_construction с новым объектом.
         '''
         if not where.status:
-            # Если объект не работает,
-            # то бросает исключение
-            pass
+            raise ConstructionClosed
 
         elif not tool.status:
             raise ToolBroken
 
         elif constructionCRUD.get_responsible(where) is None:
-            # Если у данного объекта нет ответственного,
-            # бросает исключение
-            pass
+            raise ResponsibleAbsent
 
         self.tools.remove(tool.id)
 
@@ -83,8 +80,7 @@ class StorageManager():
         if where.status:
             self.tools.remove(tool.id)
         else:
-            # Кастомное исключение
-            pass
+            raise StockClosed
 
     
     def close(self) -> None:

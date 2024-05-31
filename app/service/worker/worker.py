@@ -2,6 +2,7 @@ from app.entities.construction import Construction
 from app.entities.worker import Worker
 from app.errors.service_error.worker_error import ImpossibleDismiss
 import enum
+from app.errors.service_error.construction_error import ConstructionClosed
 
 
 class StatusWorker(enum.Enum):
@@ -57,7 +58,6 @@ class WorkerManager():
         Сменить объект
         '''
         if not constr.status:
-            # Если объект не работает,
-            # то вызывает исключение
-            pass
+            raise ConstructionClosed
+            
         workerCRUD.change_construction(self.worker, constr)
