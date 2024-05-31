@@ -3,6 +3,7 @@ from app.entities.construction import Construction
 from app.entities.tool import Tool
 from app.entities.storage import Storage
 from app.errors.service_error.tool_error import ToolBroken
+from app.errors.service_error.storage_error import StockClosed
 
 
 class ToolStatus(enum.Enum):
@@ -50,9 +51,8 @@ class ToolManager():
         Переместить инструмент на склад
         '''
         if not storage.status:
-            # Если склад закрыт,
-            # то вызывает исключение
-            pass
+            raise StockClosed
+            
         toolCRUD.move_to_storage(self.tool, storage)
 
 

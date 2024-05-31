@@ -1,8 +1,9 @@
 import enum
 from app.entities.construction import Construction
-from app.entities.worker import Worker
 from app.entities.tool import Tool
 from app.entities.storage import Storage
+from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock
+from app.errors.service_error.tool_error import ToolBroken
 
 
 class StorageStatus(enum.Enum):
@@ -61,9 +62,7 @@ class StorageManager():
             pass
 
         elif not tool.status:
-            # Если инструмент не работает,
-            # бросает исключение
-            pass
+            raise ToolBroken
 
         elif constructionCRUD.get_responsible(where) is None:
             # Если у данного объекта нет ответственного,
@@ -94,9 +93,8 @@ class StorageManager():
         '''
         
         if self.tools:
-            # Бросает исключение, 
-            # если на складе есть инструмент
-            pass
+            raise ImpossibleCloseStock
+            
         self.storage.status = StorageStatus.close
 
 
@@ -116,5 +114,4 @@ class StorageManager():
         '''
         
         if self.storage.status is StorageStatus.close:
-            # КАСТОМНОЕ ИСКЛЮЧЕНИЕ
-            pass
+            raise StockClosed

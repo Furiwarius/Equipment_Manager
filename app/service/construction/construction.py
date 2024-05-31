@@ -3,6 +3,7 @@ from app.entities.construction import Construction
 from app.entities.worker import Worker
 from app.entities.tool import Tool
 from app.entities.storage import Storage
+from app.errors.service_error.storage_error import StockClosed
 
 
 class ConstructionStatus(enum.Enum):
@@ -76,9 +77,7 @@ class ConstructionManager():
         Перевезти инструмент с объекта на склад
         '''
         if not where.status:
-            # Если склад закрыт,
-            # вызывает исключение.
-            pass
+            raise StockClosed
 
         toolCRUD.move_to_storage(tool, where)
     
