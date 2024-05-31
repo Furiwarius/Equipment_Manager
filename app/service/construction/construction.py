@@ -6,7 +6,7 @@ from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed
 from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.construction_error import ImpossibleCloseConstruction, ConstructionClosed, ResponsibleAbsent
-
+from app.errors.service_error.worker_error import WorkerDoesntWork
 
 class ConstructionStatus(enum.Enum):
     '''
@@ -32,9 +32,7 @@ class ConstructionManager():
         '''
         self.__works_check()
         if not worker.status:
-            # Если работник не работает,
-            # вызывает исключение
-            pass
+            raise WorkerDoesntWork
 
         constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=True)
     
@@ -47,9 +45,7 @@ class ConstructionManager():
         self.__works_check()
 
         if not worker.status:
-            # Если работник не работает,
-            # вызывает исключение
-            pass
+            raise WorkerDoesntWork
 
         constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=False)
 
