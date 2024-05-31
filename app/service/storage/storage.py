@@ -24,38 +24,28 @@ class StorageManager():
         
         self.storage = storage
 
-        self.tools = []
-
 
     def add_tool(self, tool: Tool) -> None:
         '''
         Добавить новый инструмент на склад
-
-        В бд в таблице tool_on_storage создает новую запись.
         '''
         self.__works_check()
 
-        self.tools.append(tool.id)
+        storageCRUD.add_tool(self.storage, tool)
     
 
     def delete_tool(self, tool: Tool) -> None:
         '''
         Удалить инструмент со склада
 
-        В бд в таблице tool_on_storage меняет
-        значение поля DT_end на текущую дату.
+        При продаже инструмента
         '''
-        self.tools.remove(tool.id)
+        storageCRUD.delete_tool(self.storage, tool)
     
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
         Перемещение инструмента на объект
-
-        В бд в таблице tool_on_storage меняет
-        значение поля DT_end на текущую дату.
-        После чего делает новую запись в таблице
-        tool_on_construction с новым объектом.
         '''
         if not where.status:
             raise ConstructionClosed
@@ -66,7 +56,7 @@ class StorageManager():
         elif constructionCRUD.get_responsible(where) is None:
             raise ResponsibleAbsent
 
-        self.tools.remove(tool.id)
+        toolCRUD.move_to_construction(tool, where)
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -78,7 +68,7 @@ class StorageManager():
         После чего делает новую запись с новым складом.
         '''
         if where.status:
-            self.tools.remove(tool.id)
+            toolCRUD.move_to_storage(tool, where)
         else:
             raise StockClosed
 
@@ -91,14 +81,14 @@ class StorageManager():
         if self.tools:
             raise ImpossibleCloseStock
             
-        self.storage.status = StorageStatus.close
+        storageCRUD.close(self.storage)
 
 
     def restore(self) -> None:
         '''
         Возобновить работу склада
         '''
-        self.storage.status = StorageStatus.works
+        storageCRUD.work(self.storage)
     
     
     def __works_check(self) -> None:
