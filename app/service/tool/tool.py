@@ -2,6 +2,7 @@ import enum
 from app.entities.construction import Construction
 from app.entities.tool import Tool
 from app.entities.storage import Storage
+from app.errors.service_error.tool_error import ToolBroken
 
 
 class ToolStatus(enum.Enum):
@@ -33,9 +34,8 @@ class ToolManager():
             # то вызывает исключение
             pass
         elif self.tool.status is ToolStatus.faulty:
-            # Если инструмент не работает,
-            # то вызывает исключение
-            pass
+            raise ToolBroken
+
         elif constructionCRUD.get_responsible(constr) is None:
             # Если у объекта нет ответственного,
             # то вызывает исключение
