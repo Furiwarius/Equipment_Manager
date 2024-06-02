@@ -8,6 +8,12 @@ class ConstructionCRUD():
     '''
 
 
+    def add_construction(self, construction:Construction) -> None:
+        '''
+        Добавить объект строительства
+        '''
+
+
     def get_tools(self, constr:Construction) -> dict:
         '''
         Получить инструменты на объекте 
