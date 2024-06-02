@@ -10,6 +10,15 @@ class ToolCRUD():
     '''
 
 
+    def add_tool(self, tool:Tool, where:Storage|Construction) -> None:
+        '''
+        Добавить инструмент
+        
+        Для добавления нового инструмента, нужно также
+        указать объект или склад, где он будет хранится
+        '''
+        
+
     def move_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
         Перевезти инструмент на другой склад
