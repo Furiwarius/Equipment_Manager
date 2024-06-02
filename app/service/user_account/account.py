@@ -1,4 +1,4 @@
-from app.service.utilities.hashing import to_hash
+from app.utilities.hashing import to_hash
 
 class Account():
     
