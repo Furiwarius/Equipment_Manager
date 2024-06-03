@@ -1,5 +1,6 @@
 from app.utilities.hashing import to_hash
 from app.service.verification_code.code import SenderCode
+from app.database.accountCRUD import AccountCRUD
 
 class Account():
     
@@ -12,13 +13,13 @@ class Account():
         '''
         Сравнение данных
         '''
-
-        if AccountCRUD.is_login_correct(to_hash(login)) is None:
+        acc = AccountCRUD.get_account(to_hash(login))
+        
+        if acc is None:
             # Если логина нет в бд
             raise IncorrectLogin
         
-        elif not AccountCRUD.is_password_correct(login, 
-                                             to_hash(password)):
+        elif acc.password is to_hash(password):
             # Если пароль не совпадает с тем, который сохранен в бд
             raise IncorrectPassword
     
@@ -34,7 +35,7 @@ class Account():
         Создание аккаунта
         '''
 
-        if AccountCRUD.is_login_correct(to_hash(login)):
+        if AccountCRUD.get_account(to_hash(login)):
             # Если логин есть в БД
             raise LoginExists
         
@@ -63,4 +64,4 @@ class Account():
             # Если проверочный код не совпадает
             raise CodeDoesntMatch
         
-        AccountCRUD.add_account(login, password, email)
+        AccountCRUD.add_account(self.login, self.password, self.email)

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class AccountTable():
+class Account():
     '''
     Аккаунт 
     '''
