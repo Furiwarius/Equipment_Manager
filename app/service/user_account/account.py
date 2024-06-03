@@ -1,47 +1,66 @@
 from app.utilities.hashing import to_hash
+from app.service.verification_code.code import SenderCode
 
 class Account():
     
-    def __init__(self, login:str, password:str, account_name:str, email:str) -> None:
+    def __init__(self) -> None:
+
+        pass
+
+
+    def is_correct(self, login:str, password:str) -> None:
+        '''
+        Сравнение данных
+        '''
+
+        if AccountCRUD.is_login_correct(to_hash(login)) is None:
+            # Если логина нет в бд
+            raise IncorrectLogin
         
-        # логин
-        self.__login = to_hash(login)
-        # пароль от аккаунта
-        self.__password = to_hash(password)
-        # при создании аккаунта требуется почта, для отправки кода
-        self.__email = to_hash(email)
-        # имя аккаунта, то как система будет обращаться к пользователю
-        self.__account_name = account_name
-
-
-    def check_login(self, transmitted_login:str) -> bool:
-        '''
-        Проверка логина
-        '''
-        return to_hash(transmitted_login)==self.__login
-
-
-    def check_password(self, transmitted_password:str) -> bool:
-        '''
-        Проверка пароля
-        '''
-        return to_hash(transmitted_password)==self.__password
-
-
-    def check_email(self, transmitted_email:str) -> bool:
-        '''
-        Проверка электронной почты
-        '''
-        return to_hash(transmitted_email)==self.__email
+        elif not AccountCRUD.is_password_correct(login, 
+                                             to_hash(password)):
+            # Если пароль не совпадает с тем, который сохранен в бд
+            raise IncorrectPassword
     
 
-    def change_password(self, new_password:str):
+    def change_password(self, login:str, new_password:str) -> None:
         '''
         Измненение пароля
         '''
-        if self.__password == new_password:
-            raise ValueError("Новый пароль не должен совпадать со старым")
+
+
+    def create(self, login:str, password:str, email:str) -> None:
+        '''
+        Создание аккаунта
+        '''
+
+        if AccountCRUD.is_login_correct(to_hash(login)):
+            # Если логин есть в БД
+            raise LoginExists
         
-        self.__password = new_password
+        self.login = login
+        self.password = password
+        self.email = email
+        
+        self.verification()
 
 
+    def verification(self) -> None:
+        '''
+        Отправка проверочного кода
+        '''
+
+        self.code = SenderCode(self.email)
+        self.code.send_code()
+    
+    
+    def confirmation(self, code:int) -> None:
+        '''
+        Подтверждение аккаунта
+        '''
+
+        if not self.code.check_code(code):
+            # Если проверочный код не совпадает
+            raise CodeDoesntMatch
+        
+        AccountCRUD.add_account(login, password, email)

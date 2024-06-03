@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from app.service.email_client.email_client import EmailClient
+from app.clients.email_client.email_client import EmailClient
 import random
 import time
 from os import path
