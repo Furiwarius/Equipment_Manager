@@ -2,22 +2,27 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.entities.storage import Storage
+from app.database.baseCRUD import BaseCRUD
 
 
-class ToolCRUD():
+class ToolCRUD(BaseCRUD):
     '''
     Класс для взаимодействия с БД
-    '''
+    '''        
+
+    def __init__(self) -> None:
+        
+        super().__init__(table="tool")
 
 
-    def add_tool(self, tool:Tool, where:Storage|Construction) -> None:
+    def add(self, tool:Tool, where:Storage|Construction) -> None:
         '''
         Добавить инструмент
         
         Для добавления нового инструмента, нужно также
-        указать объект или склад, где он будет хранится
+        указать объект или склад, где он будет хранится.
         '''
-        
+
 
     def move_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
@@ -28,17 +33,5 @@ class ToolCRUD():
     def move_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
         Перевезти инструмент на другой объект
-        '''
-    
-
-    def break_tool(self, tool:Tool) -> None:
-        '''
-        Сломать инструмент
-        '''
-    
-
-    def fix_tool(self, tool:Tool) -> None:
-        '''
-        Починить инструмент
         '''
     

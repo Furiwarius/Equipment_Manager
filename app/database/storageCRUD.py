@@ -2,41 +2,25 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.entities.storage import Storage
+from app.database.baseCRUD import BaseCRUD
 
 
-class StorageCRUD():
+class StorageCRUD(BaseCRUD):
     '''
     Класс для взаимодействия с БД
     '''
 
-    
-    def add_storage(self, storage:Storage) -> None:
-        '''
-        Добавить склад
-        '''
+    def __init__(self) -> None:
+        
+        super().__init__(table="storage")
 
 
-    def add_tool(self, storage:Storage, tool:Tool) -> None:
+    def get_tools(self, storage:Storage) -> dict:
         '''
-        Добавить инструмент на склад
-        '''
-    
+        Получить инструменты на складе 
 
-    def delete_tool(self, storage:Storage, tool:Tool) -> None:
-        '''
-        Удалить инструмент со склада
 
-        При продаже инструмента
+        Выдает словарь в виде id: Tool 
         '''
-    
-
-    def close(self, storage:Storage) -> None:
-        '''
-        Закрыть склад
-        '''
-    
-
-    def work(self, storage:Storage) -> None:
-        '''
-        Возобновить работу склада
-        '''
+        
+        return {Tool.id: Tool}
