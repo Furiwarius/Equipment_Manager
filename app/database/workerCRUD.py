@@ -2,39 +2,21 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.entities.storage import Storage
+from app.database.baseCRUD import BaseCRUD
 
 
-class WorkerCRUD():
+class WorkerCRUD(BaseCRUD):
     '''
     Класс для взаимодействия с БД
     '''
-    
 
-    def add_worker(self, worker:Worker) -> None:
-        '''
-        Добавить работника
-        '''
+    def __init__(self) -> None:
+        
+        super().__init__(table="worker")
+       
     
-
-    def dismiss(self, worker:Worker) -> None:
+    def get_construction(self, worker:Worker) -> Construction:
         '''
-        Уволить работника
-        '''
-    
-
-    def sick(self, worker:Worker) -> None:
-        '''
-        Работник заболевает
-        '''
-    
-
-    def get_well(self, worker:Worker) -> None:
-        '''
-        Работник выздоравливает
-        '''
-    
-
-    def change_construction(self, worker:Worker, constr:Construction) -> None:
-        '''
-        Перевести работник на объект
-        '''
+        Получить объект, на котором
+        находится работник
+        ''' 

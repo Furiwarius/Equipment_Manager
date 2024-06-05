@@ -1,17 +1,17 @@
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
+from app.database.baseCRUD import BaseCRUD
 
-class ConstructionCRUD():
+
+class ConstructionCRUD(BaseCRUD):
     '''
     Класс для взаимодействия с БД
     '''
 
-
-    def add_construction(self, construction:Construction) -> None:
-        '''
-        Добавить объект строительства
-        '''
+    def __init__(self, ) -> None:
+        
+        super().__init__(table="construction")
 
 
     def get_tools(self, constr:Construction) -> dict:
@@ -44,29 +44,11 @@ class ConstructionCRUD():
         return Worker
 
 
-    def add_tool(self,  constr:Construction, tool:Tool) -> None:
+    def transfer_worker(self,  constr:Construction, worker:Worker, brigadir:bool) -> None:
         '''
-        Перевезти инструмент на этот объект
-        '''
-
-
-    def add_worker(self,  constr:Construction, worker:Worker, brigadir:bool) -> None:
-        '''
-        Перевести работника на этот объект
+        Перевести работника на объект
         
 
         Если параметр brigadir=True, то этот работник
         будет ответственным на объекте 
-        '''
-
-
-    def close_construction(self, constr:Construction) -> None:
-        '''
-        Закрыть объект
-        '''
-
-
-    def open_construction(self, constr:Construction) -> None:
-        '''
-        Возобновить работу
         '''
