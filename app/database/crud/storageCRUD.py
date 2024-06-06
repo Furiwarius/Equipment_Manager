@@ -2,7 +2,7 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.entities.storage import Storage
-from app.database.baseCRUD import BaseCRUD
+from app.database.crud.baseCRUD import BaseCRUD
 
 
 class StorageCRUD(BaseCRUD):
