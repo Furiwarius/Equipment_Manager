@@ -2,6 +2,9 @@ import enum
 from app.entities.construction import Construction
 from app.entities.tool import Tool
 from app.entities.storage import Storage
+from app.errors.service_error.tool_error import ToolBroken
+from app.errors.service_error.storage_error import StockClosed
+from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
 
 
 class ToolStatus(enum.Enum):
@@ -29,19 +32,14 @@ class ToolManager():
         Переместить инструмент на объект
         '''
         if not constr.status:
-            # Если обьект закрыт,
-            # то вызывает исключение
-            pass
+            raise ConstructionClosed
+        
         elif self.tool.status is ToolStatus.faulty:
-            # Если инструмент не работает,
-            # то вызывает исключение
-            pass
-        elif constructionCRUD.get_responsible(constr) is None:
-            # Если у объекта нет ответственного,
-            # то вызывает исключение
-            pass
+            raise ToolBroken
 
-        # Если все нормально, то выполняет операции по перемещению
+        elif constructionCRUD.get_responsible(constr) is None:
+            raise ResponsibleAbsent
+
         toolCRUD.move_to_construction(self.tool, constr)
 
     
@@ -50,9 +48,8 @@ class ToolManager():
         Переместить инструмент на склад
         '''
         if not storage.status:
-            # Если склад закрыт,
-            # то вызывает исключение
-            pass
+            raise StockClosed
+            
         toolCRUD.move_to_storage(self.tool, storage)
 
 

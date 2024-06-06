@@ -1,8 +1,10 @@
 import enum
 from app.entities.construction import Construction
-from app.entities.worker import Worker
 from app.entities.tool import Tool
 from app.entities.storage import Storage
+from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock
+from app.errors.service_error.tool_error import ToolBroken
+from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
 
 
 class StorageStatus(enum.Enum):
@@ -22,55 +24,39 @@ class StorageManager():
         
         self.storage = storage
 
-        self.tools = []
-
 
     def add_tool(self, tool: Tool) -> None:
         '''
         Добавить новый инструмент на склад
-
-        В бд в таблице tool_on_storage создает новую запись.
         '''
         self.__works_check()
 
-        self.tools.append(tool.id)
+        storageCRUD.add_tool(self.storage, tool)
     
 
     def delete_tool(self, tool: Tool) -> None:
         '''
         Удалить инструмент со склада
 
-        В бд в таблице tool_on_storage меняет
-        значение поля DT_end на текущую дату.
+        При продаже инструмента
         '''
-        self.tools.remove(tool.id)
+        storageCRUD.delete_tool(self.storage, tool)
     
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
         Перемещение инструмента на объект
-
-        В бд в таблице tool_on_storage меняет
-        значение поля DT_end на текущую дату.
-        После чего делает новую запись в таблице
-        tool_on_construction с новым объектом.
         '''
         if not where.status:
-            # Если объект не работает,
-            # то бросает исключение
-            pass
+            raise ConstructionClosed
 
         elif not tool.status:
-            # Если инструмент не работает,
-            # бросает исключение
-            pass
+            raise ToolBroken
 
         elif constructionCRUD.get_responsible(where) is None:
-            # Если у данного объекта нет ответственного,
-            # бросает исключение
-            pass
+            raise ResponsibleAbsent
 
-        self.tools.remove(tool.id)
+        toolCRUD.move_to_construction(tool, where)
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -82,10 +68,9 @@ class StorageManager():
         После чего делает новую запись с новым складом.
         '''
         if where.status:
-            self.tools.remove(tool.id)
+            toolCRUD.move_to_storage(tool, where)
         else:
-            # Кастомное исключение
-            pass
+            raise StockClosed
 
     
     def close(self) -> None:
@@ -94,17 +79,16 @@ class StorageManager():
         '''
         
         if self.tools:
-            # Бросает исключение, 
-            # если на складе есть инструмент
-            pass
-        self.storage.status = StorageStatus.close
+            raise ImpossibleCloseStock
+            
+        storageCRUD.close(self.storage)
 
 
     def restore(self) -> None:
         '''
         Возобновить работу склада
         '''
-        self.storage.status = StorageStatus.works
+        storageCRUD.work(self.storage)
     
     
     def __works_check(self) -> None:
@@ -116,5 +100,4 @@ class StorageManager():
         '''
         
         if self.storage.status is StorageStatus.close:
-            # КАСТОМНОЕ ИСКЛЮЧЕНИЕ
-            pass
+            raise StockClosed
