@@ -2,6 +2,7 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.database.crud.baseCRUD import BaseCRUD
+from app.database.tables.essence import ConstructionTable
 
 
 class ConstructionCRUD(BaseCRUD):
@@ -9,10 +10,23 @@ class ConstructionCRUD(BaseCRUD):
     Класс для взаимодействия с БД
     '''
 
-    def __init__(self, ) -> None:
+    def __init__(self) -> None:
         
         super().__init__(table="construction")
 
+
+    def add(self, constr:Construction) -> None:
+        '''
+        Добавляет объект в бд
+        '''
+        result = ConstructionTable(name=constr.name,
+                                   project=constr.project,
+                                   address=constr.address,
+                                   status=constr.status,
+                                   start_date=constr.start_date,
+                                   end_date=constr.end_date)
+        super().add(result)
+    
 
     def get_tools(self, constr:Construction) -> dict:
         '''
