@@ -12,6 +12,7 @@ from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.database.database import Database
 from sqlalchemy.orm import Session
+from app.database.converter import Converter
 
 
 class BaseCRUD():
@@ -24,6 +25,7 @@ class BaseCRUD():
         self.table:Base = table
         db = Database()
         self.engine = db.new_engine()
+        self.coverter = Converter()
 
     
 
@@ -55,7 +57,7 @@ class BaseCRUD():
         with Session(autoflush=False, bind=self.engine) as db:
             result = db.get(self.table, id)
         
-        return result
+        return self.coverter.conversion_to_data(result)
     
 
     def downgrade(self, object:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
