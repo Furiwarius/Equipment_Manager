@@ -11,9 +11,9 @@ class ToolTable(Base):
     '''
     __tablename__ = "tool"
 
-    name = Column(String(60))
-    status = Column(Boolean)
-    factory_number = Column(String(60), nullable=False)
+    name = Column(String(60), nullable=False)
+    status = Column(Boolean, default=True, nullable=False)
+    factory_number = Column(String(60))
 
 
 class WorkerTable(Base):
@@ -22,14 +22,14 @@ class WorkerTable(Base):
     '''
     __tablename__ = "worker"
 
-    account_id = Column(Integer, ForeignKey("account.id"))
-    name = Column(String(20))
-    surname = Column(String(20))
-    phone_number = Column(String(11))
-    job_title = Column(String(20))
-    start_work = Column(DateTime, default=datetime.now)
-    dismissal_work = Column(DateTime, nullable=False)
-    status = Column(Boolean)
+    account_id = Column(Integer, ForeignKey("account.id"), nullable=False)
+    name = Column(String(20), nullable=False)
+    surname = Column(String(20), nullable=False)
+    phone_number = Column(String(11), nullable=False)
+    job_title = Column(String(20), nullable=False)
+    start_work = Column(DateTime, default=datetime.now, nullable=False)
+    dismissal_work = Column(DateTime)
+    status = Column(Boolean, default=True)
 
 
 class ConstructionTable(Base):
@@ -38,12 +38,12 @@ class ConstructionTable(Base):
     '''
     __tablename__ = "construction"
 
-    name = Column(String(60))
-    project = Column(String(60))
-    address = Column(String(100))
-    status = Column(Boolean)
-    start_date = Column(DateTime, default=datetime.now)
-    end_date = Column(DateTime, nullable=False)
+    name = Column(String(60), nullable=False)
+    project = Column(String(60), nullable=False)
+    address = Column(String(100), nullable=False)
+    status = Column(Boolean, default=True, nullable=False)
+    start_date = Column(DateTime, default=datetime.now, nullable=False)
+    end_date = Column(DateTime)
 
 
 class StorageTable(Base):
@@ -52,11 +52,11 @@ class StorageTable(Base):
     '''
     __tablename__ = "storage"
 
-    name = Column(String(60))
-    address = Column(String(100))
-    status = Column(Boolean)
-    start_date = Column(DateTime, default=datetime.now)
-    end_date = Column(DateTime, nullable=False)
+    name = Column(String(60), nullable=False)
+    address = Column(String(100), nullable=False)
+    status = Column(Boolean, default=True, nullable=False)
+    start_date = Column(DateTime, default=datetime.now, nullable=False)
+    end_date = Column(DateTime)
 
 
 class AccountTable(Base):
@@ -65,7 +65,7 @@ class AccountTable(Base):
     '''
     __tablename__ = "account"
 
-    login = Column(String)
-    password = Column(String)
-    email = Column(String(30))
+    login = Column(String(30), nullable=False)
+    password = Column(String(20), nullable=False)
+    email = Column(String(30), nullable=False)
     confirmation_status = Column(Boolean)
