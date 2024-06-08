@@ -22,7 +22,7 @@ class WorkerTable(Base):
     '''
     __tablename__ = "worker"
 
-    account_id = Column(Integer, ForeignKey("account.id"), nullable=False)
+    account_id = Column(Integer, ForeignKey("account.id"))
     name = Column(String(20), nullable=False)
     surname = Column(String(20), nullable=False)
     phone_number = Column(String(11), nullable=False)
