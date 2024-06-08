@@ -14,15 +14,15 @@ class StorageCRUD(BaseCRUD):
         super().__init__(table="storage")
 
 
-    def add(self, constr:Storage) -> None:
+    def add(self, storage:Storage) -> None:
         '''
         Добавляет объект в бд
         '''
-        result = StorageTable(name=constr.name,
-                                   address=constr.address,
-                                   status=constr.status,
-                                   start_date=constr.start_date,
-                                   end_date=constr.end_date)
+        result = StorageTable(name=storage.name,
+                                   address=storage.address,
+                                   status=storage.status,
+                                   start_date=storage.start_date,
+                                   end_date=storage.end_date)
         super().add(result)
 
 

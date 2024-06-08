@@ -1,8 +1,7 @@
-from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.construction import Construction
-from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
+from app.database.tables.essence import WorkerTable
 
 
 class WorkerCRUD(BaseCRUD):
@@ -20,6 +19,20 @@ class WorkerCRUD(BaseCRUD):
         Получить объект, на котором
         находится работник
         ''' 
+    
+
+    def add(self, worker:Worker) -> None:
+        '''
+        Добавляет объект в бд
+        '''
+        result = WorkerTable(name=worker.name,
+                             surname=worker.surname,
+                             phone_number=worker.phone_number,
+                             job_title=worker.job_title,
+                             start_work=worker.start_work,
+                             dismissal_work=worker.dismissal_work,
+                             status=worker.status)
+        super().add(result)
     
 
     def is_brigadir(self, worker:Worker) -> Construction:
