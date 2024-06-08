@@ -12,7 +12,6 @@ class Database():
     def __init__(self) -> None:
 
         self.database_name = "test_equipment_manager"
-        self.create_database()
 
 
     def create_database(self) -> None:
