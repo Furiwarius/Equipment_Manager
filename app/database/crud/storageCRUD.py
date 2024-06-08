@@ -11,7 +11,7 @@ class StorageCRUD(BaseCRUD):
 
     def __init__(self) -> None:
         
-        super().__init__(table="storage")
+        super().__init__(table=StorageTable)
 
 
     def add(self, storage:Storage) -> None:

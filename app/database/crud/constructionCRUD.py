@@ -12,7 +12,7 @@ class ConstructionCRUD(BaseCRUD):
 
     def __init__(self) -> None:
         
-        super().__init__(table="construction")
+        super().__init__(table=ConstructionTable)
 
 
     def add(self, constr:Construction) -> None:

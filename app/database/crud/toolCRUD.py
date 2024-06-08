@@ -3,6 +3,7 @@ from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
+from app.database.tables.essence import ToolTable
 
 
 class ToolCRUD(BaseCRUD):
@@ -12,7 +13,7 @@ class ToolCRUD(BaseCRUD):
 
     def __init__(self) -> None:
         
-        super().__init__(table="tool")
+        super().__init__(table=ToolTable)
 
 
     def add(self, tool:Tool, where:Storage|Construction) -> None:

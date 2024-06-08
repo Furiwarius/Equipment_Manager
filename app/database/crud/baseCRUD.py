@@ -2,6 +2,7 @@ from app.database.tables.essence import ConstructionTable as ConstrTable
 from app.database.tables.essence import StorageTable
 from app.database.tables.essence import WorkerTable
 from app.database.tables.essence import ToolTable
+from app.database.tables.base import Base
 from app.entities.construction import Construction as Constr
 from app.database.tables.summary import ToolsOnConstructions
 from app.database.tables.summary import WorksOnConstructions
@@ -18,9 +19,9 @@ class BaseCRUD():
     Базовый класс для взаимодействия с БД
     '''
 
-    def __init__(self, table:str) -> None:
+    def __init__(self, table:Base) -> None:
         
-        self.table = table
+        self.table:Base = table
         db = Database()
         self.engine = db.new_engine()
 
@@ -29,11 +30,6 @@ class BaseCRUD():
     def add(self, object:WorkerTable|ConstrTable|StorageTable) -> None:
         '''
         Добавить сущности
-
-        Метод для добавления работника,
-        склада или объекта строительства.
-        Добавляет в ту таблицу, которая 
-        указана в поле table.
         '''
 
         with Session(autoflush=False, bind=self.engine) as db:
@@ -49,15 +45,17 @@ class BaseCRUD():
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
-    
+            
 
     def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
         '''
         Получить сущность по id
-
-        Ищет в таблице указанной
-        в поле table.
         '''
+        
+        with Session(autoflush=False, bind=self.engine) as db:
+            result = db.get(self.table, id)
+        
+        return result
     
 
     def downgrade(self, object:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:

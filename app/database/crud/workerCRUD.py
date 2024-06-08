@@ -11,7 +11,7 @@ class WorkerCRUD(BaseCRUD):
 
     def __init__(self) -> None:
         
-        super().__init__(table="worker")
+        super().__init__(table=WorkerTable)
        
     
     def get_construction(self, worker:Worker) -> Construction:
