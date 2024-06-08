@@ -11,6 +11,8 @@ class WorksOnConstructions(Base):
     Эта таблица отслеживает нахождение работников на объектах.
     А также ответственных лиц на этих объектах.
     '''
+    __tablename__ = "works_on_constructions"
+
     worker_id = Column(Integer, ForeignKey("worker.id"))
     construction_id = Column(Integer, ForeignKey("construction.id"))
     is_brigadir = Column(Boolean)
@@ -25,6 +27,8 @@ class ToolsOnConstructions(Base):
     Эта таблица отслеживает перемещение
     инструмента на объектах строительства.
     '''
+    __tablename__ = "tools_on_constructions"
+
     tool_id = Column(Integer, ForeignKey("tool.id"))
     construction_id = Column(Integer, ForeignKey("construction.id"))
     DT_start = Column(DateTime, default=datetime.now)
@@ -38,6 +42,8 @@ class ToolsOnStorage(Base):
     Эта таблица отслеживает перемещение
     инструмента по складам.
     '''
+    __tablename__ = "tools_on_storage"
+
     tool_id = Column(Integer, ForeignKey("tool.id"))
     storage_id = Column(Integer, ForeignKey("storage.id"))
     DT_start = Column(DateTime, default=datetime.now)
