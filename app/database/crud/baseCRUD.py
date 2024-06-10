@@ -65,19 +65,23 @@ class BaseCRUD():
         return self.coverter.conversion_to_data(result)
     
 
-    def downgrade(self, object:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+    def downgrade(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
         '''
         Поменять статус на False
         '''
-    
+        with Session(autoflush=False, bind=self.engine) as db:
+            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:False}, synchronize_session = False)
 
-    def increase(self, object:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+
+    def increase(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
         '''
         Поменять статус объекта на True
         '''
+        with Session(autoflush=False, bind=self.engine) as db:
+            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:True}, synchronize_session = False)
     
 
-    def retire(self, object:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+    def retire(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
         '''
         Удалить объект
 
