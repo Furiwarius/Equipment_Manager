@@ -14,18 +14,6 @@ class StorageCRUD(BaseCRUD):
         super().__init__(table=StorageTable)
 
 
-    def add(self, storage:Storage) -> None:
-        '''
-        Добавляет объект в бд
-        '''
-        result = StorageTable(name=storage.name,
-                                   address=storage.address,
-                                   status=storage.status,
-                                   start_date=storage.start_date,
-                                   end_date=storage.end_date)
-        super().add(result)
-
-
     def get_tools(self, storage:Storage) -> dict:
         '''
         Получить инструменты на складе 

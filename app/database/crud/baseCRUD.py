@@ -30,14 +30,14 @@ class BaseCRUD():
 
     
 
-    def add(self, object:WorkerTable|ConstrTable|StorageTable) -> None:
+    def add(self, obj:Worker|Constr|Storage) -> None:
         '''
         Добавить сущности
         '''
-
+        obj = self.coverter.conversion_to_table(obj)
         with Session(autoflush=False, bind=self.engine) as db:
 
-            db.add(object)     # добавляем в бд
+            db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
     
 

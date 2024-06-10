@@ -13,19 +13,6 @@ class ConstructionCRUD(BaseCRUD):
     def __init__(self) -> None:
         
         super().__init__(table=ConstructionTable)
-
-
-    def add(self, constr:Construction) -> None:
-        '''
-        Добавляет объект в бд
-        '''
-        result = ConstructionTable(name=constr.name,
-                                   project=constr.project,
-                                   address=constr.address,
-                                   status=constr.status,
-                                   start_date=constr.start_date,
-                                   end_date=constr.end_date)
-        super().add(result)
     
 
     def get_tools(self, constr:Construction) -> dict:

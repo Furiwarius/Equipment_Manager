@@ -4,6 +4,7 @@ from app.entities.construction import Construction
 from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ToolTable
+from app.database.converter import Converter
 
 
 class ToolCRUD(BaseCRUD):
