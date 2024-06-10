@@ -47,6 +47,11 @@ class BaseCRUD():
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
+
+        with Session(autoflush=False, bind=self.engine) as db:
+            result = db.query(self.table).all()
+        
+        return [self.coverter.conversion_to_data(item) for item in result]
             
 
     def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
