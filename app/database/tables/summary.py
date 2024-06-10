@@ -13,11 +13,11 @@ class WorksOnConstructions(Base):
     '''
     __tablename__ = "works_on_constructions"
 
-    worker_id = Column(Integer, ForeignKey("worker.id"))
-    construction_id = Column(Integer, ForeignKey("construction.id"))
-    is_brigadir = Column(Boolean)
-    DT_start = Column(DateTime, default=datetime.now)
-    DT_end = Column(DateTime, nullable=False)
+    worker_id = Column(Integer, ForeignKey("worker.id"), nullable=False)
+    construction_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
+    is_brigadir = Column(Boolean, nullable=False)
+    DT_start = Column(DateTime, default=datetime.now, nullable=False)
+    DT_end = Column(DateTime)
 
 
 class ToolsOnConstructions(Base):
@@ -29,10 +29,10 @@ class ToolsOnConstructions(Base):
     '''
     __tablename__ = "tools_on_constructions"
 
-    tool_id = Column(Integer, ForeignKey("tool.id"))
-    construction_id = Column(Integer, ForeignKey("construction.id"))
-    DT_start = Column(DateTime, default=datetime.now)
-    DT_end = Column(DateTime, nullable=False)
+    tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
+    construction_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
+    DT_start = Column(DateTime, default=datetime.now, nullable=False)
+    DT_end = Column(DateTime)
 
 
 class ToolsOnStorage(Base):
@@ -44,7 +44,7 @@ class ToolsOnStorage(Base):
     '''
     __tablename__ = "tools_on_storage"
 
-    tool_id = Column(Integer, ForeignKey("tool.id"))
-    storage_id = Column(Integer, ForeignKey("storage.id"))
-    DT_start = Column(DateTime, default=datetime.now)
-    DT_end = Column(DateTime, nullable=False)
+    tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
+    storage_id = Column(Integer, ForeignKey("storage.id"), nullable=False)
+    DT_start = Column(DateTime, default=datetime.now, nullable=False)
+    DT_end = Column(DateTime)
