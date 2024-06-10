@@ -23,8 +23,6 @@ class WorkerCRUD(BaseCRUD):
         находится работник
         ''' 
 
-        worker = self.coverter.conversion_to_table(worker)
-
         with Session(autoflush=False, bind=self.engine) as db:
             place = db.get(WorkOnConstr, worker.id)
 
@@ -36,6 +34,15 @@ class WorkerCRUD(BaseCRUD):
 
     def is_brigadir(self, worker:Worker) -> Construction:
         '''
-        Метод определяющий является
-        ли работник ответственным лицом
+        Метод, возвращающий объект, на котором 
+        работник является ответственным.
         '''
+
+        with Session(autoflush=False, bind=self.engine) as db:
+            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker.id, 
+                                                                  WorkOnConstr.DT_end==None,
+                                                                  WorkOnConstr.is_brigadir==True).all()
+            
+            if place: 
+                constr = db.get(ConstrTable, place[0])
+                return self.coverter.conversion_to_data(constr)

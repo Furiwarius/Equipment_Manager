@@ -4,6 +4,7 @@ from app.entities.construction import Construction
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ConstructionTable
 from app.database.tables.essence import ToolTable
+from app.database.tables.essence import WorkerTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolOnConstr
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
@@ -54,11 +55,19 @@ class ConstructionCRUD(BaseCRUD):
         '''
         Получить ответственного на объекте
         '''
+        
+        with Session(autoflush=False, bind=self.engine) as db:
+            place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr.id, 
+                                                                    WorkOnConstr.DT_end==None,
+                                                                    WorkOnConstr.is_brigadir==True).all()
+            
+            if place: 
+                constr = db.get(WorkerTable, place[0])
+                return self.coverter.conversion_to_data(constr)
 
-        return Worker
 
 
-    def transfer_worker(self,  constr:Construction, worker:Worker, brigadir:bool) -> None:
+    def transfer_worker(self,  constr:Construction, worker:Worker, brigadir:bool=False) -> None:
         '''
         Перевести работника на объект
         
