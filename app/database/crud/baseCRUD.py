@@ -13,6 +13,7 @@ from app.entities.worker import Worker
 from app.database.database import Database
 from sqlalchemy.orm import Session
 from app.database.converter import Converter
+from datetime import datetime
 
 
 class BaseCRUD():
@@ -65,7 +66,7 @@ class BaseCRUD():
         return self.coverter.conversion_to_data(result)
     
 
-    def downgrade(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+    def downgrade(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Поменять статус на False
         '''
@@ -74,7 +75,8 @@ class BaseCRUD():
             db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:False}, synchronize_session = False)
             db.commit()
 
-    def increase(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+
+    def increase(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Поменять статус объекта на True
         '''
@@ -83,9 +85,14 @@ class BaseCRUD():
             db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:True}, synchronize_session = False)
             db.commit()
 
-    def retire(self, obj:ToolTable|ConstrTable|StorageTable|WorkerTable) -> None:
+
+    def retire(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Удалить объект
 
         Ставит дату закрытия (увольнения)
         '''
+        obj = self.coverter.conversion_to_table(obj)
+        with Session(autoflush=False, bind=self.engine) as db:
+            db.query(self.table).filter(self.table.id == obj.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            db.commit()

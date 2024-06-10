@@ -14,6 +14,8 @@ class ToolTable(Base):
     name = Column(String(60), nullable=False)
     status = Column(Boolean, default=True, nullable=False)
     factory_number = Column(String(60))
+    start_date = Column(DateTime, default=datetime.now, nullable=False)
+    end_date = Column(DateTime)
 
 
 class WorkerTable(Base):
@@ -27,8 +29,8 @@ class WorkerTable(Base):
     surname = Column(String(20), nullable=False)
     phone_number = Column(String(11), nullable=False)
     job_title = Column(String(20), nullable=False)
-    start_work = Column(DateTime, default=datetime.now, nullable=False)
-    dismissal_work = Column(DateTime)
+    start_date = Column(DateTime, default=datetime.now, nullable=False)
+    end_date = Column(DateTime)
     status = Column(Boolean, default=True)
 
 

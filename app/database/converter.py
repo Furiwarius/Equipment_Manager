@@ -51,7 +51,10 @@ class Converter():
         '''
         
         result = Tool(id=tool.id, name=tool.name,
-                      status=tool.status, factory_number=tool.factory_number)
+                      status=tool.status, 
+                      factory_number=tool.factory_number,
+                      start_date=tool.start_date,
+                      end_date=tool.end_date)
 
         return result
 
@@ -65,8 +68,8 @@ class Converter():
                       surname=worker.surname,
                       phone_number=worker.phone_number,
                       job_title=worker.job_title,
-                      start_work=worker.start_work,
-                      dismissal_work=worker.dismissal_work,
+                      start_date=worker.start_date,
+                      end_date=worker.end_date,
                       status=worker.status)
 
         return result
@@ -139,8 +142,8 @@ class Converter():
                       surname=worker.surname,
                       phone_number=worker.phone_number,
                       job_title=worker.job_title,
-                      start_work=worker.start_work,
-                      dismissal_work=worker.dismissal_work,
+                      start_date=worker.start_date,
+                      end_date=worker.end_date,
                       status=worker.status)
 
         return result
@@ -153,6 +156,8 @@ class Converter():
 
         result = ToolT(id=tool.id, name=tool.name,
                       status=tool.status, 
-                      factory_number=tool.factory_number)
+                      factory_number=tool.factory_number,
+                      start_date=tool.start_date,
+                      end_date=tool.end_date)
 
         return result
