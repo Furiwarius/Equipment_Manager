@@ -3,7 +3,9 @@ from app.entities.worker import Worker
 from app.entities.construction import Construction
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ConstructionTable
-
+from app.database.tables.essence import ToolTable
+from sqlalchemy.orm import Session
+from app.database.tables.summary import ToolsOnConstructions as ToolOnConstr
 
 class ConstructionCRUD(BaseCRUD):
     '''
@@ -22,8 +24,13 @@ class ConstructionCRUD(BaseCRUD):
 
         Выдает словарь в виде id: Tool 
         '''
-        
-        return {Tool.id: Tool}
+
+        with Session(autoflush=False, bind=self.engine) as db:
+
+            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.construction_id==constr.id).all()
+            result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
+
+        return result
     
 
     def get_workers(self, constr:Construction) -> dict:

@@ -2,6 +2,9 @@ from app.entities.tool import Tool
 from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import StorageTable
+from app.database.tables.essence import ToolTable
+from app.database.tables.summary import ToolsOnStorage
+from sqlalchemy.orm import Session
 
 
 class StorageCRUD(BaseCRUD):
@@ -22,4 +25,9 @@ class StorageCRUD(BaseCRUD):
         Выдает словарь в виде id: Tool 
         '''
         
-        return {Tool.id: Tool}
+        with Session(autoflush=False, bind=self.engine) as db:
+
+            tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.storage_id==storage.id).all()
+            result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
+
+        return result
