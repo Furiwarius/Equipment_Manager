@@ -18,14 +18,31 @@ class Database():
         '''
         Метод для создания базы данных
         '''
+        
+        create_db_query = f"CREATE DATABASE {self.database_name}"
+        self.__execution_request(request=create_db_query)
+            
+
+    def delete_database(self) -> None:
+        '''
+        Метод для удаления базы данных
+        '''
+
+        delete_request = f"DROP DATABASE {self.database_name}"
+        self.__execution_request(request=delete_request)
+
+
+    def __execution_request(self, request:str) -> None:
+        '''
+        Выполнение запроса
+        '''
         try:
             with connect(
                 host=HOST,
                 user=DATABASE_USER,
                 password=DATABASE_PASSWORD) as connection:
-                create_db_query = f"CREATE DATABASE {self.database_name}"
                 with connection.cursor() as cursor:
-                    cursor.execute(create_db_query)
+                    cursor.execute(request)
         except Error as e:
             print(e)
 
