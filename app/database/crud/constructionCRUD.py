@@ -8,6 +8,8 @@ from app.database.tables.essence import WorkerTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolOnConstr
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
+from datetime import datetime
+
 
 class ConstructionCRUD(BaseCRUD):
     '''
@@ -75,3 +77,41 @@ class ConstructionCRUD(BaseCRUD):
         Если параметр brigadir=True, то этот работник
         будет ответственным на объекте 
         '''
+
+        with Session(autoflush=False, bind=self.engine) as db:
+            
+            location = self.__locate(db, worker)
+            if location:
+                self.__close_post(db, location)
+
+            work_on_constr = WorkOnConstr(worker_id=worker.id,
+                        construction_id=constr.id,
+                        is_brigadir=brigadir,
+                        DT_start=datetime.now(),
+                        DT_end=None)
+
+            db.add(work_on_constr)
+            db.commit()
+
+    
+
+    def __locate(self, db:Session, worker:Worker) -> WorkOnConstr:
+        '''
+        Определить местоположение работника
+        '''
+
+        constr = db.query(WorkOnConstr).filter(WorkOnConstr.worker_id==worker.id,
+                                                WorkOnConstr.DT_end==None).all()
+
+        if constr:
+            return constr[0]
+    
+
+    def __close_post(self, db:Session, location:WorkOnConstr) -> None:
+        '''
+        Записывает дату окончания работы 
+        на объекте строительства
+        '''
+
+        db.query(WorkOnConstr).filter(WorkOnConstr.id == location.id
+                                           ).update({WorkOnConstr.DT_end:datetime.now()}, synchronize_session = False)
