@@ -46,7 +46,7 @@ class ToolCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
             
-            location = self.__locate(tool)
+            location = self.__locate(db, tool)
             
             self.__close_post(db, location)
             
@@ -73,22 +73,20 @@ class ToolCRUD(BaseCRUD):
         db.add(post)
 
     
-    def __locate(self, tool:Tool) -> ToolsOnConstr|ToolsOnStorage:
+    def __locate(self, db:Session, tool:Tool) -> ToolsOnConstr|ToolsOnStorage:
         '''
         Определить местоположение инструмента
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool.id,
+                                                ToolsOnConstr.DT_end==None).all()
+        storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool.id,
+                                                ToolsOnStorage.DT_end==None).all()
 
-            constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool.id,
-                                                   ToolsOnConstr.DT_end==None).all()
-            storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool.id,
-                                                   ToolsOnStorage.DT_end==None).all()
-
-            if constr:
-                return constr[0]
-            else:
-                return storage[0]
+        if constr:
+            return constr[0]
+        else:
+            return storage[0]
             
 
     def __close_post(self, db:Session, location:ToolsOnConstr|ToolsOnStorage) -> None:

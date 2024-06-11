@@ -70,7 +70,8 @@ class Converter():
                       job_title=worker.job_title,
                       start_date=worker.start_date,
                       end_date=worker.end_date,
-                      status=worker.status)
+                      status=worker.status,
+                      account_id=worker.account_id)
 
         return result
 
