@@ -30,7 +30,7 @@ class ToolsOnConstructions(Base):
     __tablename__ = "tools_on_constructions"
 
     tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
-    construction_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
+    place_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
     DT_start = Column(DateTime, default=datetime.now, nullable=False)
     DT_end = Column(DateTime)
 
@@ -45,6 +45,6 @@ class ToolsOnStorage(Base):
     __tablename__ = "tools_on_storage"
 
     tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
-    storage_id = Column(Integer, ForeignKey("storage.id"), nullable=False)
+    place_id = Column(Integer, ForeignKey("storage.id"), nullable=False)
     DT_start = Column(DateTime, default=datetime.now, nullable=False)
     DT_end = Column(DateTime)

@@ -67,7 +67,7 @@ class ConstructionManager():
         elif ConstructionCRUD.get_responsible(self.constr) is None:
             raise ResponsibleAbsent
 
-        ToolCRUD.move_to_construction(self.constr, tool)
+        ToolCRUD.move_to(self.constr, tool)
         
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -90,7 +90,7 @@ class ConstructionManager():
         elif not tool.status:
             raise ToolBroken
 
-        ToolCRUD.move_to_construction(tool, where)
+        ToolCRUD.move_to(tool, where)
 
 
     def close_construction(self) -> None:

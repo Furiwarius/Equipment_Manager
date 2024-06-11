@@ -29,7 +29,7 @@ class ConstructionCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
 
-            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.construction_id==constr.id).all()
+            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr.id, ToolOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
@@ -45,7 +45,7 @@ class ConstructionCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
 
-            tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr.id).all()
+            tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr.id, WorkOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result

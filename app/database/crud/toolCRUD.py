@@ -5,8 +5,10 @@ from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ToolTable
 from sqlalchemy.orm import Session
-from app.database.tables.summary import ToolsOnConstructions, ToolsOnStorage
+from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
+from app.database.tables.summary import ToolsOnStorage
 from datetime import datetime
+
 
 class ToolCRUD(BaseCRUD):
     '''
@@ -31,32 +33,70 @@ class ToolCRUD(BaseCRUD):
             db.add(tool)     # добавляем в бд
             db.commit()
 
-            if isinstance(where, Storage):
-                storage = self.coverter.conversion_to_table(where)
-                where = ToolsOnStorage(tool_id=tool.id,
-                                         storage_id=storage.id,
-                                         DT_start=datetime.now(),
-                                         DT_end=None)
-
-            else:
-                constr = self.coverter.conversion_to_table(where)
-                where = ToolsOnConstructions(tool_id=tool.id,
-                                         construction_id=constr.id,
-                                         DT_start=datetime.now(),
-                                         DT_end=None)
+            where = self.coverter.conversion_to_table(where)
+            self.__move(db, tool, where)
             
-            db.add(where)
             db.commit()     # сохраняем изменения
+  
 
-
-    def move_to_storage(self, tool:Tool, where:Storage) -> None:
-        '''
-        Перевезти инструмент на другой склад
-        '''
-    
-
-    def move_to_construction(self, tool:Tool, where:Construction) -> None:
+    def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
         Перевезти инструмент на другой объект
         '''
+
+        with Session(autoflush=False, bind=self.engine) as db:
+            
+            location = self.__locate(tool)
+            
+            self.__close_post(db, location)
+            
+            self.__move(db, tool, where)
+            
+            db.commit() # сохраняем изменения
+    
+
+    def __move(self, db:Session, tool:Tool, where:Storage|Construction) -> None:
+        '''
+        Добавить запись о храненнии инструмента
+        '''
+
+        if isinstance(where, Storage):
+            place = ToolsOnStorage
+        else: 
+            place = ToolsOnConstr
+
+        post = place(tool_id=tool.id,
+                     place_id=where.id,
+                     DT_start=datetime.now(),
+                     DT_end=None)
+
+        db.add(post)
+
+    
+    def __locate(self, tool:Tool) -> ToolsOnConstr|ToolsOnStorage:
+        '''
+        Определить местоположение инструмента
+        '''
+
+        with Session(autoflush=False, bind=self.engine) as db:
+
+            constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool.id,
+                                                   ToolsOnConstr.DT_end==None).all()
+            storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool.id,
+                                                   ToolsOnStorage.DT_end==None).all()
+
+            if constr:
+                return constr[0]
+            else:
+                return storage[0]
+            
+
+    def __close_post(self, db:Session, location:ToolsOnConstr|ToolsOnStorage) -> None:
+        '''
+        Записывает дату окончания хранения 
+        инструмента на объекте строительства
+        '''
+
+        db.query(type(location)).filter(type(location).id == location.id
+                                           ).update({type(location).DT_end:datetime.now()}, synchronize_session = False)
     

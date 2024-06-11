@@ -61,7 +61,7 @@ class StorageManager():
         elif ConstructionCRUD.get_responsible(where) is None:
             raise ResponsibleAbsent
 
-        ToolCRUD.move_to_construction(tool, where)
+        ToolCRUD.move_to(tool, where)
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -73,7 +73,7 @@ class StorageManager():
         После чего делает новую запись с новым складом.
         '''
         if where.status:
-            ToolCRUD.move_to_storage(tool, where)
+            ToolCRUD.move_to(tool, where)
         else:
             raise StockClosed
 

@@ -9,7 +9,7 @@ class Construction():
     Объект
     '''
 
-    id: str
+    id: int
     # название объекта
     name: str
     # номер проекта или договора подряда

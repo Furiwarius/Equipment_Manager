@@ -27,7 +27,7 @@ class StorageCRUD(BaseCRUD):
         
         with Session(autoflush=False, bind=self.engine) as db:
 
-            tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.storage_id==storage.id).all()
+            tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.place_id==storage.id).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
