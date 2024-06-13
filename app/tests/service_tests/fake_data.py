@@ -10,13 +10,13 @@ class DataGenerator():
     '''
     Генератор данных
     '''
-    # набор цифр, которые будут использоваться как id
+    # набор уникальных цифр
     numbers = set([number for number in range(1000)])
 
 
     def __generate_number(self) -> int:
         '''
-        Генерация уникального id
+        Генерация уникальной цифры
         '''
         value = tuple(self.numbers)[randrange(0, len(self.numbers)-1)]
         self.numbers.discard(value)
@@ -65,7 +65,7 @@ class DataGenerator():
         '''
         random_number = self.__generate_number()
 
-        new_construction = Construction(id=random_number,
+        new_construction = Construction(id=None,
                                         name=f"construction{random_number}",
                                         project=f"project{random_number}",
                                         address=f"address{random_number}",
