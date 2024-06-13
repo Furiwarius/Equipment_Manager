@@ -1,7 +1,7 @@
-from app.service.construction.construction import ConstructionManager, ConstructionStatus
-from app.service.worker.worker import StatusWorker, Worker
-from app.service.tool.tool import  Tool, ToolStatus
-from app.service.storage.storage import  Storage
+from app.entities.tool import Tool
+from app.entities.construction import Construction
+from app.entities.worker import Worker
+from app.entities.storage import Storage
 from datetime import datetime
 from random import randrange
 
@@ -11,91 +11,82 @@ class DataGenerator():
     Генератор данных
     '''
     # набор цифр, которые будут использоваться как id
-    id = set([number for number in range(1000)])
+    numbers = set([number for number in range(1000)])
 
 
-    def __generate_id(self) -> int:
+    def __generate_number(self) -> int:
         '''
         Генерация уникального id
         '''
-        value = tuple(self.id)[randrange(0, len(self.id)-1)]
-        self.id.discard(value)
+        value = tuple(self.numbers)[randrange(0, len(self.numbers)-1)]
+        self.numbers.discard(value)
         return value
 
 
-    def worker_generator(self) -> Worker:
+    def worker_generator(self, status=True) -> Worker:
         '''
         Генератор работников
         '''
-        random_id = self.__generate_id()
-        name = f"name{random_id}"
-        surname = f"surname{random_id}"
-        phone = randrange(89000000000, 89999999999)
-        job_title = f"jobtitle{random_id}"
-        date = datetime.now()
-        status = StatusWorker.works
-        construction = None
+        
+        random_number = self.__generate_number()
 
-        new_worker = Worker(id=random_id,
-                                name=name,
-                                surname=surname,
-                                phone_number=phone,
-                                job_title=job_title,
-                                start_work=date,
-                                status=status,
-                                construction=construction)
+        new_worker = Worker(id=None,
+                            account_id=None,
+                            name=f"name{random_number}",
+                            surname=f"surname{random_number}",
+                            phone_number=randrange(89000000000, 89999999999),
+                            job_title=f"jobtitle{random_number}",
+                            start_date=datetime.now(),
+                            end_date=None,
+                            status=status)
+        
         return new_worker
     
 
-    def tool_generator(self) -> Tool:
+    def tool_generator(self, status=True) -> Tool:
         '''
         Генератор инструментов
         '''
-        random_id = self.__generate_id()
-        name = f"tool{random_id}"
-        date = datetime.now()
-        status = ToolStatus.works
-        construction = None
+        random_number = self.__generate_number()
 
-        new_tool = Tool(id=random_id,
-                             name=name,
-                             import_date=date,
+        new_tool = Tool(id=None,
+                             name=f"tool{random_number}",
+                             factory_number=f"factory_number{random_number}",
                              status=status,
-                             construction=construction)
+                             start_date=datetime.now(),
+                             end_date=None)
+        
         return new_tool
     
 
-    def constr_generator(self) -> ConstructionManager:
+    def constr_generator(self, status=True) -> Construction:
         '''
         Генератор объектов
         '''
-        random_id = f"C{self.__generate_id()}"
-        name = f"construction{random_id}"
-        project = f"project{random_id}"
-        status = ConstructionStatus.works
-        date = datetime.now()
-        worker = None
-        tools = dict()
+        random_number = self.__generate_number()
 
-        new_construction = ConstructionManager(id=random_id,
-                                        name=name,
-                                        project=project,
+        new_construction = Construction(id=random_number,
+                                        name=f"construction{random_number}",
+                                        project=f"project{random_number}",
+                                        address=f"address{random_number}",
                                         status=status,
-                                        date_creation=date,
-                                        worker=worker,
-                                        tools=tools)
+                                        start_date=datetime.now(),
+                                        end_date=None)
+        
         return new_construction
 
 
-    def storage_generator(self) -> Storage:
+    def storage_generator(self, status=True) -> Storage:
         '''
         Генератор данных склада
         '''
-        random_id = f"S{self.__generate_id()}"
-        name = f"storage{random_id}"
-        tools = dict()
+        random_number = f"S{self.__generate_number()}"
 
-        new_storage = Storage(id=random_id,
-                              name=name,
-                              tools=tools)
+        new_storage = Storage(id=None,
+                              name=f"storage{random_number}",
+                              address=f"address{random_number}",
+                              status=status,
+                              start_date=datetime.now(),
+                              end_date=None)
+        
         return new_storage
