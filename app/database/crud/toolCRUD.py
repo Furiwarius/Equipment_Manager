@@ -4,6 +4,8 @@ from app.entities.construction import Construction
 from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ToolTable
+from app.database.tables.essence import StorageTable
+from app.database.tables.essence import ConstructionTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
 from app.database.tables.summary import ToolsOnStorage
@@ -60,9 +62,9 @@ class ToolCRUD(BaseCRUD):
         Добавить запись о храненнии инструмента
         '''
 
-        if isinstance(where, Storage):
+        if isinstance(where, StorageTable):
             place = ToolsOnStorage
-        else: 
+        elif isinstance(where, ConstructionTable): 
             place = ToolsOnConstr
 
         post = place(tool_id=tool.id,
