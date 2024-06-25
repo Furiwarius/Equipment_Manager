@@ -229,3 +229,31 @@ class TestDatabase():
 
         if self.work_crud.is_brigadir(new_worker).id!=constr.id:
             assert False
+    
+
+    def test_move_tool(self):
+        '''
+        Тестирование метода по перемещению инструмента
+        (ToolCRUD.move_to())
+        '''
+        tool = self.tool_crud.get_by_id(id=1)
+        old_constr = self.tool_crud.get_construction(tool)
+
+        if not old_constr:
+            assert False
+
+        new_constr = self.generator.constr_generator()
+        self.constr_crud.add(new_constr)
+        new_constr = self.constr_crud.get_all()[-1]
+
+
+        if self.constr_crud.get_tools(new_constr):
+            assert False
+        
+        self.tool_crud.move_to(tool=tool, where=new_constr)
+
+        if self.tool_crud.get_construction(tool).id==old_constr.id:
+            assert False
+        
+        if tool.id not in self.constr_crud.get_tools(new_constr):
+            assert False
