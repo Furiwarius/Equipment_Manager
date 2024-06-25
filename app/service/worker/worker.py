@@ -3,7 +3,8 @@ from app.entities.worker import Worker
 from app.errors.service_error.worker_error import ImpossibleDismiss
 import enum
 from app.errors.service_error.construction_error import ConstructionClosed
-
+from app.database.crud.workerCRUD import WorkerCRUD
+from database.crud.constructionCRUD import ConstructionCRUD
 
 class StatusWorker(enum.Enum):
     '''
@@ -33,24 +34,24 @@ class WorkerManager():
         '''
         Работник заболевает
         '''
-        workerCRUD.sick(self.worker)
+        WorkerCRUD.downgrade(self.worker)
 
 
     def dismiss(self) -> None:
         '''
         Уволить работника
         '''
-        if workerCRUD.is_brigadir(self.worker):
+        if WorkerCRUD.is_brigadir(self.worker):
             raise ImpossibleDismiss
         
-        workerCRUD.dismiss(self.worker)
+        WorkerCRUD.retire(self.worker)
         
 
     def get_well(self) -> None:
         '''
         Работник выздоравливает
         '''     
-        workerCRUD.get_well(self.worker)
+        WorkerCRUD.increase(self.worker)
 
 
     def change_construction(self, constr:Construction) -> None:
@@ -60,4 +61,4 @@ class WorkerManager():
         if not constr.status:
             raise ConstructionClosed
             
-        workerCRUD.change_construction(self.worker, constr)
+        ConstructionCRUD.transfer_worker(construction=constr, worker=self.worker, brigadir=False)

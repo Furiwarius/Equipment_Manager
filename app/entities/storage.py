@@ -8,7 +8,7 @@ class Storage():
     Склад
     '''
 
-    id: str
+    id: int
     # название склада
     name: str
     # адрес склада
