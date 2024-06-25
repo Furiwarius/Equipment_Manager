@@ -1,4 +1,4 @@
-from app.tests.service_tests.fake_data import DataGenerator
+from app.tests.fake_data import DataGenerator
 from app.database.database import Database
 from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.storageCRUD import StorageCRUD

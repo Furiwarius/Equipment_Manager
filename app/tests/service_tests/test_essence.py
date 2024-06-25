@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 from app.service.essence.managers import Storekeeper
-from app.tests.service_tests.fake_data import DataGenerator
+from app.tests.fake_data import DataGenerator
 
 # TestStorekeeper
 class TestSK():
