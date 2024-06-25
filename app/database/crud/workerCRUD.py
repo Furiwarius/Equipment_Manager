@@ -24,10 +24,11 @@ class WorkerCRUD(BaseCRUD):
         ''' 
 
         with Session(autoflush=False, bind=self.engine) as db:
-            place = db.get(WorkOnConstr, worker.id)
+            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker.id, 
+                                                                  WorkOnConstr.DT_end==None).all()
 
             if place:
-                constr = db.get(ConstrTable, place.construction_id)
+                constr = db.get(ConstrTable, place[0])
                 return self.coverter.conversion_to_data(constr)
 
     
