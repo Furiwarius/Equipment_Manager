@@ -7,6 +7,7 @@ from app.database.tables.essence import ToolTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
 from app.database.tables.summary import ToolsOnStorage
+from app.database.tables.essence import ConstructionTable as ConstrTable
 from datetime import datetime
 
 
@@ -98,3 +99,19 @@ class ToolCRUD(BaseCRUD):
         db.query(type(location)).filter(type(location).id == location.id
                                            ).update({type(location).DT_end:datetime.now()}, synchronize_session = False)
     
+
+
+    def get_construction(self, tool:Tool) -> Construction|None:
+        '''
+        Получить объект, на котором
+        находится инструмент
+        ''' 
+
+        with Session(autoflush=False, bind=self.engine) as db:
+            place = db.get(ToolsOnConstr, tool.id)
+            place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool.id, 
+                                                                  ToolsOnConstr.DT_end==None).all()
+
+            if place:
+                constr = db.get(ConstrTable, place[0])
+                return self.coverter.conversion_to_data(constr)
