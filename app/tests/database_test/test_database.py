@@ -37,8 +37,7 @@ class TestDatabase():
         # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
         constr_db = self.constr_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
-        if constr_db.name!=constr.name:
-            assert False
+        assert constr_db.name==constr.name
 
 
     def test_add_storage(self):
@@ -52,8 +51,7 @@ class TestDatabase():
         # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
         storage_db = self.stor_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
-        if storage_db.name!=storage.name:
-            assert False
+        assert storage_db.name==storage.name
 
 
     def test_add_worker(self):
@@ -67,8 +65,7 @@ class TestDatabase():
         # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
         worker_db = self.work_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
-        if worker_db.name!=worker.name:
-            assert False
+        assert worker_db.name==worker.name
 
 
     def test_add_tool(self):
@@ -83,12 +80,10 @@ class TestDatabase():
         # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
         tool_db = self.tool_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
-        if tool_db.name!=tool.name: 
-            assert False
+        assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
-        if tool_db.id not in self.stor_crud.get_tools(storage=storage):
-            assert False
+        assert tool_db.id in self.stor_crud.get_tools(storage=storage)
 
 
     def test_get_by_id(self):
@@ -96,12 +91,10 @@ class TestDatabase():
         Тест метода по получению сущности по id (Base.get_by_id())
         '''
 
-        if self.tool_crud.get_by_id(id=100) is None:
-            assert True
+        assert self.tool_crud.get_by_id(id=100) is None
         
         # В предыдущем тесте добавлен инструмент
-        if self.tool_crud.get_by_id(id=1) is None:
-            assert False
+        assert self.tool_crud.get_by_id(id=1) is not None
         
 
     def test_get_all_item(self):
@@ -115,10 +108,7 @@ class TestDatabase():
         tools = self.tool_crud.get_all()
         storages = self.stor_crud.get_all()
 
-        if workers and constructions and tools and storages:
-            assert True
-        else:
-            assert False
+        assert workers and constructions and tools and storages
         
 
     def test_downgrade(self):
@@ -132,8 +122,7 @@ class TestDatabase():
 
         for crud in self.cruds:
             # Если статус сущности не False, тест провален
-            if crud.get_by_id(id=1).status:
-                assert False
+            assert not crud.get_by_id(id=1).status
     
 
     def test_increase(self):
@@ -147,9 +136,8 @@ class TestDatabase():
 
         for crud in self.cruds:
             # Если статус сущности не True, тест провален
-            if not crud.get_by_id(id=1).status:
-                assert False
-
+            assert crud.get_by_id(id=1).status
+            
 
     def __status_operations(self, items:list, mode=True):
         '''
@@ -176,8 +164,7 @@ class TestDatabase():
         tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1))
         tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(id=1))
 
-        if not tools_on_stor and tools_on_constr:
-            assert False
+        assert tools_on_stor and not tools_on_constr
         
 
     def test_transfer_worker(self):
@@ -189,17 +176,14 @@ class TestDatabase():
         worker = self.work_crud.get_by_id(id=1)    
         constr = self.constr_crud.get_by_id(id=1)
 
-        if self.constr_crud.get_workers(constr) and self.work_crud.get_construction(worker):
-            assert False
+        assert not self.constr_crud.get_workers(constr) and not self.work_crud.get_construction(worker)
 
         # Перевод работника на объект
         self.constr_crud.transfer_worker(constr=constr, worker=worker)
 
-        if not self.constr_crud.get_workers(constr) or self.constr_crud.get_responsible(constr):
-            assert False
+        assert self.constr_crud.get_workers(constr) or not self.constr_crud.get_responsible(constr)
         
-        if self.work_crud.get_construction(worker).id!=constr.id or self.work_crud.is_brigadir(worker):
-            assert False
+        assert self.work_crud.get_construction(worker).id==constr.id or not self.work_crud.is_brigadir(worker)
 
 
     def test_transfer_brigadir(self):
@@ -215,20 +199,16 @@ class TestDatabase():
         new_worker = self.work_crud.get_by_id(id=2)
         constr = self.constr_crud.get_by_id(id=1)
 
-        if self.constr_crud.get_responsible(constr) or self.work_crud.is_brigadir(new_worker):
-            assert False
+        assert not self.constr_crud.get_responsible(constr) or not self.work_crud.is_brigadir(new_worker)
 
         # Перевод работника на объект как ответственного
         self.constr_crud.transfer_worker(constr, new_worker, brigadir=True)
 
-        if not self.constr_crud.get_responsible(constr):
-            assert False
+        assert self.constr_crud.get_responsible(constr)
 
-        if new_worker.id not in self.constr_crud.get_workers(constr):
-            assert False
+        assert new_worker.id in self.constr_crud.get_workers(constr)
 
-        if self.work_crud.is_brigadir(new_worker).id!=constr.id:
-            assert False
+        assert self.work_crud.is_brigadir(new_worker).id==constr.id
     
 
     def test_move_tool(self):
@@ -239,21 +219,17 @@ class TestDatabase():
         tool = self.tool_crud.get_by_id(id=1)
         old_constr = self.tool_crud.get_construction(tool)
 
-        if not old_constr:
-            assert False
+        assert old_constr
 
         new_constr = self.generator.constr_generator()
         self.constr_crud.add(new_constr)
         new_constr = self.constr_crud.get_all()[-1]
 
 
-        if self.constr_crud.get_tools(new_constr):
-            assert False
+        assert not self.constr_crud.get_tools(new_constr)
         
         self.tool_crud.move_to(tool=tool, where=new_constr)
 
-        if self.tool_crud.get_construction(tool).id==old_constr.id:
-            assert False
+        assert self.tool_crud.get_construction(tool).id!=old_constr.id
         
-        if tool.id not in self.constr_crud.get_tools(new_constr):
-            assert False
+        assert tool.id in self.constr_crud.get_tools(new_constr)
