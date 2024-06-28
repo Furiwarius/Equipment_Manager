@@ -53,7 +53,7 @@ class DatabaseLogger():
         logging.config.fileConfig(setting)
 
     
-    def info(self, func:function):
+    def info(self, func):
         '''
         Выводит информацию о методе и послупающих в него данных
         '''
@@ -62,9 +62,9 @@ class DatabaseLogger():
             if isinstance(self.logger, log.NullHandler):
                 result = func(*args, **kwargs)
             else:
-                self.logger.info(f"method: {func.__name__}; input date: {args} {kwargs}")
+                self.logger.info(f"method: {func.__name__}; input data: {args} {kwargs}")
                 result = func(*args, **kwargs)
-                self.logger.info(f"method: {func.__name__}; output date: {result}")
+                self.logger.info(f"method: {func.__name__}; output data: {result}")
 
             return result
 
