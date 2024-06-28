@@ -1,6 +1,7 @@
 import logging as log
 import logging.config
 import enum
+import functools 
 
 
 class ModeLogger(enum.Enum):
@@ -56,7 +57,8 @@ class DatabaseLogger():
         '''
         Выводит информацию о методе и послупающих в него данных
         '''
-        def work_with_func(*args, **kwargs):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
             
             if isinstance(self.logger, log.NullHandler):
                 result = func(*args, **kwargs)
@@ -67,4 +69,4 @@ class DatabaseLogger():
 
             return result
 
-        return work_with_func
+        return wrapper
