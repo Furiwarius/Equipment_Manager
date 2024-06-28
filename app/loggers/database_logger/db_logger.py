@@ -1,4 +1,4 @@
-import logging
+import logging as log
 import logging.config
 import enum
 
@@ -26,21 +26,21 @@ class DatabaseLogger():
     log_print = 'app/settings/database_log_print.conf'
     
 
-    def get_logger(self, mode:ModeLogger=ModeLogger.write):
+    def get_logger(self, mode:ModeLogger=ModeLogger.write) -> log.StreamHandler|log.FileHandler|log.NullHandler:
         '''
         Возвращает логгер с нужным режимом работы
         '''
 
         if mode is ModeLogger.write:
             self._setting_logger(self.log_write)
-            self.logger = logging.getLogger('root')
+            self.logger = log.getLogger('root')
 
         elif mode is ModeLogger.print_:
             self._setting_logger(self.log_print)
-            self.logger = logging.getLogger('root')
+            self.logger = log.getLogger('root')
 
         elif mode is ModeLogger.disable:
-            self.logger = logging.NullHandler()
+            self.logger = log.NullHandler()
 
         return self.logger
 
@@ -53,13 +53,13 @@ class DatabaseLogger():
         logging.config.fileConfig(setting)
 
     
-    def info(self, func):
+    def info(self, func:function):
         '''
         Выводит информацию о методе и послупающих в него данных
         '''
         def work_with_func(*args, **kwargs):
             
-            if isinstance(self.logger, logging.NullHandler):
+            if isinstance(self.logger, log.NullHandler):
                 result = func(*args, **kwargs)
             else:
                 self.logger.info(f"method: {func.__name__}; input date: {args} {kwargs}")
