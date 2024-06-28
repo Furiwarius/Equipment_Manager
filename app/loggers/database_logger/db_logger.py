@@ -22,8 +22,7 @@ class DatabaseLogger():
     отключен.
     '''
 
-    log_write = 'app/settings/database_log_write.conf'
-    log_print = 'app/settings/database_log_print.conf'
+    log_setting = 'app/settings/database_log.conf'
     
 
     def get_logger(self, mode:ModeLogger=ModeLogger.write) -> log.StreamHandler|log.FileHandler|log.NullHandler:
@@ -32,12 +31,12 @@ class DatabaseLogger():
         '''
 
         if mode is ModeLogger.write:
-            self._setting_logger(self.log_write)
-            self.logger = log.getLogger('root')
+            self._setting_logger(self.log_setting)
+            self.logger = log.getLogger('write')
 
         elif mode is ModeLogger.print_:
-            self._setting_logger(self.log_print)
-            self.logger = log.getLogger('root')
+            self._setting_logger(self.log_setting)
+            self.logger = log.getLogger('print')
 
         elif mode is ModeLogger.disable:
             self.logger = log.NullHandler()
