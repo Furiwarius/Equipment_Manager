@@ -17,6 +17,7 @@ class WorkerCRUD(BaseCRUD):
         super().__init__(table=WorkerTable)
        
     
+    @BaseCRUD.logger.info
     def get_construction(self, worker:Worker) -> Construction|None:
         '''
         Получить объект, на котором
@@ -32,7 +33,7 @@ class WorkerCRUD(BaseCRUD):
                 return self.coverter.conversion_to_data(constr)
 
     
-
+    @BaseCRUD.logger.info
     def is_brigadir(self, worker:Worker) -> Construction:
         '''
         Метод, возвращающий объект, на котором 

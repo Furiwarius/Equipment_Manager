@@ -55,7 +55,7 @@ class Database():
         # строка подключения
         mysql_database = f"mysql+pymysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{HOST}/{self.database_name}"
         # создаем движок SqlAlchemy
-        self.engine = create_engine(mysql_database, echo=True)
+        self.engine = create_engine(mysql_database, echo=False)
 
         self.create_table()
         return self.engine
