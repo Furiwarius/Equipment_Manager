@@ -16,7 +16,7 @@ class BaseCRUD():
     '''
 
     logger = DatabaseLogger()
-    logger.get_logger(mode=ModeLogger.disable)
+    logger.get_logger(mode=ModeLogger.print_)
 
 
     def __init__(self, table:Base) -> None:
