@@ -1,10 +1,15 @@
 import pytest
 from datetime import datetime
-from app.service.construction.construction import Construction as Constr
-from app.service.storage.storage import Storage
-from app.service.worker.worker import Worker
-from app.service.tool.tool import Tool
+from app.service.construction.construction import ConstructionManager as ConstrM
+from app.service.storage.storage import StorageManager as StorM
+from app.service.worker.worker import WorkerManager as WorkM
+from app.service.tool.tool import ToolManager as ToolM
 from app.tests.fake_data import DataGenerator
+from app.database.database import Database
+from app.database.crud.toolCRUD import ToolCRUD
+from app.database.crud.storageCRUD import StorageCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.workerCRUD import WorkerCRUD
 
 
 class TestBusinessLogic():
@@ -14,12 +19,23 @@ class TestBusinessLogic():
 
     generator = DataGenerator()
 
+    db = Database()
+    # Пересоздаем бд
+    db.delete_database()
+    db.create_database()
+
+    # круды
+    constr_crud = ConstructionCRUD()
+    stor_crud = StorageCRUD()
+    work_crud = WorkerCRUD()
+    tool_crud = ToolCRUD()
+
 
     def test_add_storage(self):
         '''
         Тестрирование метода по добавлению склада
         '''
-    
+
     
     def test_add_tool(self):
         '''
