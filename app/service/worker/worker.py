@@ -4,7 +4,7 @@ from app.errors.service_error.worker_error import ImpossibleDismiss
 import enum
 from app.errors.service_error.construction_error import ConstructionClosed
 from app.database.crud.workerCRUD import WorkerCRUD
-from database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
 
 class StatusWorker(enum.Enum):
     '''
