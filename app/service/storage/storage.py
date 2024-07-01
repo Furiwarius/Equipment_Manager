@@ -27,7 +27,12 @@ class StorageManager():
 
     def __init__(self, storage:Storage) -> None:
         
+        self.stor_crud = StorageCRUD()
+        self.tool_crud = ToolCRUD()
+        self.constr_crud = ConstructionCRUD()
+
         self.storage = storage
+
 
 
     def add_tool(self, tool: Tool) -> None:
@@ -36,7 +41,7 @@ class StorageManager():
         '''
         self.__works_check()
 
-        ToolCRUD.add(self.storage, tool)
+        self.tool_crud.add(tool, self.storage)
     
 
     def delete_tool(self, tool: Tool) -> None:
@@ -45,7 +50,7 @@ class StorageManager():
 
         При продаже инструмента
         '''
-        StorageCRUD.retire(tool)
+        self.stor_crud.retire(tool)
     
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
@@ -58,10 +63,10 @@ class StorageManager():
         elif not tool.status:
             raise ToolBroken
 
-        elif ConstructionCRUD.get_responsible(where) is None:
+        elif self.constr_crud.get_responsible(where) is None:
             raise ResponsibleAbsent
 
-        ToolCRUD.move_to(tool, where)
+        self.tool_crud.move_to(tool, where)
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -73,7 +78,7 @@ class StorageManager():
         После чего делает новую запись с новым складом.
         '''
         if where.status:
-            ToolCRUD.move_to(tool, where)
+            self.tool_crud.move_to(tool, where)
         else:
             raise StockClosed
 
@@ -83,17 +88,17 @@ class StorageManager():
         Закрыть склад
         '''
         
-        if self.tools:
+        if self.stor_crud.get_tools(storage=self.storage):
             raise ImpossibleCloseStock
             
-        StorageCRUD.increase(self.storage)
+        self.stor_crud.downgrade(self.storage)
 
 
     def restore(self) -> None:
         '''
         Возобновить работу склада
         '''
-        StorageCRUD.retire(self.storage)
+        self.stor_crud.increase(self.storage)
     
     
     def __works_check(self) -> None:
