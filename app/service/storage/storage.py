@@ -2,7 +2,7 @@ import enum
 from app.entities.construction import Construction
 from app.entities.tool import Tool
 from app.entities.storage import Storage
-from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock
+from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock, StorageValid
 from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
 from app.database.crud.constructionCRUD import ConstructionCRUD
@@ -31,8 +31,22 @@ class StorageManager():
         self.tool_crud = ToolCRUD()
         self.constr_crud = ConstructionCRUD()
 
-        self.storage = storage
 
+        if storage.id is None:
+            if not self._validate_storade(storage):
+                raise StorageValid
+            
+            self.stor_crud.add(storage)
+            self.storage = self.stor_crud.get_all()[-1]
+
+        else: 
+            self.storage = storage
+
+
+    def _validate_storade(self, storage:Storage) -> bool:
+        '''
+        Метод для проверки получаемых данных
+        '''
 
 
     def add_tool(self, tool: Tool) -> None:
