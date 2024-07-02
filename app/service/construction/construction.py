@@ -89,7 +89,7 @@ class ConstructionManager():
         elif self.constr_crud.get_responsible(self.constr) is None:
             raise ResponsibleAbsent
 
-        self.tool_crud.move_to(tool, self.constr)
+        self.tool_crud.add(tool, self.constr)
         
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
