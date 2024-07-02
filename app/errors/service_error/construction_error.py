@@ -34,3 +34,14 @@ class ResponsibleAbsent(Exception):
         
         message = "На этом объекте не назначен ответственный"
         super().__init__(message)
+
+
+class ConstructionValid(Exception):
+    '''
+    Вызывается если пере
+    '''
+
+    def __init__(self):
+        
+        message = "Получены некорректные данные для добавления в бд"
+        super().__init__(message)

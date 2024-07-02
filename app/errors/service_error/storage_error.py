@@ -22,3 +22,14 @@ class ImpossibleCloseStock(Exception):
         
         message = "Этот склад нельзя закрыть, потому что на нем хранится инструмент"
         super().__init__(message)
+
+
+class StorageValid(Exception):
+    '''
+    Вызывается если переданы некорректные данные для добавления в БД
+    '''
+
+    def __init__(self):
+        
+        message = "Получены некорректные данные для добавления в бд"
+        super().__init__(message)
