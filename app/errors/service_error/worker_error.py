@@ -24,3 +24,15 @@ class WorkerDoesntWork(Exception):
         
         message = "Этот работник не может работать"
         super().__init__(message)
+
+
+class WorkerValid(Exception):
+    '''
+    Вызывается при попытке добавить
+    в БД некорректные данные
+    '''
+
+    def __init__(self):
+        
+        message = "Получены некорректные данные для добавления в бд"
+        super().__init__(message)
