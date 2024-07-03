@@ -2,11 +2,12 @@ from app.entities.construction import Construction
 from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
+from app.entities.account import Account
 from datetime import datetime
 from app.errors.service_error.validator_error import PresenceNumbers, ForbiddenSymbols
 from app.errors.service_error.validator_error import NonDisplayableSymbols, NotDatetime
-from app.errors.service_error.validator_error import DateMismatch, NotNumber, InvalidLength
-
+from app.errors.service_error.validator_error import DateMismatch, NotNumber
+from app.errors.service_error.validator_error import WrongType, InvalidLength
 
 
 class DataValidator():
@@ -78,16 +79,16 @@ class DataValidator():
 
 
 
-    def end_date(self, start_date:datetime, end_date:datetime) -> None:
+    def end_date(self, start_date:datetime, end_date:datetime|None) -> None:
         '''
         Проверка даты окончания
         '''
-
-        if not isinstance(start_date, datetime) or not isinstance(end_date, datetime):
-            raise NotDatetime
-        
-        elif end_date<start_date:
-            raise DateMismatch
+        if end_date:
+            if not isinstance(start_date, datetime) or not isinstance(end_date, datetime):
+                raise NotDatetime
+            
+            elif end_date<start_date:
+                raise DateMismatch
     
 
 
@@ -109,32 +110,78 @@ class ValidatorEssence():
     Валидатор поступающих в БД данных
     '''
 
-    validator = DataValidator()
+    valid = DataValidator()
 
 
-    def validate_construction(self, constr: Construction) -> bool:
+    def validate_construction(self, constr: Construction) -> None:
         '''
         Валидатор для новой записи
         в таблицу construction 
         '''
-    
 
-    def validate_storage(self, storage:Storage) -> bool:
+        if not isinstance(constr, Construction):
+            raise WrongType
+        
+        self.valid.only_strings(constr.name, length=60)
+        self.valid.strings_with_number(constr.address, length=100)
+        self.valid.strings_with_number(constr.project, length=60)
+        self.valid.start_date(constr.start_date)
+        self.valid.end_date(constr.start_date, constr.end_date)
+        
+
+
+    def validate_storage(self, storage:Storage) -> None:
         '''
         Валидатор для новой записи
         в таблицу storage 
         '''
-    
 
-    def validate_tool(self, tool:Tool) -> bool:
+        if not isinstance(storage, Storage):
+            raise WrongType
+
+        self.valid.only_strings(storage.name, length=60)
+        self.valid.strings_with_number(storage.address, length=100)
+        self.valid.start_date(storage.start_date)
+        self.valid.end_date(storage.start_date, storage.end_date)
+
+
+
+    def validate_tool(self, tool:Tool) -> None:
         '''
         Валидатор для новой записи
         в таблицу tool
         '''
 
+        if not isinstance(tool, Tool):
+            raise WrongType
+        
+        self.valid.only_strings(tool.name, length=60)
+        self.valid.strings_with_number(tool.factory_number, length=60)
+        self.valid.start_date(tool.start_date)
+        self.valid.end_date(tool.start_date, tool.end_date)
 
-    def validate_worker(self, worker:Worker) -> bool:
+
+
+    def validate_worker(self, worker:Worker) -> None:
         '''
         Валидатор для новой записи
         в таблицу worker 
+        '''
+
+        if not isinstance(worker, Worker):
+            raise WrongType
+        
+        self.valid.only_strings(worker.name, length=20)
+        self.valid.only_strings(worker.surname, length=20)
+        self.valid.phone_number(worker.phone_number)
+        self.valid.only_strings(worker.job_title, length=20)
+        self.valid.start_date(worker.start_date)
+        self.valid.end_date(worker.start_date, worker.end_date)
+
+
+    
+    def validate_account(self, account:Account) -> None:
+        '''
+        Валидатор для новой записи
+        в таблицу account
         '''
