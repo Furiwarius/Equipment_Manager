@@ -1,6 +1,12 @@
 
+class BaseValidatorException(Exception):
+    '''
+    Базовое исключение родитель
+    для удобного отслеживания
+    '''
 
-class PresenceNumbers(Exception):
+
+class PresenceNumbers(BaseValidatorException):
     '''
     Вызывается, если попытаться 
     внести сущность, в 
@@ -15,7 +21,7 @@ class PresenceNumbers(Exception):
 
 
 
-class ForbiddenSymbols(Exception):
+class ForbiddenSymbols(BaseValidatorException):
     '''
     Вызывается, если попытаться 
     внести сущность, в атрибуте
@@ -30,7 +36,7 @@ class ForbiddenSymbols(Exception):
 
 
 
-class NonDisplayableSymbols(Exception):
+class NonDisplayableSymbols(BaseValidatorException):
     '''
     Вызывается, если попытаться 
     внести сущность, атрибут которого
@@ -44,7 +50,7 @@ class NonDisplayableSymbols(Exception):
     
 
 
-class NotDatetime(Exception):
+class NotDatetime(BaseValidatorException):
     '''
     Вызывается, если попытаться 
     внести сущность, атрибут с датой
@@ -58,7 +64,7 @@ class NotDatetime(Exception):
 
 
 
-class DateMismatch(Exception):
+class DateMismatch(BaseValidatorException):
     '''
     Вызыввется, если попытаться внести
     в столбец end_time дату более раннюю
@@ -72,7 +78,7 @@ class DateMismatch(Exception):
 
 
 
-class InvalidLength(Exception):
+class InvalidLength(BaseValidatorException):
     '''
     Вызыввется, если попытаться внести
     атрибут неверной длинны
@@ -85,7 +91,7 @@ class InvalidLength(Exception):
 
 
 
-class NotNumber(Exception):
+class NotNumber(BaseValidatorException):
     '''
     Вызыввется, если попытаться внести
     номер состоящий не только из цифр
@@ -94,4 +100,17 @@ class NotNumber(Exception):
     def __init__(self):
         
         message = "В строке имеются не только цифры"
+        super().__init__(message)
+
+
+
+class WrongType(BaseValidatorException):
+    '''
+    Вызыввется, если в валидатор
+    передать неправильный тип данных
+    '''
+
+    def __init__(self):
+        
+        message = "Валидатор получил ножиданный тип данных"
         super().__init__(message)
