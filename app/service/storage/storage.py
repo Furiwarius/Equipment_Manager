@@ -54,6 +54,8 @@ class StorageManager():
         '''
         Добавить новый инструмент на склад
         '''
+
+        self.valid_essence.validate_tool(tool)
         self.__works_check()
 
         self.tool_crud.add(tool, self.storage)

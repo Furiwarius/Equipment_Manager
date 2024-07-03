@@ -84,6 +84,7 @@ class ConstructionManager():
         Добавить инструмент на объект
         '''
 
+        self.valid_essence.validate_tool(tool)
         self.__works_check()
 
         if not tool.status:
