@@ -6,10 +6,11 @@ from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed
 from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
-from app.errors.service_error.construction_error import ImpossibleCloseConstruction, ConstructionValid
+from app.errors.service_error.construction_error import ImpossibleCloseConstruction
 from app.errors.service_error.worker_error import WorkerDoesntWork
 from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.toolCRUD import ToolCRUD
+from app.service.validator.validator import ValidatorEssence, DataValidator
 
 
 class ConstructionStatus(enum.Enum):
@@ -25,6 +26,11 @@ class ConstructionManager():
     Управляющий класс для стройки
     '''
     
+    # Классы валидаторы
+    valid_essence = ValidatorEssence()
+    valid_data = DataValidator()
+
+
     def __init__(self, constr:Construction) -> None:
         '''
         При передаче constr взятого из БД
@@ -35,21 +41,16 @@ class ConstructionManager():
         self.constr_crud = ConstructionCRUD()
         self.tool_crud = ToolCRUD()
 
+
         if constr.id is None:
-            if not self._validate_construction(constr):
-                raise ConstructionValid
+            self.valid_essence.validate_construction(constr)
             
             self.constr_crud.add(constr)
             self.constr=self.constr_crud.get_all()[-1]
 
         else:
-            self.constr = constr       
+            self.constr = constr     
 
-
-    def _validate_construction(self, constr:Construction) -> bool:
-        '''
-        Метод для проверки получаемых данных
-        '''
 
 
     def appointment_responsible(self, worker:Worker) -> None:
@@ -63,6 +64,7 @@ class ConstructionManager():
         self.constr_crud.transfer_worker(construction=self.constr, worker=worker, brigadir=True)
     
 
+
     def add_worker(self, worker:Worker) -> None:
         '''
         Добавить работника
@@ -74,6 +76,7 @@ class ConstructionManager():
             raise WorkerDoesntWork
 
         self.constr_crud.transfer_worker(construction=self.constr, worker=worker, brigadir=False)
+
 
 
     def add_tool(self, tool:Tool) -> None:
@@ -92,6 +95,7 @@ class ConstructionManager():
         self.tool_crud.add(tool, self.constr)
         
 
+
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
         Перевезти инструмент с объекта на склад
@@ -101,6 +105,7 @@ class ConstructionManager():
 
         self.tool_crud.move_to(tool, where)
     
+
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
@@ -115,6 +120,7 @@ class ConstructionManager():
         self.tool_crud.move_to(tool, where)
 
 
+
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
@@ -125,12 +131,14 @@ class ConstructionManager():
         self.constr_crud.downgrade(self.constr)
     
 
+
     def open_construction(self):
         '''
         Возобновление строительства
         '''
         self.constr_crud.increase(self.constr)
     
+
 
     def __works_check(self) -> None:
         '''
