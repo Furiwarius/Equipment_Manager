@@ -10,6 +10,7 @@ from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
+from app.errors.service_error.validator_error import BaseValidatorException
 
 
 class TestBusinessLogic():
@@ -35,8 +36,25 @@ class TestBusinessLogic():
         '''
         Тестрирование метода по добавлению склада
         '''
+        new_storage = self.generator.storage_generator()
+
+        storage_manager = StorM(new_storage)
+
+        assert self.stor_crud.get_all()[-1].id is storage_manager.storage.id
+
 
     
+    def test_add_broken_storage(self):
+        '''
+        Тестирование исключений выпадающих 
+        при добавлении склада с неправильными атрибутами
+        '''
+        with pytest.raises(BaseValidatorException):
+            broken_storage = self.generator.storage_generator()
+            broken_storage.name = "   "
+            storage_manager = StorM(broken_storage)
+
+
     def test_add_tool(self):
         '''
         Тестирование метода по добавлению инструмента
