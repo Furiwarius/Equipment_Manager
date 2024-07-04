@@ -136,6 +136,25 @@ class TestBusinessLogic():
         
         assert self.work_crud.is_brigadir(worker).id is constr.id
         assert self.constr_crud.get_responsible(constr).id is worker.id
+    
+
+
+    def test_add_tool_in_construction_with_responsible(self):
+        '''
+        Тестирование метода по добавлению 
+        инструмента на объект строительства
+        без с имеющимся ответственным лицом
+        '''
+
+        new_tool = self.generator.tool_generator()
+        constr = self.constr_crud.get_all()[-1]
+            
+        constr_m = ConstrM(constr)
+        constr_m.add_tool(new_tool)
+
+        tool = self.tool_crud.get_all()[-1]
+        
+        assert tool.id in self.constr_crud.get_tools(constr_m.constr)
 
 
 
@@ -188,8 +207,32 @@ class TestBusinessLogic():
         Тестирование метода по перемещению работающего 
         инструмента со склада на объект
         '''
+
+        new_storage = self.generator.storage_generator()
+        stor_m = StorM(new_storage)
+
+        # Создаем объект строительства
+        new_constr = self.generator.constr_generator()
+        constr_m = ConstrM(new_constr)
+
+        # Создаем работника и назначаем его ответственным на объекте
+        new_worker = self.generator.worker_generator()
+        constr_m.appointment_responsible(WorkM(new_worker).worker)
+
+        new_tool = self.generator.tool_generator()
+        # Помещаем инструмент на склад
+        stor_m.add_tool(new_tool)
+        tool = self.tool_crud.get_all()[-1]
+
+        assert tool.id in self.stor_crud.get_tools(stor_m.storage)
+
+        tool_m = ToolM(tool)
+        tool_m.move_tool_to_construction(constr_m.constr)
         
-    
+        assert tool.id in self.constr_crud.get_tools(constr_m.constr)    
+        assert tool.id not in self.stor_crud.get_tools(stor_m.storage)
+
+        
 
     def test_move_broken_tool(self):
         '''
