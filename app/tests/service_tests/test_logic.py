@@ -267,7 +267,24 @@ class TestBusinessLogic():
         Тестирование метода по перемещению сломанного
         инструмента со объекта на склад
         '''
-        
+
+        constr = self.constr_crud.get_all()[-1]
+        constr_m = ConstrM(constr)
+
+        new_tool = self.generator.tool_generator()
+        constr_m.add_tool(new_tool)
+
+        tool = self.tool_crud.get_all()[-1]
+        tool_m = ToolM(tool)
+        tool_m.break_tool()
+
+        storage = self.stor_crud.get_all()[-1]
+
+        constr_m.move_tool_to_storage(tool, storage)
+
+        assert tool.id not in self.constr_crud.get_tools(constr)
+        assert tool.id in self.stor_crud.get_tools(storage)
+
 
 
     def test_remove_tool_from_stock(self):
