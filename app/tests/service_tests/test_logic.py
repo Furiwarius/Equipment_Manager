@@ -13,6 +13,7 @@ from app.database.crud.workerCRUD import WorkerCRUD
 from app.errors.service_error.validator_error import BaseValidatorException
 from app.errors.service_error.construction_error import ResponsibleAbsent
 from app.errors.service_error.worker_error import WorkerDoesntWork
+from app.errors.service_error.tool_error import ToolBroken
 
 
 class TestBusinessLogic():
@@ -239,6 +240,26 @@ class TestBusinessLogic():
         Тестирование метода по перемещению сломанного
         инструмента со склада на объект
         '''
+        storage = self.stor_crud.get_all()[-1]
+        stor_m = StorM(storage)
+
+        new_tool = self.generator.tool_generator()
+        stor_m.add_tool(new_tool)
+
+        tool = self.tool_crud.get_all()[-1]
+        tool_m = ToolM(tool)
+        tool_m.break_tool()
+
+        assert not self.tool_crud.get_by_id(id=tool_m.tool.id).status
+
+        constr = self.constr_crud.get_all()[-1]
+        assert self.constr_crud.get_responsible(constr)
+
+        with pytest.raises(ToolBroken):
+            stor_m.move_tool_to_construction(self.tool_crud.get_by_id(tool.id), constr)
+
+        assert tool.id not in self.constr_crud.get_tools(constr)
+
 
 
     def test_move_broken_tool_to_storage(self):
