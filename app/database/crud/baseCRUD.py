@@ -43,16 +43,16 @@ class BaseCRUD():
 
     def get_all(self) -> list:
         '''
-        Получить сущности
+        Получить id сущност
 
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
 
         with Session(autoflush=False, bind=self.engine) as db:
-            result = db.query(self.table).all()
+            result = db.query(self.table.id).all()
         
-        return [self.coverter.conversion_to_data(item) for item in result]
+        return list(result)
             
 
     def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
