@@ -42,7 +42,7 @@ class BaseCRUD():
             
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return result
+        return self.coverter.conversion_to_data(result)
 
 
 
