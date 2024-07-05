@@ -30,7 +30,7 @@ class BaseCRUD():
 
     
 
-    def add(self, obj:Worker|Constr|Storage) -> None:
+    def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
@@ -39,7 +39,12 @@ class BaseCRUD():
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
-    
+            
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return result
+
+
 
     def get_all(self) -> list:
         '''
