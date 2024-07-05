@@ -43,10 +43,9 @@ class ToolCRUD(BaseCRUD):
   
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return result
+        return self.coverter.conversion_to_data(result)
     
 
-    
 
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
