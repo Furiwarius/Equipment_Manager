@@ -22,7 +22,8 @@ class ToolCRUD(BaseCRUD):
         super().__init__(table=ToolTable)
 
 
-    def add(self, tool:Tool, where:Storage|Construction) -> None:
+
+    def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''
         Добавить инструмент
         
@@ -40,6 +41,12 @@ class ToolCRUD(BaseCRUD):
             
             db.commit()     # сохраняем изменения
   
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return result
+    
+
+    
 
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
