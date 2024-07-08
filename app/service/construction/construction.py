@@ -45,8 +45,7 @@ class ConstructionManager():
         if constr.id is None:
             self.valid_essence.validate_construction(constr)
             
-            self.constr_crud.add(constr)
-            self.constr=self.constr_crud.get_all()[-1]
+            self.constr=self.constr_crud.add(constr)
 
         else:
             self.constr = constr     
@@ -79,7 +78,7 @@ class ConstructionManager():
 
 
 
-    def add_tool(self, tool:Tool) -> None:
+    def add_tool(self, tool:Tool) -> Tool:
         '''
         Добавить инструмент на объект
         '''
@@ -93,8 +92,9 @@ class ConstructionManager():
         elif self.constr_crud.get_responsible(self.constr) is None:
             raise ResponsibleAbsent
 
-        self.tool_crud.add(tool, self.constr)
+        result = self.tool_crud.add(tool, self.constr)
         
+        return result
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
