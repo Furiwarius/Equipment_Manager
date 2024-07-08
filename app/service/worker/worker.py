@@ -43,9 +43,8 @@ class WorkerManager():
         if worker.id is None:
             self.valid_essence.validate_worker(worker)
             
-            self.worker_crud.add(worker)
-            self.worker = self.worker_crud.get_all()[-1]
-
+            self.worker = self.worker_crud.add(worker)
+            
         else: 
             self.worker = worker
 
