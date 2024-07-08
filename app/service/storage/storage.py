@@ -42,8 +42,7 @@ class StorageManager():
         if storage.id is None:
             self.valid_essence.validate_storage(storage)
             
-            self.stor_crud.add(storage)
-            self.storage = self.stor_crud.get_all()[-1]
+            self.storage = self.stor_crud.add(storage)
 
         else: 
             self.storage = storage
@@ -58,7 +57,9 @@ class StorageManager():
         self.valid_essence.validate_tool(tool)
         self.__works_check()
 
-        self.tool_crud.add(tool, self.storage)
+        result = self.tool_crud.add(tool, self.storage)
+
+        return result
     
 
 
