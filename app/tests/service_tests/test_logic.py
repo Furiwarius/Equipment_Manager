@@ -43,7 +43,7 @@ class TestBusinessLogic():
 
         storage_manager = StorM(new_storage)
 
-        assert self.stor_crud.get_all()[-1].id is storage_manager.storage.id
+        assert self.stor_crud.get_last_one().id is storage_manager.storage.id
 
 
     
@@ -59,7 +59,7 @@ class TestBusinessLogic():
 
             StorM(broken_storage)
         
-        assert self.stor_crud.get_all()[-1].name != broken_storage.name     
+        assert self.stor_crud.get_last_one().name != broken_storage.name     
 
 
 
@@ -71,12 +71,12 @@ class TestBusinessLogic():
 
         new_tool = self.generator.tool_generator()  
         
-        storage = self.stor_crud.get_all()[-1]
+        storage = self.stor_crud.get_last_one()
         stor_manager = StorM(storage)
         
-        stor_manager.add_tool(new_tool)      
+        tool = stor_manager.add_tool(new_tool)      
 
-        assert self.tool_crud.get_all()[-1].id in self.stor_crud.get_tools(storage) 
+        assert tool.id in self.stor_crud.get_tools(storage) 
 
 
 
@@ -88,7 +88,7 @@ class TestBusinessLogic():
         new_constr = self.generator.constr_generator()
         constr_manager = ConstrM(new_constr)
 
-        assert self.constr_crud.get_all()[-1].id is constr_manager.constr.id
+        assert self.constr_crud.get_last_one().id is constr_manager.constr.id
 
 
 
@@ -102,7 +102,7 @@ class TestBusinessLogic():
         with pytest.raises(ResponsibleAbsent):
             
             new_tool = self.generator.tool_generator()
-            constr = self.constr_crud.get_all()[-1]
+            constr = self.constr_crud.get_last_one()
             
             constr_m = ConstrM(constr)
             constr_m.add_tool(new_tool)
@@ -117,7 +117,7 @@ class TestBusinessLogic():
         new_worker = self.generator.worker_generator()
         worker_manager = WorkM(new_worker)
 
-        assert self.work_crud.get_all()[-1].id is worker_manager.worker.id
+        assert self.work_crud.get_last_one().id is worker_manager.worker.id
 
 
 
@@ -126,10 +126,10 @@ class TestBusinessLogic():
         Тестирование метода по назначению ответственного лица на объект (Работник здоров)
         '''
 
-        worker = self.work_crud.get_all()[-1]
+        worker = self.work_crud.get_last_one()
         assert worker.status
 
-        constr = self.constr_crud.get_all()[-1]
+        constr = self.constr_crud.get_last_one()
         assert not self.constr_crud.get_responsible(constr)
 
         constr_m = ConstrM(constr)
@@ -148,12 +148,10 @@ class TestBusinessLogic():
         '''
 
         new_tool = self.generator.tool_generator()
-        constr = self.constr_crud.get_all()[-1]
+        constr = self.constr_crud.get_last_one()
             
         constr_m = ConstrM(constr)
-        constr_m.add_tool(new_tool)
-
-        tool = self.tool_crud.get_all()[-1]
+        tool = constr_m.add_tool(new_tool)
         
         assert tool.id in self.constr_crud.get_tools(constr_m.constr)
 
@@ -164,7 +162,7 @@ class TestBusinessLogic():
         Тестирование метода по назначению ответственного лица на объект (Работник болен)
         '''
 
-        constr = self.constr_crud.get_all()[-1]
+        constr = self.constr_crud.get_last_one()
         assert self.constr_crud.get_responsible(constr)
 
         worker = self.generator.worker_generator()
@@ -189,7 +187,7 @@ class TestBusinessLogic():
         лица с уже имеющимся объектом и инструментами на нем
         '''
         
-        old_constr = self.constr_crud.get_all()[-1]
+        old_constr = self.constr_crud.get_last_one()
         responsible = self.constr_crud.get_responsible(old_constr)
         assert responsible
 
@@ -222,8 +220,7 @@ class TestBusinessLogic():
 
         new_tool = self.generator.tool_generator()
         # Помещаем инструмент на склад
-        stor_m.add_tool(new_tool)
-        tool = self.tool_crud.get_all()[-1]
+        tool = stor_m.add_tool(new_tool)
 
         assert tool.id in self.stor_crud.get_tools(stor_m.storage)
 
@@ -240,19 +237,18 @@ class TestBusinessLogic():
         Тестирование метода по перемещению сломанного
         инструмента со склада на объект
         '''
-        storage = self.stor_crud.get_all()[-1]
+        storage = self.stor_crud.get_last_one()
         stor_m = StorM(storage)
 
         new_tool = self.generator.tool_generator()
-        stor_m.add_tool(new_tool)
+        tool = stor_m.add_tool(new_tool)
 
-        tool = self.tool_crud.get_all()[-1]
         tool_m = ToolM(tool)
         tool_m.break_tool()
 
         assert not self.tool_crud.get_by_id(id=tool_m.tool.id).status
 
-        constr = self.constr_crud.get_all()[-1]
+        constr = self.constr_crud.get_last_one()
         assert self.constr_crud.get_responsible(constr)
 
         with pytest.raises(ToolBroken):
@@ -268,17 +264,16 @@ class TestBusinessLogic():
         инструмента со объекта на склад
         '''
 
-        constr = self.constr_crud.get_all()[-1]
+        constr = self.constr_crud.get_last_one()
         constr_m = ConstrM(constr)
 
         new_tool = self.generator.tool_generator()
-        constr_m.add_tool(new_tool)
+        tool = constr_m.add_tool(new_tool)
 
-        tool = self.tool_crud.get_all()[-1]
         tool_m = ToolM(tool)
         tool_m.break_tool()
 
-        storage = self.stor_crud.get_all()[-1]
+        storage = self.stor_crud.get_last_one()
 
         constr_m.move_tool_to_storage(tool, storage)
 
