@@ -49,7 +49,7 @@ class StorageManager():
 
 
 
-    def add_tool(self, tool: Tool) -> None:
+    def add_tool(self, tool: Tool) -> Tool:
         '''
         Добавить новый инструмент на склад
         '''
