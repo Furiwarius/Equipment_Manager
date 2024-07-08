@@ -56,7 +56,8 @@ class BaseCRUD():
 
         with Session(autoflush=False, bind=self.engine) as db:
             result = db.query(self.table.id).all()
-        
+            result = [item[0] for item in result]
+
         return list(result)
             
 
@@ -101,3 +102,15 @@ class BaseCRUD():
         with Session(autoflush=False, bind=self.engine) as db:
             db.query(self.table).filter(self.table.id == obj.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
             db.commit()
+    
+
+
+    def get_last_one(self) -> Constr|Storage|Tool|Worker:
+        '''
+        Получить последнего добавленного в таблицу
+        '''
+        with Session(autoflush=False, bind=self.engine) as db:
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return self.coverter.conversion_to_data(result)
+
