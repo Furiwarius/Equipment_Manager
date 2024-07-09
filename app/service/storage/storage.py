@@ -69,7 +69,7 @@ class StorageManager():
 
         При продаже инструмента
         '''
-        self.stor_crud.retire(tool)
+        self.tool_crud.retire(tool)
     
 
 

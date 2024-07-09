@@ -126,3 +126,21 @@ class ToolCRUD(BaseCRUD):
                 constr = db.get(StorageTable, place[0])
             
             return self.coverter.conversion_to_data(constr)
+    
+
+
+    def retire(self, tool:Tool) -> None:
+        '''
+        Удалить инструмент
+
+        Ставит дату закрытия (продажи, списания)
+        '''
+        tool = self.coverter.conversion_to_table(tool)
+        with Session(autoflush=False, bind=self.engine) as db:
+            
+            location = self.__locate(db, tool)
+            self.__close_post(db, location)
+
+            db.query(self.table).filter(self.table.id == tool.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            
+            db.commit()
