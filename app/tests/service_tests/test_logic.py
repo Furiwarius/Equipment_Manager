@@ -286,11 +286,13 @@ class TestBusinessLogic():
         '''
         Удаление инструмента со склада
         '''
-        
+        stor = self.stor_crud.get_last_one()
+        stor_m = StorM(stor)
 
-    
-    def test_remove_tool_from_construction(self):
-        '''
-        Удаление инструмента с объекта строительства
-        '''
+        new_tool = self.generator.tool_generator()
+        tool = stor_m.add_tool(new_tool)
+
+        stor_m.delete_tool(tool)
+
+        assert tool.id not in self.stor_crud.get_tools(stor)
         
