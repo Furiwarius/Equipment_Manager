@@ -110,7 +110,7 @@ class StorageManager():
         Закрыть склад
         '''
         
-        if self.stor_crud.get_tools(storage=self.storage):
+        if self.stor_crud.get_tools(storage_id=self.storage):
             raise ImpossibleCloseStock
             
         self.stor_crud.modify_status(self.storage, False)

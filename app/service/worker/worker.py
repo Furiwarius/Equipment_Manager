@@ -81,4 +81,4 @@ class WorkerManager():
         if not constr.status:
             raise ConstructionClosed
             
-        self.constr_crud.transfer_worker(construction=constr, worker=self.worker, brigadir=False)
+        self.constr_crud.transfer_worker(construction=constr, worker_id=self.worker, brigadir=False)

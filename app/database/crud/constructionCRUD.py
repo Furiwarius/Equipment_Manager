@@ -22,7 +22,7 @@ class ConstructionCRUD(BaseCRUD):
     
 
     @BaseCRUD.logger.info
-    def get_tools(self, constr:Construction) -> dict:
+    def get_tools(self, constr_id:int) -> dict:
         '''
         Получить инструменты на объекте 
 
@@ -32,14 +32,14 @@ class ConstructionCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
 
-            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr.id, ToolOnConstr.DT_end==None).all()
+            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
     
 
     @BaseCRUD.logger.info
-    def get_workers(self, constr:Construction) -> dict:
+    def get_workers(self, constr_id:int) -> dict:
         '''
         Получить работников на объекте
 
@@ -49,30 +49,30 @@ class ConstructionCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
 
-            tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr.id, WorkOnConstr.DT_end==None).all()
+            tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
     
     
     @BaseCRUD.logger.info
-    def get_responsible(self, constr:Construction) -> Worker:
+    def get_responsible(self, constr_id:int) -> Worker:
         '''
         Получить ответственного на объекте
         '''
         
         with Session(autoflush=False, bind=self.engine) as db:
-            place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr.id, 
+            place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, 
                                                                     WorkOnConstr.DT_end==None,
                                                                     WorkOnConstr.is_brigadir==True).all()
             
             if place: 
-                constr = db.get(WorkerTable, place[0])
-                return self.coverter.conversion_to_data(constr)
+                constr_id = db.get(WorkerTable, place[0])
+                return self.coverter.conversion_to_data(constr_id)
 
 
     @BaseCRUD.logger.info
-    def transfer_worker(self,  constr:Construction, worker:Worker, brigadir:bool=False) -> None:
+    def transfer_worker(self,  constr_id:int, worker_id:int, brigadir:bool=False) -> None:
         '''
         Перевести работника на объект
         
@@ -83,12 +83,12 @@ class ConstructionCRUD(BaseCRUD):
 
         with Session(autoflush=False, bind=self.engine) as db:
             
-            location = self.__locate(db, worker)
+            location = self.__locate(db, worker_id)
             if location:
                 self.__close_post(db, location)
 
-            work_on_constr = WorkOnConstr(worker_id=worker.id,
-                        construction_id=constr.id,
+            work_on_constr = WorkOnConstr(worker_id=worker_id,
+                        construction_id=constr_id,
                         is_brigadir=brigadir,
                         DT_start=datetime.now(),
                         DT_end=None)
@@ -98,12 +98,12 @@ class ConstructionCRUD(BaseCRUD):
 
     
     @BaseCRUD.logger.info
-    def __locate(self, db:Session, worker:Worker) -> WorkOnConstr:
+    def __locate(self, db:Session, worker_id:int) -> WorkOnConstr:
         '''
         Определить местоположение работника
         '''
 
-        constr = db.query(WorkOnConstr).filter(WorkOnConstr.worker_id==worker.id,
+        constr = db.query(WorkOnConstr).filter(WorkOnConstr.worker_id==worker_id,
                                                 WorkOnConstr.DT_end==None).all()
 
         if constr:

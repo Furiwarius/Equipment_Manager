@@ -74,27 +74,25 @@ class BaseCRUD():
 
 
     @logger.info
-    def modify_status(self, obj:Tool|Constr|Storage|Worker, status:bool) -> None:
+    def modify_status(self, obj_id:int, status:bool) -> None:
         '''
         Поменять статус
         '''
-        obj = self.coverter.conversion_to_table(obj)
         with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:status}, synchronize_session = False)
+            db.query(self.table).filter(self.table.id == obj_id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
 
 
 
     @logger.info
-    def retire(self, obj:Tool|Constr|Storage|Worker) -> None:
+    def retire(self, obj_id:int) -> None:
         '''
         Удалить объект
 
         Ставит дату закрытия (увольнения)
         '''
-        obj = self.coverter.conversion_to_table(obj)
         with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            db.query(self.table).filter(self.table.id == obj_id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
             db.commit()
     
 

@@ -78,7 +78,7 @@ class TestDatabase():
         assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
-        assert tool_db.id in self.stor_crud.get_tools(storage=storage)
+        assert tool_db.id in self.stor_crud.get_tools(storage_id=storage)
 
 
 
@@ -176,7 +176,7 @@ class TestDatabase():
         assert not self.constr_crud.get_workers(constr) and not self.work_crud.get_construction(worker)
 
         # Перевод работника на объект
-        self.constr_crud.transfer_worker(constr=constr, worker=worker)
+        self.constr_crud.transfer_worker(constr_id=constr, worker_id=worker)
 
         assert self.constr_crud.get_workers(constr) or not self.constr_crud.get_responsible(constr)
         

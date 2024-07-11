@@ -18,14 +18,14 @@ class WorkerCRUD(BaseCRUD):
        
     
     @BaseCRUD.logger.info
-    def get_construction(self, worker:Worker) -> Construction|None:
+    def get_construction(self, worker_id:int) -> Construction|None:
         '''
         Получить объект, на котором
         находится работник
         ''' 
 
         with Session(autoflush=False, bind=self.engine) as db:
-            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker.id, 
+            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
                                                                   WorkOnConstr.DT_end==None).all()
 
             if place:
@@ -34,14 +34,14 @@ class WorkerCRUD(BaseCRUD):
 
     
     @BaseCRUD.logger.info
-    def is_brigadir(self, worker:Worker) -> Construction:
+    def is_brigadir(self, worker_id:int) -> Construction:
         '''
         Метод, возвращающий объект, на котором 
         работник является ответственным.
         '''
 
         with Session(autoflush=False, bind=self.engine) as db:
-            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker.id, 
+            place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
                                                                   WorkOnConstr.DT_end==None,
                                                                   WorkOnConstr.is_brigadir==True).all()
             

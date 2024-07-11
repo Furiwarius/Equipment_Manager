@@ -60,7 +60,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        self.constr_crud.transfer_worker(constr=self.constr, worker=worker, brigadir=True)
+        self.constr_crud.transfer_worker(constr_id=self.constr, worker_id=worker, brigadir=True)
     
 
 
@@ -74,7 +74,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        self.constr_crud.transfer_worker(construction=self.constr, worker=worker, brigadir=False)
+        self.constr_crud.transfer_worker(construction=self.constr, worker_id=worker, brigadir=False)
 
 
 
