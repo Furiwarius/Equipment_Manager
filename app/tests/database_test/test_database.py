@@ -111,7 +111,7 @@ class TestDatabase():
 
     def test_downgrade(self):
         '''
-        Тестирование метода по изменению статуса на False (Base.downgrade())
+        Тестирование метода по изменению статуса на False (Base.modify_status(False))
         '''
 
         items = [crud.get_by_id(id=1) for crud in self.cruds]
@@ -126,7 +126,7 @@ class TestDatabase():
 
     def test_increase(self):
         '''
-        Тестирование метода по изменению статуса на True (Base.increase())
+        Тестирование метода по изменению статуса на True (Base.modify_status(True))
         '''
 
         items = [crud.get_by_id(id=1) for crud in self.cruds]
@@ -145,12 +145,7 @@ class TestDatabase():
         '''
 
         # Изменяем статус каждой сущности в зависимости от mode
-        if mode: 
-            # Выставляем статус True
-            [crud.increase(item) for item, crud in zip(items, self.cruds)]
-        else: 
-            # Выставляем статус False
-            [crud.downgrade(item) for item, crud in zip(items, self.cruds)]
+        [crud.modify_status(item, status=mode) for item, crud in zip(items, self.cruds)]
 
 
 

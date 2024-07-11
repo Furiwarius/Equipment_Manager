@@ -113,7 +113,7 @@ class StorageManager():
         if self.stor_crud.get_tools(storage=self.storage):
             raise ImpossibleCloseStock
             
-        self.stor_crud.downgrade(self.storage)
+        self.stor_crud.modify_status(self.storage, False)
 
 
 
@@ -121,7 +121,7 @@ class StorageManager():
         '''
         Возобновить работу склада
         '''
-        self.stor_crud.increase(self.storage)
+        self.stor_crud.modify_status(self.storage, True)
     
     
     

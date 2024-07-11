@@ -64,7 +64,7 @@ class ToolManager():
         '''
         Сломать инструмент
         '''
-        self.tool_crud.downgrade(self.tool)
+        self.tool_crud.modify_status(self.tool, False)
     
 
 
@@ -72,4 +72,4 @@ class ToolManager():
         '''
         Починить инструмент
         '''
-        self.tool_crud.increase(self.tool)
+        self.tool_crud.increase(self.tool, True)

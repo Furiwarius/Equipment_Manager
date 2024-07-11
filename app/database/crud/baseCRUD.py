@@ -28,7 +28,7 @@ class BaseCRUD():
 
 
     @logger.info
-    def add(self, obj:Worker|Constr|Storage) -> None:
+    def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
@@ -72,26 +72,17 @@ class BaseCRUD():
         return self.coverter.conversion_to_data(result)
     
 
+
     @logger.info
-    def downgrade(self, obj:Tool|Constr|Storage|Worker) -> None:
+    def modify_status(self, obj:Tool|Constr|Storage|Worker, status:bool) -> None:
         '''
-        Поменять статус на False
+        Поменять статус
         '''
         obj = self.coverter.conversion_to_table(obj)
         with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:False}, synchronize_session = False)
+            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
 
-
-    @logger.info
-    def increase(self, obj:Tool|Constr|Storage|Worker) -> None:
-        '''
-        Поменять статус объекта на True
-        '''
-        obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:True}, synchronize_session = False)
-            db.commit()
 
 
     @logger.info
