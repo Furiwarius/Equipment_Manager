@@ -2,6 +2,8 @@ import logging as log
 import logging.config
 import enum
 import functools 
+from app.settings.settings import DATABASE_LOG_SETTINGS
+
 
 
 class ModeLogger(enum.Enum):
@@ -9,9 +11,10 @@ class ModeLogger(enum.Enum):
     Режимы работы логгера БД
     '''
 
-    print_ = 'Печатать в консоль'
-    write = 'Записывать в файл'
-    disable = 'Отключить'
+    print_ = 'print'
+    write = 'write'
+    disable = 'off'
+
 
 
 class DatabaseLogger():
@@ -26,23 +29,25 @@ class DatabaseLogger():
     log_setting = 'app/settings/database_log.conf'
     
 
-    def get_logger(self, mode:ModeLogger=ModeLogger.write) -> log.StreamHandler|log.FileHandler|log.NullHandler:
+
+    def get_logger(self) -> log.StreamHandler|log.FileHandler|log.NullHandler:
         '''
         Возвращает логгер с нужным режимом работы
         '''
 
-        if mode is ModeLogger.write:
+        if DATABASE_LOG_SETTINGS is ModeLogger.write:
             self._setting_logger(self.log_setting)
             self.logger = log.getLogger('write')
 
-        elif mode is ModeLogger.print_:
+        elif DATABASE_LOG_SETTINGS is ModeLogger.print_:
             self._setting_logger(self.log_setting)
             self.logger = log.getLogger('print')
 
-        elif mode is ModeLogger.disable:
+        elif DATABASE_LOG_SETTINGS is ModeLogger.disable:
             self.logger = log.NullHandler()
 
         return self.logger
+
 
 
     def _setting_logger(self, setting:str) -> None:
@@ -52,6 +57,7 @@ class DatabaseLogger():
 
         logging.config.fileConfig(setting)
 
+    
     
     def info(self, func):
         '''
