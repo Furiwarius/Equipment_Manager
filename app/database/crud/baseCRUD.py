@@ -7,7 +7,7 @@ from app.database.database import Database
 from sqlalchemy.orm import Session
 from app.database.converter import Converter
 from datetime import datetime
-from app.loggers.database_logger.db_logger import DatabaseLogger, ModeLogger
+from app.loggers.database_logger.db_logger import DatabaseLogger
 
 
 class BaseCRUD():

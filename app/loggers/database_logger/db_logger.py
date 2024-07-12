@@ -6,17 +6,6 @@ from app.settings.settings import DATABASE_LOG_SETTINGS
 
 
 
-class ModeLogger(enum.Enum):
-    '''
-    Режимы работы логгера БД
-    '''
-
-    print_ = 'print'
-    write = 'write'
-    disable = 'off'
-
-
-
 class DatabaseLogger():
     '''
     Логгер базы данных   
@@ -35,15 +24,15 @@ class DatabaseLogger():
         Возвращает логгер с нужным режимом работы
         '''
 
-        if DATABASE_LOG_SETTINGS is ModeLogger.write:
+        if DATABASE_LOG_SETTINGS=='write':
             self._setting_logger(self.log_setting)
             self.logger = log.getLogger('write')
 
-        elif DATABASE_LOG_SETTINGS is ModeLogger.print_:
+        elif DATABASE_LOG_SETTINGS=='print':
             self._setting_logger(self.log_setting)
             self.logger = log.getLogger('print')
 
-        elif DATABASE_LOG_SETTINGS is ModeLogger.disable:
+        elif DATABASE_LOG_SETTINGS=='off':
             self.logger = log.NullHandler()
 
         return self.logger
