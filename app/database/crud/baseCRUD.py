@@ -1,12 +1,5 @@
-from app.database.tables.essence import ConstructionTable as ConstrTable
-from app.database.tables.essence import StorageTable
-from app.database.tables.essence import WorkerTable
-from app.database.tables.essence import ToolTable
 from app.database.tables.base import Base
 from app.entities.construction import Construction as Constr
-from app.database.tables.summary import ToolsOnConstructions
-from app.database.tables.summary import WorksOnConstructions
-from app.database.tables.summary import ToolsOnStorage
 from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
@@ -14,12 +7,17 @@ from app.database.database import Database
 from sqlalchemy.orm import Session
 from app.database.converter import Converter
 from datetime import datetime
+from app.loggers.database_logger.db_logger import DatabaseLogger, ModeLogger
 
 
 class BaseCRUD():
     '''
     Базовый класс для взаимодействия с БД
     '''
+
+    logger = DatabaseLogger()
+    logger.get_logger(mode=ModeLogger.print_)
+
 
     def __init__(self, table:Base) -> None:
         
@@ -28,8 +26,8 @@ class BaseCRUD():
         self.engine = db.new_engine()
         self.coverter = Converter()
 
-    
 
+    @logger.info
     def add(self, obj:Worker|Constr|Storage) -> None:
         '''
         Добавить сущности
@@ -41,6 +39,7 @@ class BaseCRUD():
             db.commit()     # сохраняем изменения
     
 
+    @logger.info
     def get_all(self) -> list:
         '''
         Получить сущности
@@ -55,6 +54,7 @@ class BaseCRUD():
         return [self.coverter.conversion_to_data(item) for item in result]
             
 
+    @logger.info
     def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
         '''
         Получить сущность по id
@@ -66,6 +66,7 @@ class BaseCRUD():
         return self.coverter.conversion_to_data(result)
     
 
+    @logger.info
     def downgrade(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Поменять статус на False
@@ -76,6 +77,7 @@ class BaseCRUD():
             db.commit()
 
 
+    @logger.info
     def increase(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Поменять статус объекта на True
@@ -86,6 +88,7 @@ class BaseCRUD():
             db.commit()
 
 
+    @logger.info
     def retire(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Удалить объект

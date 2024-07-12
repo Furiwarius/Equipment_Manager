@@ -22,6 +22,7 @@ class ToolCRUD(BaseCRUD):
         super().__init__(table=ToolTable)
 
 
+    @BaseCRUD.logger.info
     def add(self, tool:Tool, where:Storage|Construction) -> None:
         '''
         Добавить инструмент
@@ -41,6 +42,7 @@ class ToolCRUD(BaseCRUD):
             db.commit()     # сохраняем изменения
   
 
+    @BaseCRUD.logger.info
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
         Перевезти инструмент на другой объект
@@ -57,6 +59,7 @@ class ToolCRUD(BaseCRUD):
             db.commit() # сохраняем изменения
     
 
+    @BaseCRUD.logger.info
     def __move(self, db:Session, tool:Tool, where:Storage|StorageTable|Construction|ConstrTable) -> None:
         '''
         Добавить запись о храненнии инструмента
@@ -75,6 +78,7 @@ class ToolCRUD(BaseCRUD):
         db.add(post)
 
     
+    @BaseCRUD.logger.info
     def __locate(self, db:Session, tool:Tool) -> ToolsOnConstr|ToolsOnStorage:
         '''
         Определить местоположение инструмента
@@ -91,6 +95,7 @@ class ToolCRUD(BaseCRUD):
             return storage[0]
             
 
+    @BaseCRUD.logger.info
     def __close_post(self, db:Session, location:ToolsOnConstr|ToolsOnStorage) -> None:
         '''
         Записывает дату окончания хранения 
@@ -101,7 +106,7 @@ class ToolCRUD(BaseCRUD):
                                            ).update({type(location).DT_end:datetime.now()}, synchronize_session = False)
     
 
-
+    @BaseCRUD.logger.info
     def get_construction(self, tool:Tool) -> Construction|None:
         '''
         Получить объект, на котором
