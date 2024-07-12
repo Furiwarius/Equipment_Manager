@@ -5,8 +5,12 @@ from app.entities.tool import Tool
 from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed
 from app.errors.service_error.tool_error import ToolBroken
-from app.errors.service_error.construction_error import ImpossibleCloseConstruction, ConstructionClosed, ResponsibleAbsent
+from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
+from app.errors.service_error.construction_error import ImpossibleCloseConstruction
 from app.errors.service_error.worker_error import WorkerDoesntWork
+from database.crud.constructionCRUD import ConstructionCRUD
+from database.crud.toolCRUD import ToolCRUD
+
 
 class ConstructionStatus(enum.Enum):
     '''
@@ -34,7 +38,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=True)
+        ConstructionCRUD.transfer_worker(construction=self.constr, worker=worker, brigadir=True)
     
 
     def add_worker(self, worker:Worker) -> None:
@@ -47,7 +51,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        constructionCRUD.add_worker(construction=self.constr, worker=worker, brigadir=False)
+        ConstructionCRUD.transfer_worker(construction=self.constr, worker=worker, brigadir=False)
 
 
     def add_tool(self, tool:Tool) -> None:
@@ -60,10 +64,10 @@ class ConstructionManager():
         if not tool.status:
             raise ToolBroken
 
-        elif constructionCRUD.get_responsible(self.constr) is None:
+        elif ConstructionCRUD.get_responsible(self.constr) is None:
             raise ResponsibleAbsent
 
-        constructionCRUD.add_tool(self.constr, tool)
+        ToolCRUD.move_to(self.constr, tool)
         
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -73,7 +77,7 @@ class ConstructionManager():
         if not where.status:
             raise StockClosed
 
-        toolCRUD.move_to_storage(tool, where)
+        ToolCRUD.move_to_storage(tool, where)
     
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
@@ -86,24 +90,24 @@ class ConstructionManager():
         elif not tool.status:
             raise ToolBroken
 
-        toolCRUD.move_to_construction(tool, where)
+        ToolCRUD.move_to(tool, where)
 
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
-        if constructionCRUD.get_tools(): 
+        if ConstructionCRUD.get_tools(): 
             raise ImpossibleCloseConstruction
         
-        constructionCRUD.close_construction(self.constr)
+        ConstructionCRUD.downgrade(self.constr)
     
 
     def open_construction(self):
         '''
         Возобновление строительства
         '''
-        constructionCRUD.open_construction(self.constr)
+        ConstructionCRUD.increase(self.constr)
     
 
     def __works_check(self) -> None:

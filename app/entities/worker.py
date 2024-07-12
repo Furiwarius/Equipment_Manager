@@ -18,9 +18,9 @@ class Worker():
     phone_number: str
     # Должность работника
     job_title: str
-    # Дата приема на работу
-    start_work: datetime
-    # Дата увольнения
-    dismissal_work: datetime
+    # дата начала работы работника
+    start_date: datetime
+    # дата окончания работы работника
+    end_date: datetime
     # Статус работника
     status: bool
