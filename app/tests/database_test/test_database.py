@@ -176,7 +176,7 @@ class TestDatabase():
         assert not self.constr_crud.get_workers(constr.id) and not self.work_crud.get_construction(worker.id)
 
         # Перевод работника на объект
-        self.constr_crud.transfer_worker(constr_id=constr, worker_id=worker)
+        self.constr_crud.transfer_worker(constr_id=constr.id, worker_id=worker.id)
 
         assert self.constr_crud.get_workers(constr.id) or not self.constr_crud.get_responsible(constr.id)
         

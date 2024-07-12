@@ -44,7 +44,7 @@ class ToolManager():
         elif self.tool.status is ToolStatus.faulty:
             raise ToolBroken
 
-        elif self.constr_crud.get_responsible(constr) is None:
+        elif self.constr_crud.get_responsible(constr.id) is None:
             raise ResponsibleAbsent
 
         self.tool_crud.move_to(self.tool, constr)
@@ -64,7 +64,7 @@ class ToolManager():
         '''
         Сломать инструмент
         '''
-        self.tool_crud.modify_status(self.tool, False)
+        self.tool_crud.modify_status(self.tool.id, False)
     
 
 
@@ -72,4 +72,4 @@ class ToolManager():
         '''
         Починить инструмент
         '''
-        self.tool_crud.increase(self.tool, True)
+        self.tool_crud.modify_status(self.tool.id, True)

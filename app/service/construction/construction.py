@@ -60,7 +60,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        self.constr_crud.transfer_worker(constr_id=self.constr, worker_id=worker, brigadir=True)
+        self.constr_crud.transfer_worker(constr_id=self.constr.id, worker_id=worker.id, brigadir=True)
     
 
 
@@ -74,7 +74,7 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        self.constr_crud.transfer_worker(construction=self.constr, worker_id=worker, brigadir=False)
+        self.constr_crud.transfer_worker(constr_id=self.constr.id, worker_id=worker.id, brigadir=False)
 
 
 
@@ -89,7 +89,7 @@ class ConstructionManager():
         if not tool.status:
             raise ToolBroken
 
-        elif self.constr_crud.get_responsible(self.constr) is None:
+        elif self.constr_crud.get_responsible(self.constr.id) is None:
             raise ResponsibleAbsent
 
         result = self.tool_crud.add(tool, self.constr)
@@ -126,10 +126,10 @@ class ConstructionManager():
         '''
         Закрытие объекта строительства
         '''
-        if self.constr_crud.get_tools(self.constr): 
+        if self.constr_crud.get_tools(self.constr.id): 
             raise ImpossibleCloseConstruction
         
-        self.constr_crud.modify_status(self.constr, False)
+        self.constr_crud.modify_status(self.constr.id, False)
     
 
 
@@ -137,7 +137,7 @@ class ConstructionManager():
         '''
         Возобновление строительства
         '''
-        self.constr_crud.modify_status(self.constr, True)
+        self.constr_crud.modify_status(self.constr.id, True)
     
 
 

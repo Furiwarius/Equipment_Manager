@@ -69,7 +69,7 @@ class StorageManager():
 
         При продаже инструмента
         '''
-        self.tool_crud.retire(tool)
+        self.tool_crud.retire(tool.id)
     
 
 
@@ -113,7 +113,7 @@ class StorageManager():
         if self.stor_crud.get_tools(storage_id=self.storage):
             raise ImpossibleCloseStock
             
-        self.stor_crud.modify_status(self.storage, False)
+        self.stor_crud.modify_status(self.storage.id, False)
 
 
 
@@ -121,7 +121,7 @@ class StorageManager():
         '''
         Возобновить работу склада
         '''
-        self.stor_crud.modify_status(self.storage, True)
+        self.stor_crud.modify_status(self.storage.id, True)
     
     
     

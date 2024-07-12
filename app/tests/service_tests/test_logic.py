@@ -76,7 +76,7 @@ class TestBusinessLogic():
         
         tool = stor_manager.add_tool(new_tool)      
 
-        assert tool.id in self.stor_crud.get_tools(storage) 
+        assert tool.id in self.stor_crud.get_tools(storage.id) 
 
 
 
@@ -130,13 +130,13 @@ class TestBusinessLogic():
         assert worker.status
 
         constr = self.constr_crud.get_last_one()
-        assert not self.constr_crud.get_responsible(constr)
+        assert not self.constr_crud.get_responsible(constr.id)
 
         constr_m = ConstrM(constr)
         constr_m.appointment_responsible(worker)
         
-        assert self.work_crud.is_brigadir(worker).id is constr.id
-        assert self.constr_crud.get_responsible(constr).id is worker.id
+        assert self.work_crud.is_brigadir(worker.id).id is constr.id
+        assert self.constr_crud.get_responsible(constr.id).id is worker.id
     
 
 
@@ -144,16 +144,20 @@ class TestBusinessLogic():
         '''
         Тестирование метода по добавлению 
         инструмента на объект строительства
-        без с имеющимся ответственным лицом
+        с имеющимся ответственным лицом
         '''
 
         new_tool = self.generator.tool_generator()
         constr = self.constr_crud.get_last_one()
-            
+        
+        assert self.constr_crud.get_responsible(constr.id)
+
         constr_m = ConstrM(constr)
+        assert constr_m.constr.id is constr.id
+
         tool = constr_m.add_tool(new_tool)
         
-        assert tool.id in self.constr_crud.get_tools(constr_m.constr)
+        assert tool.id in self.constr_crud.get_tools(constr_m.constr.id)
 
 
 
@@ -163,7 +167,7 @@ class TestBusinessLogic():
         '''
 
         constr = self.constr_crud.get_last_one()
-        assert self.constr_crud.get_responsible(constr)
+        assert self.constr_crud.get_responsible(constr.id)
 
         worker = self.generator.worker_generator()
         worker_m = WorkM(worker)
@@ -177,7 +181,7 @@ class TestBusinessLogic():
         with pytest.raises(WorkerDoesntWork):
             constr_m.appointment_responsible(sick_worker)
         
-        assert self.constr_crud.get_responsible(constr_m.constr).id!=sick_worker.id
+        assert self.constr_crud.get_responsible(constr_m.constr.id).id!=sick_worker.id
 
 
     
@@ -188,16 +192,16 @@ class TestBusinessLogic():
         '''
         
         old_constr = self.constr_crud.get_last_one()
-        responsible = self.constr_crud.get_responsible(old_constr)
+        responsible = self.constr_crud.get_responsible(old_constr.id)
         assert responsible
 
         new_constr = self.generator.constr_generator()
         constr_m = ConstrM(new_constr)
         constr_m.appointment_responsible(responsible)
 
-        assert self.constr_crud.get_responsible(constr_m.constr).id is responsible.id
-        assert not self.constr_crud.get_responsible(old_constr)
-        assert self.work_crud.is_brigadir(responsible).id is constr_m.constr.id
+        assert self.constr_crud.get_responsible(constr_m.constr.id).id is responsible.id
+        assert not self.constr_crud.get_responsible(old_constr.id)
+        assert self.work_crud.is_brigadir(responsible.id).id is constr_m.constr.id
 
 
 
@@ -222,13 +226,13 @@ class TestBusinessLogic():
         # Помещаем инструмент на склад
         tool = stor_m.add_tool(new_tool)
 
-        assert tool.id in self.stor_crud.get_tools(stor_m.storage)
+        assert tool.id in self.stor_crud.get_tools(stor_m.storage.id)
 
         tool_m = ToolM(tool)
         tool_m.move_tool_to_construction(constr_m.constr)
         
-        assert tool.id in self.constr_crud.get_tools(constr_m.constr)    
-        assert tool.id not in self.stor_crud.get_tools(stor_m.storage)
+        assert tool.id in self.constr_crud.get_tools(constr_m.constr.id)    
+        assert tool.id not in self.stor_crud.get_tools(stor_m.storage.id)
 
         
 
@@ -249,12 +253,12 @@ class TestBusinessLogic():
         assert not self.tool_crud.get_by_id(id=tool_m.tool.id).status
 
         constr = self.constr_crud.get_last_one()
-        assert self.constr_crud.get_responsible(constr)
+        assert self.constr_crud.get_responsible(constr.id)
 
         with pytest.raises(ToolBroken):
             stor_m.move_tool_to_construction(self.tool_crud.get_by_id(tool.id), constr)
 
-        assert tool.id not in self.constr_crud.get_tools(constr)
+        assert tool.id not in self.constr_crud.get_tools(constr.id)
 
 
 
@@ -277,8 +281,8 @@ class TestBusinessLogic():
 
         constr_m.move_tool_to_storage(tool, storage)
 
-        assert tool.id not in self.constr_crud.get_tools(constr)
-        assert tool.id in self.stor_crud.get_tools(storage)
+        assert tool.id not in self.constr_crud.get_tools(constr.id)
+        assert tool.id in self.stor_crud.get_tools(storage.id)
 
 
 
