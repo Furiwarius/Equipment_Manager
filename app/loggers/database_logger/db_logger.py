@@ -1,8 +1,9 @@
 import logging as log
 import logging.config
-import enum
+from app.clients.email_client.email_client import EmailClient
 import functools 
-from app.settings.settings import DATABASE_LOG_SETTINGS
+from app.settings.settings import DATABASE_LOG_SETTINGS, DEVELOPER_EMAIL
+from datetime import datetime
 
 
 
@@ -17,6 +18,9 @@ class DatabaseLogger():
 
     log_setting = 'app/settings/database_log.conf'
     
+    sender = EmailClient() 
+    # путь к шаблону с сообщением об ошибке в работе БД
+    report = r"app\templates\error_database.txt"
 
 
     def get_logger(self) -> log.StreamHandler|log.FileHandler|log.NullHandler:
@@ -67,6 +71,11 @@ class DatabaseLogger():
             
             except Exception as err:
                 self.logger.error(f"method: {func.__name__} : {err}")
+                
+                # Отправка отчета об ошибке
+                self.sender.send(user_to=DEVELOPER_EMAIL, 
+                                 message=f"{datetime.now()} method: {func.__name__} : {err}",
+                                 template=self.report)
                 raise err
 
         return wrapper

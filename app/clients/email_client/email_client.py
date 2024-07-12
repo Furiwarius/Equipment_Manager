@@ -9,9 +9,10 @@ class EmailClient():
     '''
 
     default_template = "template_letter\default_template.txt"
+    default_setting = "app\settings\defoult_setting_email_client.ini"
 
     def __init__(self, 
-                 setting=r"app\setting\defoult_setting_email_client.ini") -> None:
+                 setting=default_setting) -> None:
         # Если не был передан путь с настройками
         # то используется путь по умолчанию
         self.setting = setting
@@ -78,13 +79,13 @@ class EmailClient():
 
 
     def send (self, user_to:str, message:str,
-              template="template_letter\default_template.txt", ) -> None:
+              template=default_template, ) -> None:
         '''
         Главный метод-менеджер, принимающий почту,
         на которую нужно отправить сообщение, само сообщение
         и шаблон для письма
         
-        template - текстровый шаблон (путь до него), в который будет вставляться сообщение
+        template - текстовый шаблон (путь до него), в который будет вставляться сообщение
         message - тест сообщения
         '''
         self.to = user_to
