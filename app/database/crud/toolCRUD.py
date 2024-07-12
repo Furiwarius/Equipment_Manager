@@ -4,6 +4,7 @@ from app.entities.construction import Construction
 from app.entities.storage import Storage
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.tables.essence import ToolTable
+from app.database.tables.essence import StorageTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
 from app.database.tables.summary import ToolsOnStorage
@@ -56,14 +57,14 @@ class ToolCRUD(BaseCRUD):
             db.commit() # сохраняем изменения
     
 
-    def __move(self, db:Session, tool:Tool, where:Storage|Construction) -> None:
+    def __move(self, db:Session, tool:Tool, where:Storage|StorageTable|Construction|ConstrTable) -> None:
         '''
         Добавить запись о храненнии инструмента
         '''
 
-        if isinstance(where, Storage):
+        if isinstance(where, StorageTable|Storage):
             place = ToolsOnStorage
-        else: 
+        elif isinstance(where, ConstrTable|Construction): 
             place = ToolsOnConstr
 
         post = place(tool_id=tool.id,
@@ -108,10 +109,14 @@ class ToolCRUD(BaseCRUD):
         ''' 
 
         with Session(autoflush=False, bind=self.engine) as db:
-            place = db.get(ToolsOnConstr, tool.id)
             place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool.id, 
                                                                   ToolsOnConstr.DT_end==None).all()
 
             if place:
                 constr = db.get(ConstrTable, place[0])
-                return self.coverter.conversion_to_data(constr)
+            else:
+                place = db.query(ToolsOnStorage.place_id).filter(ToolsOnStorage.tool_id==tool.id, 
+                                                                  ToolsOnStorage.DT_end==None).all()
+                constr = db.get(StorageTable, place[0])
+            
+            return self.coverter.conversion_to_data(constr)
