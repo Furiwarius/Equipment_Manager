@@ -23,6 +23,11 @@ class ToolCRUD(BaseCRUD):
 
 
 
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}"
+
+
+
     @BaseCRUD.logger.info
     def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''

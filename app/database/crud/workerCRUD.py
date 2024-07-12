@@ -15,7 +15,13 @@ class WorkerCRUD(BaseCRUD):
     def __init__(self) -> None:
         
         super().__init__(table=WorkerTable)
-       
+
+
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}"       
+
+
     
     @BaseCRUD.logger.info
     def get_construction(self, worker_id:int) -> Construction|None:

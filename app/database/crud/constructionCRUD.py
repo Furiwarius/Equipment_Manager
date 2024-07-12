@@ -21,6 +21,12 @@ class ConstructionCRUD(BaseCRUD):
         super().__init__(table=ConstructionTable)
     
 
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}"
+    
+
+
     @BaseCRUD.logger.info
     def get_tools(self, constr_id:int) -> dict:
         '''

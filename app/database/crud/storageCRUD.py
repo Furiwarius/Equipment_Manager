@@ -17,6 +17,12 @@ class StorageCRUD(BaseCRUD):
         super().__init__(table=StorageTable)
 
 
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}"
+
+
+
     @BaseCRUD.logger.info
     def get_tools(self, storage_id:int) -> dict:
         '''
