@@ -115,6 +115,9 @@ class ConstructionManager():
         if not where.status:
             raise ConstructionClosed
         
+        elif self.constr_crud.get_responsible(where.id) is None:
+            raise ResponsibleAbsent
+
         elif not tool.status:
             raise ToolBroken
 
