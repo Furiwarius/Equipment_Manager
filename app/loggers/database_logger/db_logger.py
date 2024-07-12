@@ -56,12 +56,17 @@ class DatabaseLogger():
         def wrapper(*args, **kwargs):
             
             if isinstance(self.logger, log.NullHandler):
-                result = func(*args, **kwargs)
-            else:
-                self.logger.info(f"method: {func.__name__}; input data: {args} {kwargs}")
+                return func(*args, **kwargs)
+            
+            self.logger.info(f"method: {func.__name__}; input data: {args} {kwargs}")
+
+            try:
                 result = func(*args, **kwargs)
                 self.logger.info(f"method: {func.__name__}; output data: {result}")
-
-            return result
+                return result
+            
+            except Exception as err:
+                self.logger.error(f"method: {func.__name__} : {err}")
+                raise err
 
         return wrapper
