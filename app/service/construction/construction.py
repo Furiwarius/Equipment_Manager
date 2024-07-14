@@ -133,6 +133,7 @@ class ConstructionManager():
             raise ImpossibleCloseConstruction
         
         self.constr_crud.modify_status(self.constr.id, False)
+        self.constr.status = True
     
 
 
@@ -141,6 +142,7 @@ class ConstructionManager():
         Возобновление строительства
         '''
         self.constr_crud.modify_status(self.constr.id, True)
+        self.constr.status = True
     
 
 

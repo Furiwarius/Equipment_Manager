@@ -114,6 +114,7 @@ class StorageManager():
             raise ImpossibleCloseStock
             
         self.stor_crud.modify_status(self.storage.id, False)
+        self.storage.status = False
 
 
 
@@ -122,6 +123,7 @@ class StorageManager():
         Возобновить работу склада
         '''
         self.stor_crud.modify_status(self.storage.id, True)
+        self.storage.status = True
     
     
     

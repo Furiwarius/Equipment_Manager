@@ -60,11 +60,13 @@ class ToolManager():
         self.tool_crud.move_to(self.tool, storage)
 
 
+
     def break_tool(self) -> None:
         '''
         Сломать инструмент
         '''
         self.tool_crud.modify_status(self.tool.id, False)
+        self.tool.status = False
     
 
 
@@ -73,3 +75,4 @@ class ToolManager():
         Починить инструмент
         '''
         self.tool_crud.modify_status(self.tool.id, True)
+        self.tool.status = True

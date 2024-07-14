@@ -55,6 +55,8 @@ class WorkerManager():
         Работник заболевает
         '''
         self.worker_crud.modify_status(self.worker.id, False)
+        self.worker.status = False
+
 
 
     def dismiss(self) -> None:
@@ -72,6 +74,8 @@ class WorkerManager():
         Работник выздоравливает
         '''     
         self.worker_crud.modify_status(self.worker.id, True)
+        self.worker.status = True
+
 
 
     def change_construction(self, constr:Construction) -> None:

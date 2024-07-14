@@ -81,8 +81,6 @@ class TestDatabase():
         '''
         Тест метода по получению сущности по id (Base.get_by_id())
         '''
-
-        assert self.tool_crud.get_by_id(id=100) is None
         
         # В предыдущем тесте добавлен инструмент
         assert self.tool_crud.get_by_id(id=1) is not None

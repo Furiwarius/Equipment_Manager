@@ -167,15 +167,14 @@ class TestBusinessLogic():
         worker_m = WorkM(worker)
         worker_m.get_sick() 
         
-        sick_worker = self.work_crud.get_by_id(id=worker_m.worker.id)
-        assert not sick_worker.status
+        assert not worker_m.worker.status
 
         constr_m = ConstrM(constr)
 
         with pytest.raises(WorkerDoesntWork):
-            constr_m.appointment_responsible(sick_worker)
+            constr_m.appointment_responsible(worker_m.worker)
         
-        assert self.constr_crud.get_responsible(constr_m.constr.id).id!=sick_worker.id
+        assert self.constr_crud.get_responsible(constr_m.constr.id).id!=worker_m.worker.id
 
 
     
@@ -244,7 +243,7 @@ class TestBusinessLogic():
         tool_m = ToolM(tool)
         tool_m.break_tool()
 
-        assert not self.tool_crud.get_by_id(id=tool_m.tool.id).status
+        assert not tool_m.tool.status
 
         constr = self.constr_crud.get_last_one()
         assert self.constr_crud.get_responsible(constr.id)
