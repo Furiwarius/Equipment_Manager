@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Engine
 from mysql.connector import connect, Error
-from app.settings.settings import DATABASE_PASSWORD, DATABASE_USER, HOST
+from app.settings.settings import DATABASE, DATABASE_PASSWORD, DATABASE_USER, HOST
 from app.database.tables.base import Base
 
 
@@ -9,9 +9,15 @@ class Database():
     База данных
     '''
 
-    def __init__(self) -> None:
+    database_name = DATABASE
 
-        self.database_name = "test_equipment_manager"
+
+    _instance = None  # Приватное поле для хранения единственного экземпляра
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(Database, cls).__new__(cls)
+        return cls._instance
 
 
     def create_database(self) -> None:
