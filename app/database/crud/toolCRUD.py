@@ -10,6 +10,8 @@ from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
 from app.database.tables.summary import ToolsOnStorage
 from app.database.tables.essence import ConstructionTable as ConstrTable
 from datetime import datetime
+from app.database.database import Database
+
 
 
 class ToolCRUD(BaseCRUD):
@@ -37,7 +39,7 @@ class ToolCRUD(BaseCRUD):
         указать объект или склад, где он будет хранится.
         '''
         tool = self.coverter.conversion_to_table(tool)
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             db.add(tool)     # добавляем в бд
             db.commit()
@@ -59,7 +61,7 @@ class ToolCRUD(BaseCRUD):
         Перевезти инструмент на другой объект
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             
             location = self.__locate(db, tool.id)
             
@@ -124,7 +126,7 @@ class ToolCRUD(BaseCRUD):
         находится инструмент
         ''' 
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool_id, 
                                                                   ToolsOnConstr.DT_end==None).all()
 
@@ -145,7 +147,7 @@ class ToolCRUD(BaseCRUD):
 
         Ставит дату закрытия (продажи, списания)
         '''
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             
             location = self.__locate(db, tool_id)
             self.__close_post(db, location)

@@ -22,12 +22,6 @@ class TestBusinessLogic():
     '''
 
     generator = DataGenerator()
-
-    db = Database()
-    # Пересоздаем бд
-    db.delete_database()
-    db.create_database()
-
     # круды
     constr_crud = ConstructionCRUD()
     stor_crud = StorageCRUD()
@@ -299,4 +293,3 @@ class TestBusinessLogic():
         stor_m.delete_tool(tool)
 
         assert tool.id not in self.stor_crud.get_tools(stor)
-        

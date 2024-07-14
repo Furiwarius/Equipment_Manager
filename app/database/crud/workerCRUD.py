@@ -5,6 +5,7 @@ from app.database.tables.essence import WorkerTable
 from app.database.tables.essence import ConstructionTable as ConstrTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
+from app.database.database import Database
 
 
 class WorkerCRUD(BaseCRUD):
@@ -30,7 +31,7 @@ class WorkerCRUD(BaseCRUD):
         находится работник
         ''' 
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
                                                                   WorkOnConstr.DT_end==None).all()
 
@@ -46,7 +47,7 @@ class WorkerCRUD(BaseCRUD):
         работник является ответственным.
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
                                                                   WorkOnConstr.DT_end==None,
                                                                   WorkOnConstr.is_brigadir==True).all()

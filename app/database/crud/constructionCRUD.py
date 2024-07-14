@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.database.tables.summary import ToolsOnConstructions as ToolOnConstr
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
 from datetime import datetime
+from app.database.database import Database
 
 
 class ConstructionCRUD(BaseCRUD):
@@ -36,7 +37,7 @@ class ConstructionCRUD(BaseCRUD):
         Выдает словарь в виде id: Tool 
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
@@ -53,7 +54,7 @@ class ConstructionCRUD(BaseCRUD):
         Выдает словарь в виде id: Worker
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
             result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
@@ -67,7 +68,7 @@ class ConstructionCRUD(BaseCRUD):
         Получить ответственного на объекте
         '''
         
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, 
                                                                     WorkOnConstr.DT_end==None,
                                                                     WorkOnConstr.is_brigadir==True).all()
@@ -87,7 +88,7 @@ class ConstructionCRUD(BaseCRUD):
         будет ответственным на объекте 
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             
             location = self.__locate(db, worker_id)
             if location:

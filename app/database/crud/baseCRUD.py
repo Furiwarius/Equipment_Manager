@@ -22,8 +22,6 @@ class BaseCRUD():
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
-        db = Database()
-        self.engine = db.new_engine()
         self.coverter = Converter()
 
 
@@ -33,7 +31,7 @@ class BaseCRUD():
         Добавить сущности
         '''
         obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
@@ -53,7 +51,7 @@ class BaseCRUD():
         и по нему ищет данные в БД
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.query(self.table.id).all()
             result = [item[0] for item in result]
 
@@ -66,7 +64,7 @@ class BaseCRUD():
         Получить сущность по id
         '''
         
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.get(self.table, id)
         
         return self.coverter.conversion_to_data(result)
@@ -78,7 +76,7 @@ class BaseCRUD():
         '''
         Поменять статус
         '''
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             db.query(self.table).filter(self.table.id == obj_id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
 
@@ -91,7 +89,7 @@ class BaseCRUD():
 
         Ставит дату закрытия (увольнения)
         '''
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             db.query(self.table).filter(self.table.id == obj_id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
             db.commit()
     
@@ -101,7 +99,7 @@ class BaseCRUD():
         '''
         Получить последнего добавленного в таблицу
         '''
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
         return self.coverter.conversion_to_data(result)

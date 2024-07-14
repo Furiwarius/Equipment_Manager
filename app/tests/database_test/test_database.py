@@ -12,12 +12,7 @@ class TestDatabase():
     '''
 
     generator = DataGenerator()
-
-    db = Database()
-    # Пересоздаем бд
-    db.delete_database()
-    db.create_database()
-
+    
     constr_crud = ConstructionCRUD()
     stor_crud = StorageCRUD()
     work_crud = WorkerCRUD()
@@ -169,9 +164,9 @@ class TestDatabase():
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
         '''
-
-        worker = self.work_crud.get_by_id(id=1)    
-        constr = self.constr_crud.get_by_id(id=1)
+        new_worker = self.generator.worker_generator()
+        worker = self.work_crud.add(new_worker)    
+        constr = self.constr_crud.get_last_one()
 
         assert not self.constr_crud.get_workers(constr.id) and not self.work_crud.get_construction(worker.id)
 
