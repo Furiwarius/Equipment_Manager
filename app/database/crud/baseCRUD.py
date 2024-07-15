@@ -6,7 +6,7 @@ from app.entities.worker import Worker
 from app.database.database import Database
 from sqlalchemy.orm import Session
 from app.database.converter import Converter
-from datetime import datetime
+from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
 
 
@@ -90,7 +90,7 @@ class BaseCRUD():
         Ставит дату закрытия (увольнения)
         '''
         with Database() as db:
-            db.query(self.table).filter(self.table.id == obj_id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            db.query(self.table).filter(self.table.id == obj_id).update({self.table.end_date:datetime.now(timezone.utc)}, synchronize_session = False)
             db.commit()
     
 

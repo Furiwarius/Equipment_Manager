@@ -71,3 +71,4 @@ class AccountTable(Base):
     password = Column(String(20), nullable=False)
     email = Column(String(30), nullable=False)
     confirmation_status = Column(Boolean)
+    timezone = Column(String(40), nullable=False)

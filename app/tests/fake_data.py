@@ -2,7 +2,7 @@ from app.entities.tool import Tool
 from app.entities.construction import Construction
 from app.entities.worker import Worker
 from app.entities.storage import Storage
-from datetime import datetime
+from datetime import datetime, timezone
 from random import randrange
 
 
@@ -36,7 +36,7 @@ class DataGenerator():
                             surname=f"surname{random_number}",
                             phone_number=str(randrange(89000000000, 89999999999)),
                             job_title=f"jobtitle{random_number}",
-                            start_date=datetime.now(),
+                            start_date=datetime.now(timezone.utc),
                             end_date=None,
                             status=status)
         
@@ -53,7 +53,7 @@ class DataGenerator():
                              name=f"tool{random_number}",
                              factory_number=f"factory_number{random_number}",
                              status=status,
-                             start_date=datetime.now(),
+                             start_date=datetime.now(timezone.utc),
                              end_date=None)
         
         return new_tool
@@ -70,7 +70,7 @@ class DataGenerator():
                                         project=f"project{random_number}",
                                         address=f"address{random_number}",
                                         status=status,
-                                        start_date=datetime.now(),
+                                        start_date=datetime.now(timezone.utc),
                                         end_date=None)
         
         return new_construction
@@ -86,7 +86,7 @@ class DataGenerator():
                               name=f"storage{random_number}",
                               address=f"address{random_number}",
                               status=status,
-                              start_date=datetime.now(),
+                              start_date=datetime.now(timezone.utc),
                               end_date=None)
         
         return new_storage
