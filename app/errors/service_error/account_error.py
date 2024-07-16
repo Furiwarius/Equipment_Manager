@@ -35,6 +35,21 @@ class LoginExists(Exception):
         super().__init__(message)
 
 
+
+class EmailExists(Exception):
+    '''
+    Вызывается, если при создании аккаунта
+    указывается уже используемая на другом
+    аккаунте почта
+    '''
+
+    def __init__(self):
+        
+        message = "Эта почта уже используется"
+        super().__init__(message)
+
+
+
 class CodeDoesntMatch(Exception):
     '''
     Вызывается, если не совпадает проверочный код
