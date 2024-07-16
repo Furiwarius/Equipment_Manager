@@ -56,8 +56,8 @@ class ConstructionCRUD(BaseCRUD):
 
         with Database() as db:
 
-            tools_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
-            result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
+            works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
+            result = {item[0]: self.coverter.conversion_to_data(db.get(WorkerTable, item)) for item in works_id}
 
         return result
     
