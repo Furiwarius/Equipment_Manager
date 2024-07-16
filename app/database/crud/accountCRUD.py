@@ -27,17 +27,28 @@ class AccountCRUD():
 
 
     @logger.info
-    def get_account(self, login:str, password:str) -> Account:
+    def get_account_by_login(self, login:str) -> Account:
         '''
         Получение данных об аккаунте по логину
 
-        login и password передаются в виде hash
+        login передаются в виде hash
         '''
         with Database() as db:
-            account = db.query(self.table).filter(AccountTable.login==login, 
-                                                                  AccountTable.password==password).all()
+            account = db.query(self.table).filter(AccountTable.login==login).all()
             
         return account[0]
+
+
+    @logger.info
+    def get_account_by_email(self, email:str) -> Account:
+        '''
+        Получение данных лю аккаунте по адресу почты
+        '''
+        with Database() as db:
+            account = db.query(self.table).filter(AccountTable.email==email).all()
+            
+        return account[0]
+
 
 
 
@@ -57,6 +68,10 @@ class AccountCRUD():
                                        timezone=timezone)
             db.add(new_account)
             db.commit()
+
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+        
+        return result
 
     
 
