@@ -16,3 +16,5 @@ class Account():
     email:str
     # Статус подтверждения
     confirmation_status:bool
+    # Таймзона пользователя
+    timezone:str
