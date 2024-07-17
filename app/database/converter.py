@@ -44,13 +44,13 @@ class Converter():
         param_names = list(class_.__init__.__code__.co_varnames[:class_.__init__.__code__.co_argcount])[1:] 
         
         # Инициализируется с полями None по умолчанию
-        result = class_()
+        class_instance = class_()
 
         # Заполнение полей
         for atr in param_names:
-            setattr(result, atr, getattr(item, atr))
+            setattr(class_instance, atr, getattr(item, atr))
         
-        return result 
+        return class_instance 
 
 
 
@@ -64,12 +64,12 @@ class Converter():
         param_names = list(item.__init__.__code__.co_varnames[:item.__init__.__code__.co_argcount])[1:] 
 
         # Создаем класс таблицы соответствующий классу бизнес логики
-        result = self.compliance.get(item.__class__.__name__)()
+        class_instance = self.compliance.get(item.__class__.__name__)()
 
         # Заполняем поля
         for atr in param_names:
-            setattr(result, atr, getattr(item, atr))
+            setattr(class_instance, atr, getattr(item, atr))
 
-        return result
+        return class_instance
 
         
