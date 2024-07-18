@@ -7,20 +7,20 @@ class Worker():
     Работник
     '''
 
-    id: int
+    id: int = None
     # id аккаунта, к которому привязан этот работник
-    account_id: int
-    # Имя
-    name: str
+    account_id: int = None
+    # Имя 
+    name: str = None
     # Фамилия
-    surname: str
+    surname: str = None
     # Номер телефона
-    phone_number: str
+    phone_number: str = None
     # Должность работника
-    job_title: str
+    job_title: str = None
     # дата начала работы работника
-    start_date: datetime
+    start_date: datetime = None
     # дата окончания работы работника
-    end_date: datetime
+    end_date: datetime = None
     # Статус работника
-    status: bool
+    status: bool = None

@@ -10,6 +10,8 @@ from app.database.tables.summary import ToolsOnConstructions as ToolsOnConstr
 from app.database.tables.summary import ToolsOnStorage
 from app.database.tables.essence import ConstructionTable as ConstrTable
 from datetime import datetime
+from app.database.database import Database
+
 
 
 class ToolCRUD(BaseCRUD):
@@ -22,7 +24,12 @@ class ToolCRUD(BaseCRUD):
         super().__init__(table=ToolTable)
 
 
-        
+
+    def __repr__(self) -> str:
+        return f"{__class__.__name__}"
+
+      
+      
     @BaseCRUD.logger.info
     def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''
@@ -32,7 +39,7 @@ class ToolCRUD(BaseCRUD):
         указать объект или склад, где он будет хранится.
         '''
         tool = self.coverter.conversion_to_table(tool)
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             db.add(tool)     # добавляем в бд
             db.commit()
@@ -54,9 +61,9 @@ class ToolCRUD(BaseCRUD):
         Перевезти инструмент на другой объект
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             
-            location = self.__locate(db, tool)
+            location = self.__locate(db, tool.id)
             
             self.__close_post(db, location)
             
@@ -85,14 +92,14 @@ class ToolCRUD(BaseCRUD):
 
     
     @BaseCRUD.logger.info
-    def __locate(self, db:Session, tool:Tool) -> ToolsOnConstr|ToolsOnStorage:
+    def __locate(self, db:Session, tool_id:int) -> ToolsOnConstr|ToolsOnStorage:
         '''
         Определить местоположение инструмента
         '''
 
-        constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool.id,
+        constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool_id,
                                                 ToolsOnConstr.DT_end==None).all()
-        storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool.id,
+        storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool_id,
                                                 ToolsOnStorage.DT_end==None).all()
 
         if constr:
@@ -113,20 +120,20 @@ class ToolCRUD(BaseCRUD):
     
 
     @BaseCRUD.logger.info
-    def get_construction(self, tool:Tool) -> Construction|None:
+    def get_construction(self, tool_id:int) -> Construction|None:
         '''
         Получить объект, на котором
         находится инструмент
         ''' 
 
-        with Session(autoflush=False, bind=self.engine) as db:
-            place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool.id, 
+        with Database() as db:
+            place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool_id, 
                                                                   ToolsOnConstr.DT_end==None).all()
 
             if place:
                 constr = db.get(ConstrTable, place[0])
             else:
-                place = db.query(ToolsOnStorage.place_id).filter(ToolsOnStorage.tool_id==tool.id, 
+                place = db.query(ToolsOnStorage.place_id).filter(ToolsOnStorage.tool_id==tool_id, 
                                                                   ToolsOnStorage.DT_end==None).all()
                 constr = db.get(StorageTable, place[0])
             
@@ -134,18 +141,17 @@ class ToolCRUD(BaseCRUD):
     
 
 
-    def retire(self, tool:Tool) -> None:
+    def retire(self, tool_id:int) -> None:
         '''
         Удалить инструмент
 
         Ставит дату закрытия (продажи, списания)
         '''
-        tool = self.coverter.conversion_to_table(tool)
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             
-            location = self.__locate(db, tool)
+            location = self.__locate(db, tool_id)
             self.__close_post(db, location)
 
-            db.query(self.table).filter(self.table.id == tool.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            db.query(self.table).filter(self.table.id == tool_id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
             
             db.commit()

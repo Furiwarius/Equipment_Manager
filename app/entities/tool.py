@@ -8,14 +8,14 @@ class Tool():
     Инструмент
     '''
 
-    id: int
+    id: int = None
     # название инструмента
-    name: str
+    name: str = None
     # статус инструмента
-    status: bool
+    status: bool = None
     # заводской номер
-    factory_number: str
+    factory_number: str = None
     # дата начала работы инструмента
-    start_date: datetime
+    start_date: datetime = None
     # дата окончания работы инструмента
-    end_date: datetime
+    end_date: datetime = None

@@ -7,3 +7,7 @@ class Base(DeclarativeBase):
     '''
     id = Column(Integer, primary_key=True, 
                 index=True, autoincrement='auto', unique=True)
+    
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: {self.id}"

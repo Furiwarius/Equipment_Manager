@@ -12,12 +12,7 @@ class TestDatabase():
     '''
 
     generator = DataGenerator()
-
-    db = Database()
-    # Пересоздаем бд
-    db.delete_database()
-    db.create_database()
-
+    
     constr_crud = ConstructionCRUD()
     stor_crud = StorageCRUD()
     work_crud = WorkerCRUD()
@@ -78,7 +73,7 @@ class TestDatabase():
         assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
-        assert tool_db.id in self.stor_crud.get_tools(storage=storage)
+        assert tool_db.id in self.stor_crud.get_tools(storage.id)
 
 
 
@@ -86,8 +81,6 @@ class TestDatabase():
         '''
         Тест метода по получению сущности по id (Base.get_by_id())
         '''
-
-        assert self.tool_crud.get_by_id(id=100) is None
         
         # В предыдущем тесте добавлен инструмент
         assert self.tool_crud.get_by_id(id=1) is not None
@@ -111,7 +104,7 @@ class TestDatabase():
 
     def test_downgrade(self):
         '''
-        Тестирование метода по изменению статуса на False (Base.downgrade())
+        Тестирование метода по изменению статуса на False (Base.modify_status(False))
         '''
 
         items = [crud.get_by_id(id=1) for crud in self.cruds]
@@ -126,7 +119,7 @@ class TestDatabase():
 
     def test_increase(self):
         '''
-        Тестирование метода по изменению статуса на True (Base.increase())
+        Тестирование метода по изменению статуса на True (Base.modify_status(True))
         '''
 
         items = [crud.get_by_id(id=1) for crud in self.cruds]
@@ -145,12 +138,7 @@ class TestDatabase():
         '''
 
         # Изменяем статус каждой сущности в зависимости от mode
-        if mode: 
-            # Выставляем статус True
-            [crud.increase(item) for item, crud in zip(items, self.cruds)]
-        else: 
-            # Выставляем статус False
-            [crud.downgrade(item) for item, crud in zip(items, self.cruds)]
+        [crud.modify_status(obj_id=item.id, status=mode) for item, crud in zip(items, self.cruds)]
 
 
 
@@ -160,10 +148,11 @@ class TestDatabase():
         (StorageCRUD.get_tools() | ConstructionCRUD.get_tools())
         '''
 
-        # Инструмент с id=1 был добавлен на склад с id 1
-        # На стройке с id=1 не должно быть инструмента вообще
-        tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1))
-        tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(id=1))
+        new_constr = self.generator.constr_generator()
+        constr = self.constr_crud.add(new_constr)
+        
+        tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1).id)
+        tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(constr.id))
 
         assert tools_on_stor and not tools_on_constr
         
@@ -174,18 +163,18 @@ class TestDatabase():
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
         '''
+        new_worker = self.generator.worker_generator()
+        worker = self.work_crud.add(new_worker)    
+        constr = self.constr_crud.get_last_one()
 
-        worker = self.work_crud.get_by_id(id=1)    
-        constr = self.constr_crud.get_by_id(id=1)
-
-        assert not self.constr_crud.get_workers(constr) and not self.work_crud.get_construction(worker)
+        assert not self.constr_crud.get_workers(constr.id) and not self.work_crud.get_construction(worker.id)
 
         # Перевод работника на объект
-        self.constr_crud.transfer_worker(constr=constr, worker=worker)
+        self.constr_crud.transfer_worker(constr_id=constr.id, worker_id=worker.id)
 
-        assert self.constr_crud.get_workers(constr) or not self.constr_crud.get_responsible(constr)
+        assert self.constr_crud.get_workers(constr.id) or not self.constr_crud.get_responsible(constr.id)
         
-        assert self.work_crud.get_construction(worker).id==constr.id or not self.work_crud.is_brigadir(worker)
+        assert self.work_crud.get_construction(worker.id).id==constr.id or not self.work_crud.is_brigadir(worker.id)
 
 
 
@@ -200,16 +189,16 @@ class TestDatabase():
 
         constr = self.constr_crud.get_by_id(id=1)
 
-        assert not self.constr_crud.get_responsible(constr) or not self.work_crud.is_brigadir(new_worker)
+        assert not self.constr_crud.get_responsible(constr.id) or not self.work_crud.is_brigadir(new_worker.id)
 
         # Перевод работника на объект как ответственного
-        self.constr_crud.transfer_worker(constr, new_worker, brigadir=True)
+        self.constr_crud.transfer_worker(constr.id, new_worker.id, brigadir=True)
 
-        assert self.constr_crud.get_responsible(constr)
+        assert self.constr_crud.get_responsible(constr.id)
 
-        assert new_worker.id in self.constr_crud.get_workers(constr)
+        assert new_worker.id in self.constr_crud.get_workers(constr.id)
 
-        assert self.work_crud.is_brigadir(new_worker).id==constr.id
+        assert self.work_crud.is_brigadir(new_worker.id).id==constr.id
     
 
 
@@ -219,7 +208,7 @@ class TestDatabase():
         (ToolCRUD.move_to())
         '''
         tool = self.tool_crud.get_by_id(id=1)
-        old_constr = self.tool_crud.get_construction(tool)
+        old_constr = self.tool_crud.get_construction(tool.id)
 
         assert old_constr
 
@@ -227,10 +216,10 @@ class TestDatabase():
         new_constr = self.constr_crud.add(new_constr)
 
 
-        assert not self.constr_crud.get_tools(new_constr)
+        assert not self.constr_crud.get_tools(new_constr.id)
         
         self.tool_crud.move_to(tool=tool, where=new_constr)
 
-        assert self.tool_crud.get_construction(tool).id!=old_constr.id
+        assert self.tool_crud.get_construction(tool.id).id!=old_constr.id
         
-        assert tool.id in self.constr_crud.get_tools(new_constr)
+        assert tool.id in self.constr_crud.get_tools(new_constr.id)

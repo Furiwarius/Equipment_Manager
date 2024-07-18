@@ -6,8 +6,9 @@ from app.entities.worker import Worker
 from app.database.database import Database
 from sqlalchemy.orm import Session
 from app.database.converter import Converter
-from datetime import datetime
-from app.loggers.database_logger.db_logger import DatabaseLogger, ModeLogger
+from datetime import datetime, timezone
+from app.loggers.database_logger.db_logger import DatabaseLogger
+
 
 
 class BaseCRUD():
@@ -16,14 +17,13 @@ class BaseCRUD():
     '''
 
     logger = DatabaseLogger()
-    logger.get_logger(mode=ModeLogger.print_)
+    logger.get_logger()
+
 
 
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
-        db = Database()
-        self.engine = db.new_engine()
         self.coverter = Converter()
 
 
@@ -34,7 +34,7 @@ class BaseCRUD():
         Добавить сущности
         '''
         obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
@@ -54,7 +54,7 @@ class BaseCRUD():
         и по нему ищет данные в БД
         '''
 
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.query(self.table.id).all()
             result = [item[0] for item in result]
 
@@ -67,44 +67,33 @@ class BaseCRUD():
         Получить сущность по id
         '''
         
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.get(self.table, id)
         
         return self.coverter.conversion_to_data(result)
     
 
+
     @logger.info
-    def downgrade(self, obj:Tool|Constr|Storage|Worker) -> None:
+    def modify_status(self, obj_id:int, status:bool) -> None:
         '''
-        Поменять статус на False
+        Поменять статус
         '''
-        obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:False}, synchronize_session = False)
+        with Database() as db:
+            db.query(self.table).filter(self.table.id == obj_id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
 
 
     @logger.info
-    def increase(self, obj:Tool|Constr|Storage|Worker) -> None:
-        '''
-        Поменять статус объекта на True
-        '''
-        obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.status:True}, synchronize_session = False)
-            db.commit()
+    def retire(self, obj_id:int) -> None:
 
-
-    @logger.info
-    def retire(self, obj:Tool|Constr|Storage|Worker) -> None:
         '''
         Удалить объект
 
         Ставит дату закрытия (увольнения)
         '''
-        obj = self.coverter.conversion_to_table(obj)
-        with Session(autoflush=False, bind=self.engine) as db:
-            db.query(self.table).filter(self.table.id == obj.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+        with Database() as db:
+            db.query(self.table).filter(self.table.id == obj_id).update({self.table.end_date:datetime.now(timezone.utc)}, synchronize_session = False)
             db.commit()
     
 
@@ -113,7 +102,7 @@ class BaseCRUD():
         '''
         Получить последнего добавленного в таблицу
         '''
-        with Session(autoflush=False, bind=self.engine) as db:
+        with Database() as db:
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
         return self.coverter.conversion_to_data(result)
