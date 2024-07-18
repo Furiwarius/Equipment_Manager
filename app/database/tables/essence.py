@@ -67,7 +67,8 @@ class AccountTable(Base):
     '''
     __tablename__ = "account"
 
-    login = Column(String(30), nullable=False)
-    password = Column(String(20), nullable=False)
-    email = Column(String(30), nullable=False)
+    login = Column(String(65), nullable=False, unique=True)
+    password = Column(String(65), nullable=False)
+    email = Column(String(60), nullable=False, unique=True)
     confirmation_status = Column(Boolean)
+    timezone = Column(String(40), nullable=False)

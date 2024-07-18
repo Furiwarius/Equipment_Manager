@@ -1,21 +1,31 @@
 from app.utilities.hashing import to_hash
 from app.service.verification_code.code import SenderCode
-from app.database.accountCRUD import AccountCRUD
-from app.errors.service_error.account_error import IncorrectLogin, IncorrectPassword, LoginExists, CodeDoesntMatch
+from app.database.crud.accountCRUD import AccountCRUD
+from app.errors.service_error.account_error import (IncorrectLogin, IncorrectPassword, 
+                                                    LoginExists, CodeDoesntMatch, EmailExists)
+from tzlocal import get_localzone
+from app.entities.account import Account
 
 
-class Account():
+class AccountManager():
     
-    def __init__(self) -> None:
 
-        pass
+    def __init__(self, login:str, password:str, email:str=None) -> None:
+
+        self.account_crud = AccountCRUD()
+
+        if email:
+            self.create(login, password, email)
+        else:
+            self.account = self.is_correct(login, password)
+        
 
 
-    def is_correct(self, login:str, password:str) -> None:
+    def is_correct(self, login:str, password:str) -> Account:
         '''
         Сравнение данных
         '''
-        acc = AccountCRUD.get_account(to_hash(login))
+        acc = self.account_crud.get_account_by_login(to_hash(login))
         
         if acc is None:
             # Если логина нет в бд
@@ -24,7 +34,10 @@ class Account():
         elif acc.password is to_hash(password):
             # Если пароль не совпадает с тем, который сохранен в бд
             raise IncorrectPassword
+
+        return acc
     
+
 
     def change_password(self, login:str, new_password:str) -> None:
         '''
@@ -32,30 +45,38 @@ class Account():
         '''
 
 
+
     def create(self, login:str, password:str, email:str) -> None:
         '''
         Создание аккаунта
         '''
 
-        if AccountCRUD.get_account(to_hash(login)):
+        if self.account_crud.get_account_by_login(to_hash(login)):
             # Если логин есть в БД
             raise LoginExists
+        elif self.account_crud.get_account_by_email(email):
+            # Если аккаунт с такой почтой уже есть
+            raise EmailExists
         
-        self.login = login
-        self.password = password
-        self.email = email
+        self.account = self.account_crud.add_account(login=to_hash(login), 
+                                                    password=to_hash(password),
+                                                    email=email,
+                                                    timezone=get_localzone())
         
-        self.verification()
+        # Отправка письма с проверочный кодом на почту
+        self.verification(email)
 
 
-    def verification(self) -> None:
+
+    def verification(self, email:str) -> None:
         '''
         Отправка проверочного кода
         '''
 
-        self.code = SenderCode(self.email)
+        self.code = SenderCode(email)
         self.code.send_code()
     
+
     
     def confirmation(self, code:int) -> None:
         '''
@@ -65,5 +86,7 @@ class Account():
         if not self.code.check_code(code):
             # Если проверочный код не совпадает
             raise CodeDoesntMatch
+    
+        self.account_crud.confirm(self.account.id)
         
-        AccountCRUD.add_account(self.login, self.password, self.email)
+

@@ -54,7 +54,9 @@ class WorkerManager():
         '''
         Работник заболевает
         '''
-        self.worker_crud.downgrade(self.worker)
+        self.worker_crud.modify_status(self.worker.id, False)
+        self.worker.status = False
+
 
 
     def dismiss(self) -> None:
@@ -64,14 +66,16 @@ class WorkerManager():
         if self.worker_crud.is_brigadir(self.worker):
             raise ImpossibleDismiss
         
-        self.worker_crud.retire(self.worker)
+        self.worker_crud.retire(self.worker.id)
         
 
     def get_well(self) -> None:
         '''
         Работник выздоравливает
         '''     
-        self.worker_crud.increase(self.worker)
+        self.worker_crud.modify_status(self.worker.id, True)
+        self.worker.status = True
+
 
 
     def change_construction(self, constr:Construction) -> None:
@@ -81,4 +85,4 @@ class WorkerManager():
         if not constr.status:
             raise ConstructionClosed
             
-        self.constr_crud.transfer_worker(construction=constr, worker=self.worker, brigadir=False)
+        self.constr_crud.transfer_worker(constr_id=constr.id, worker_id=self.worker.id, brigadir=False)
