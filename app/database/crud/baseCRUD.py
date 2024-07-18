@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
 
 
+
 class BaseCRUD():
     '''
     Базовый класс для взаимодействия с БД
@@ -19,10 +20,12 @@ class BaseCRUD():
     logger.get_logger()
 
 
+
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
         self.coverter = Converter()
+
 
 
     @logger.info
@@ -81,9 +84,9 @@ class BaseCRUD():
             db.commit()
 
 
-
     @logger.info
     def retire(self, obj_id:int) -> None:
+
         '''
         Удалить объект
 

@@ -77,7 +77,8 @@ class ConstructionCRUD(BaseCRUD):
                 constr_id = db.get(WorkerTable, place[0])
                 return self.coverter.conversion_to_data(constr_id)
 
-
+              
+              
     @BaseCRUD.logger.info
     def transfer_worker(self,  constr_id:int, worker_id:int, brigadir:bool=False) -> None:
         '''

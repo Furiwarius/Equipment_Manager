@@ -41,8 +41,8 @@ class DatabaseLogger():
 
         return self.logger
 
-
-
+      
+      
     def _setting_logger(self, setting:str) -> None:
         '''
         Чтение настроек для логгера базы данных
@@ -51,7 +51,7 @@ class DatabaseLogger():
         logging.config.fileConfig(setting)
 
     
-    
+
     def info(self, func):
         '''
         Выводит информацию о методе и послупающих в него данных
