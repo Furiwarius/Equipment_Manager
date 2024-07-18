@@ -27,8 +27,9 @@ class BaseCRUD():
         self.coverter = Converter()
 
 
+
     @logger.info
-    def add(self, obj:Worker|Constr|Storage) -> None:
+    def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
@@ -37,21 +38,27 @@ class BaseCRUD():
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
-    
+            
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return self.coverter.conversion_to_data(result)
+
+
 
     @logger.info
     def get_all(self) -> list:
         '''
-        Получить сущности
+        Получить id сущност
 
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
 
         with Session(autoflush=False, bind=self.engine) as db:
-            result = db.query(self.table).all()
-        
-        return [self.coverter.conversion_to_data(item) for item in result]
+            result = db.query(self.table.id).all()
+            result = [item[0] for item in result]
+
+        return list(result)
             
 
     @logger.info
@@ -99,3 +106,15 @@ class BaseCRUD():
         with Session(autoflush=False, bind=self.engine) as db:
             db.query(self.table).filter(self.table.id == obj.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
             db.commit()
+    
+
+
+    def get_last_one(self) -> Constr|Storage|Tool|Worker:
+        '''
+        Получить последнего добавленного в таблицу
+        '''
+        with Session(autoflush=False, bind=self.engine) as db:
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return self.coverter.conversion_to_data(result)
+

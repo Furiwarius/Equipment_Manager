@@ -32,12 +32,11 @@ class TestDatabase():
         '''
 
         constr = self.generator.constr_generator()
-        self.constr_crud.add(constr)
+        constr_db = self.constr_crud.add(constr)
 
-        # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
-        constr_db = self.constr_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert constr_db.name==constr.name
+
 
 
     def test_add_storage(self):
@@ -46,12 +45,11 @@ class TestDatabase():
         '''
 
         storage = self.generator.storage_generator()
-        self.stor_crud.add(storage)
+        storage_db = self.stor_crud.add(storage)
 
-        # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
-        storage_db = self.stor_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert storage_db.name==storage.name
+
 
 
     def test_add_worker(self):
@@ -60,12 +58,11 @@ class TestDatabase():
         '''
 
         worker = self.generator.worker_generator()
-        self.work_crud.add(worker)
+        worker_db = self.work_crud.add(worker)
 
-        # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
-        worker_db = self.work_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert worker_db.name==worker.name
+
 
 
     def test_add_tool(self):
@@ -75,15 +72,14 @@ class TestDatabase():
         # Тк до этого добавляли склад, он есть в бд
         storage = self.stor_crud.get_by_id(id=1)
         tool = self.generator.tool_generator()
-        self.tool_crud.add(tool=tool, where=storage)
+        tool_db = self.tool_crud.add(tool=tool, where=storage)
 
-        # Бд была пуста, поэтому мы точно знаем с каким id добавлен элемент
-        tool_db = self.tool_crud.get_by_id(id=1)
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
         assert tool_db.id in self.stor_crud.get_tools(storage=storage)
+
 
 
     def test_get_by_id(self):
@@ -96,6 +92,7 @@ class TestDatabase():
         # В предыдущем тесте добавлен инструмент
         assert self.tool_crud.get_by_id(id=1) is not None
         
+
 
     def test_get_all_item(self):
         '''
@@ -111,6 +108,7 @@ class TestDatabase():
         assert workers and constructions and tools and storages
         
 
+
     def test_downgrade(self):
         '''
         Тестирование метода по изменению статуса на False (Base.downgrade())
@@ -124,6 +122,7 @@ class TestDatabase():
             # Если статус сущности не False, тест провален
             assert not crud.get_by_id(id=1).status
     
+
 
     def test_increase(self):
         '''
@@ -139,6 +138,7 @@ class TestDatabase():
             assert crud.get_by_id(id=1).status
             
 
+
     def __status_operations(self, items:list, mode=True):
         '''
         Операции по изменению статуса у списка сущностей
@@ -151,6 +151,7 @@ class TestDatabase():
         else: 
             # Выставляем статус False
             [crud.downgrade(item) for item, crud in zip(items, self.cruds)]
+
 
 
     def test_get_tools(self):
@@ -166,6 +167,7 @@ class TestDatabase():
 
         assert tools_on_stor and not tools_on_constr
         
+
 
     def test_transfer_worker(self):
         '''
@@ -186,6 +188,7 @@ class TestDatabase():
         assert self.work_crud.get_construction(worker).id==constr.id or not self.work_crud.is_brigadir(worker)
 
 
+
     def test_transfer_brigadir(self):
         '''
         Тестирование метода по назначению ответственного лица на объект 
@@ -193,10 +196,8 @@ class TestDatabase():
         '''
         # Генерация нового работника
         new_worker = self.generator.worker_generator()    
-        self.work_crud.add(new_worker)
+        new_worker = self.work_crud.add(new_worker)
 
-        # Получение данных из таблиц
-        new_worker = self.work_crud.get_by_id(id=2)
         constr = self.constr_crud.get_by_id(id=1)
 
         assert not self.constr_crud.get_responsible(constr) or not self.work_crud.is_brigadir(new_worker)
@@ -211,6 +212,7 @@ class TestDatabase():
         assert self.work_crud.is_brigadir(new_worker).id==constr.id
     
 
+
     def test_move_tool(self):
         '''
         Тестирование метода по перемещению инструмента
@@ -222,8 +224,7 @@ class TestDatabase():
         assert old_constr
 
         new_constr = self.generator.constr_generator()
-        self.constr_crud.add(new_constr)
-        new_constr = self.constr_crud.get_all()[-1]
+        new_constr = self.constr_crud.add(new_constr)
 
 
         assert not self.constr_crud.get_tools(new_constr)

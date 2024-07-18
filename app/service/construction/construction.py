@@ -8,8 +8,9 @@ from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
 from app.errors.service_error.construction_error import ImpossibleCloseConstruction
 from app.errors.service_error.worker_error import WorkerDoesntWork
-from database.crud.constructionCRUD import ConstructionCRUD
-from database.crud.toolCRUD import ToolCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.toolCRUD import ToolCRUD
+from app.service.validator.validator import ValidatorEssence, DataValidator
 
 
 class ConstructionStatus(enum.Enum):
@@ -25,9 +26,30 @@ class ConstructionManager():
     Управляющий класс для стройки
     '''
     
-    def __init__(self, constr:Construction) -> None:
+    # Классы валидаторы
+    valid_essence = ValidatorEssence()
+    valid_data = DataValidator()
 
-        self.constr = constr       
+
+    def __init__(self, constr:Construction) -> None:
+        '''
+        При передаче constr взятого из БД
+        продолжает с ним рабоать.
+        Если объект новый, то пытается добавить его в БД.
+        '''
+
+        self.constr_crud = ConstructionCRUD()
+        self.tool_crud = ToolCRUD()
+
+
+        if constr.id is None:
+            self.valid_essence.validate_construction(constr)
+            
+            self.constr=self.constr_crud.add(constr)
+
+        else:
+            self.constr = constr     
+
 
 
     def appointment_responsible(self, worker:Worker) -> None:
@@ -38,8 +60,9 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        ConstructionCRUD.transfer_worker(construction=self.constr, worker=worker, brigadir=True)
+        self.constr_crud.transfer_worker(constr=self.constr, worker=worker, brigadir=True)
     
+
 
     def add_worker(self, worker:Worker) -> None:
         '''
@@ -51,24 +74,28 @@ class ConstructionManager():
         if not worker.status:
             raise WorkerDoesntWork
 
-        ConstructionCRUD.transfer_worker(construction=self.constr, worker=worker, brigadir=False)
+        self.constr_crud.transfer_worker(construction=self.constr, worker=worker, brigadir=False)
 
 
-    def add_tool(self, tool:Tool) -> None:
+
+    def add_tool(self, tool:Tool) -> Tool:
         '''
         Добавить инструмент на объект
         '''
 
+        self.valid_essence.validate_tool(tool)
         self.__works_check()
 
         if not tool.status:
             raise ToolBroken
 
-        elif ConstructionCRUD.get_responsible(self.constr) is None:
+        elif self.constr_crud.get_responsible(self.constr) is None:
             raise ResponsibleAbsent
 
-        ToolCRUD.move_to(self.constr, tool)
+        result = self.tool_crud.add(tool, self.constr)
         
+        return result
+
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
         '''
@@ -77,8 +104,9 @@ class ConstructionManager():
         if not where.status:
             raise StockClosed
 
-        ToolCRUD.move_to_storage(tool, where)
+        self.tool_crud.move_to(tool, where)
     
+
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
@@ -90,25 +118,28 @@ class ConstructionManager():
         elif not tool.status:
             raise ToolBroken
 
-        ToolCRUD.move_to(tool, where)
+        self.tool_crud.move_to(tool, where)
+
 
 
     def close_construction(self) -> None:
         '''
         Закрытие объекта строительства
         '''
-        if ConstructionCRUD.get_tools(): 
+        if self.constr_crud.get_tools(self.constr): 
             raise ImpossibleCloseConstruction
         
-        ConstructionCRUD.downgrade(self.constr)
+        self.constr_crud.downgrade(self.constr)
     
+
 
     def open_construction(self):
         '''
         Возобновление строительства
         '''
-        ConstructionCRUD.increase(self.constr)
+        self.constr_crud.increase(self.constr)
     
+
 
     def __works_check(self) -> None:
         '''
@@ -120,4 +151,3 @@ class ConstructionManager():
         
         if self.constr.status is ConstructionStatus.finished:
             raise ConstructionClosed
-

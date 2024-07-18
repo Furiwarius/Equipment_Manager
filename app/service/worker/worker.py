@@ -4,7 +4,10 @@ from app.errors.service_error.worker_error import ImpossibleDismiss
 import enum
 from app.errors.service_error.construction_error import ConstructionClosed
 from app.database.crud.workerCRUD import WorkerCRUD
-from database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.service.validator.validator import ValidatorEssence, DataValidator
+
+
 
 class StatusWorker(enum.Enum):
     '''
@@ -20,38 +23,55 @@ class StatusWorker(enum.Enum):
     sick = False
     
 
+
 class WorkerManager():
     '''
     Работник
     '''
 
+
+    # Классы валидаторы
+    valid_essence = ValidatorEssence()
+    valid_data = DataValidator()
+
+
     def __init__(self, worker: Worker) -> None:
         
-        self.worker = worker
+        self.worker_crud = WorkerCRUD()
+        self.constr_crud = ConstructionCRUD()
 
-    
+        if worker.id is None:
+            self.valid_essence.validate_worker(worker)
+            
+            self.worker = self.worker_crud.add(worker)
+            
+        else: 
+            self.worker = worker
+
+
+
     def get_sick(self) -> None:
         '''
         Работник заболевает
         '''
-        WorkerCRUD.downgrade(self.worker)
+        self.worker_crud.downgrade(self.worker)
 
 
     def dismiss(self) -> None:
         '''
         Уволить работника
         '''
-        if WorkerCRUD.is_brigadir(self.worker):
+        if self.worker_crud.is_brigadir(self.worker):
             raise ImpossibleDismiss
         
-        WorkerCRUD.retire(self.worker)
+        self.worker_crud.retire(self.worker)
         
 
     def get_well(self) -> None:
         '''
         Работник выздоравливает
         '''     
-        WorkerCRUD.increase(self.worker)
+        self.worker_crud.increase(self.worker)
 
 
     def change_construction(self, constr:Construction) -> None:
@@ -61,4 +81,4 @@ class WorkerManager():
         if not constr.status:
             raise ConstructionClosed
             
-        ConstructionCRUD.transfer_worker(construction=constr, worker=self.worker, brigadir=False)
+        self.constr_crud.transfer_worker(construction=constr, worker=self.worker, brigadir=False)

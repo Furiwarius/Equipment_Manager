@@ -34,7 +34,7 @@ class DataGenerator():
                             account_id=None,
                             name=f"name{random_number}",
                             surname=f"surname{random_number}",
-                            phone_number=randrange(89000000000, 89999999999),
+                            phone_number=str(randrange(89000000000, 89999999999)),
                             job_title=f"jobtitle{random_number}",
                             start_date=datetime.now(),
                             end_date=None,

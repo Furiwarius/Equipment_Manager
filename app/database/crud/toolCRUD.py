@@ -22,8 +22,9 @@ class ToolCRUD(BaseCRUD):
         super().__init__(table=ToolTable)
 
 
+        
     @BaseCRUD.logger.info
-    def add(self, tool:Tool, where:Storage|Construction) -> None:
+    def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''
         Добавить инструмент
         
@@ -41,6 +42,11 @@ class ToolCRUD(BaseCRUD):
             
             db.commit()     # сохраняем изменения
   
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+
+        return self.coverter.conversion_to_data(result)
+    
+
 
     @BaseCRUD.logger.info
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
@@ -125,3 +131,21 @@ class ToolCRUD(BaseCRUD):
                 constr = db.get(StorageTable, place[0])
             
             return self.coverter.conversion_to_data(constr)
+    
+
+
+    def retire(self, tool:Tool) -> None:
+        '''
+        Удалить инструмент
+
+        Ставит дату закрытия (продажи, списания)
+        '''
+        tool = self.coverter.conversion_to_table(tool)
+        with Session(autoflush=False, bind=self.engine) as db:
+            
+            location = self.__locate(db, tool)
+            self.__close_post(db, location)
+
+            db.query(self.table).filter(self.table.id == tool.id).update({self.table.end_date:datetime.now()}, synchronize_session = False)
+            
+            db.commit()
