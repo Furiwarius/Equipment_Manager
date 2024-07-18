@@ -21,6 +21,7 @@ class ConstructionCRUD(BaseCRUD):
         super().__init__(table=ConstructionTable)
     
 
+    @BaseCRUD.logger.info
     def get_tools(self, constr:Construction) -> dict:
         '''
         Получить инструменты на объекте 
@@ -37,6 +38,7 @@ class ConstructionCRUD(BaseCRUD):
         return result
     
 
+    @BaseCRUD.logger.info
     def get_workers(self, constr:Construction) -> dict:
         '''
         Получить работников на объекте
@@ -53,6 +55,7 @@ class ConstructionCRUD(BaseCRUD):
         return result
     
     
+    @BaseCRUD.logger.info
     def get_responsible(self, constr:Construction) -> Worker:
         '''
         Получить ответственного на объекте
@@ -68,7 +71,7 @@ class ConstructionCRUD(BaseCRUD):
                 return self.coverter.conversion_to_data(constr)
 
 
-
+    @BaseCRUD.logger.info
     def transfer_worker(self,  constr:Construction, worker:Worker, brigadir:bool=False) -> None:
         '''
         Перевести работника на объект
@@ -94,7 +97,7 @@ class ConstructionCRUD(BaseCRUD):
             db.commit()
 
     
-
+    @BaseCRUD.logger.info
     def __locate(self, db:Session, worker:Worker) -> WorkOnConstr:
         '''
         Определить местоположение работника
@@ -107,6 +110,7 @@ class ConstructionCRUD(BaseCRUD):
             return constr[0]
     
 
+    @BaseCRUD.logger.info
     def __close_post(self, db:Session, location:WorkOnConstr) -> None:
         '''
         Записывает дату окончания работы 

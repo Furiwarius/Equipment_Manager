@@ -17,6 +17,7 @@ class StorageCRUD(BaseCRUD):
         super().__init__(table=StorageTable)
 
 
+    @BaseCRUD.logger.info
     def get_tools(self, storage:Storage) -> dict:
         '''
         Получить инструменты на складе 
