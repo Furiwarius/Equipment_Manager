@@ -5,6 +5,12 @@ from app.entities.storage import Storage
 from app.errors.service_error.storage_error import StockClosed, ImpossibleCloseStock
 from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.toolCRUD import ToolCRUD
+from app.database.crud.storageCRUD import StorageCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.toolCRUD import ToolCRUD
+from app.service.validator.validator import ValidatorEssence, DataValidator
 
 
 class StorageStatus(enum.Enum):
@@ -20,19 +26,42 @@ class StorageManager():
     Управляющий класс для склада
     '''
 
+
+    # Классы валидаторы
+    valid_essence = ValidatorEssence()
+    valid_data = DataValidator()
+
+
     def __init__(self, storage:Storage) -> None:
         
-        self.storage = storage
+        self.stor_crud = StorageCRUD()
+        self.tool_crud = ToolCRUD()
+        self.constr_crud = ConstructionCRUD()
 
 
-    def add_tool(self, tool: Tool) -> None:
+        if storage.id is None:
+            self.valid_essence.validate_storage(storage)
+            
+            self.storage = self.stor_crud.add(storage)
+
+        else: 
+            self.storage = storage
+
+
+
+    def add_tool(self, tool: Tool) -> Tool:
         '''
         Добавить новый инструмент на склад
         '''
+
+        self.valid_essence.validate_tool(tool)
         self.__works_check()
 
-        storageCRUD.add_tool(self.storage, tool)
+        result = self.tool_crud.add(tool, self.storage)
+
+        return result
     
+
 
     def delete_tool(self, tool: Tool) -> None:
         '''
@@ -40,8 +69,9 @@ class StorageManager():
 
         При продаже инструмента
         '''
-        storageCRUD.delete_tool(self.storage, tool)
+        self.tool_crud.retire(tool.id)
     
+
 
     def move_tool_to_construction(self, tool:Tool, where:Construction) -> None:
         '''
@@ -53,10 +83,11 @@ class StorageManager():
         elif not tool.status:
             raise ToolBroken
 
-        elif constructionCRUD.get_responsible(where) is None:
+        elif self.constr_crud.get_responsible(where) is None:
             raise ResponsibleAbsent
 
-        toolCRUD.move_to_construction(tool, where)
+        self.tool_crud.move_to(tool, where)
+
 
 
     def move_tool_to_storage(self, tool:Tool, where:Storage) -> None:
@@ -68,27 +99,32 @@ class StorageManager():
         После чего делает новую запись с новым складом.
         '''
         if where.status:
-            toolCRUD.move_to_storage(tool, where)
+            self.tool_crud.move_to(tool, where)
         else:
             raise StockClosed
 
     
+
     def close(self) -> None:
         '''
         Закрыть склад
         '''
         
-        if self.tools:
+        if self.stor_crud.get_tools(storage_id=self.storage):
             raise ImpossibleCloseStock
             
-        storageCRUD.close(self.storage)
+        self.stor_crud.modify_status(self.storage.id, False)
+        self.storage.status = False
+
 
 
     def restore(self) -> None:
         '''
         Возобновить работу склада
         '''
-        storageCRUD.work(self.storage)
+        self.stor_crud.modify_status(self.storage.id, True)
+        self.storage.status = True
+    
     
     
     def __works_check(self) -> None:

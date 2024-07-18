@@ -8,14 +8,14 @@ class Storage():
     Склад
     '''
 
-    id: str
+    id: int = None
     # название склада
-    name: str
+    name: str = None
     # адрес склада
-    address: str
+    address: str = None
     # статус склада
-    status: bool
+    status: bool = None
     # дата начала работы склада
-    start_date: datetime
+    start_date: datetime = None
     # дата окончания работы склада
-    end_date: datetime
+    end_date: datetime = None

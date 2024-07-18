@@ -1,6 +1,6 @@
-from elements.letters import UniqueLetter
-from elements.numbers import UniqueNumber
-from elements.symbols import UniqueSymbol
+from app.service.password.password_generator.elements.letters import UniqueLetter
+from app.service.password.password_generator.elements.numbers import UniqueNumber
+from app.service.password.password_generator.elements.symbols import UniqueSymbol
 from random import randint
 
 class PasswordGenerator():

@@ -9,16 +9,16 @@ class Construction():
     Объект
     '''
 
-    id: str
+    id: int = None
     # название объекта
-    name: str
+    name: str = None
     # номер проекта или договора подряда
-    project: str
+    project: str = None
     # адрес объекта
-    address: str
+    address: str = None
     # статус объекта
-    status: bool
+    status: bool = None
     # дата начала работы объекта
-    start_date: datetime
+    start_date: datetime = None
     # дата окончания работы объекта
-    end_date: datetime
+    end_date: datetime = None

@@ -5,6 +5,9 @@ from app.entities.storage import Storage
 from app.errors.service_error.tool_error import ToolBroken
 from app.errors.service_error.storage_error import StockClosed
 from app.errors.service_error.construction_error import ConstructionClosed, ResponsibleAbsent
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.toolCRUD import ToolCRUD
+from app.database.crud.storageCRUD import StorageCRUD
 
 
 class ToolStatus(enum.Enum):
@@ -24,6 +27,10 @@ class ToolManager():
 
     def __init__(self, tool:Tool) -> None:
         
+        self.constr_crud = ConstructionCRUD()
+        self.tool_crud = ToolCRUD()
+        self.storage_cud = StorageCRUD()
+
         self.tool = tool
             
 
@@ -37,10 +44,10 @@ class ToolManager():
         elif self.tool.status is ToolStatus.faulty:
             raise ToolBroken
 
-        elif constructionCRUD.get_responsible(constr) is None:
+        elif self.constr_crud.get_responsible(constr.id) is None:
             raise ResponsibleAbsent
 
-        toolCRUD.move_to_construction(self.tool, constr)
+        self.tool_crud.move_to(self.tool, constr)
 
     
     def move_tool_to_storage(self, storage: Storage) -> None:
@@ -50,14 +57,16 @@ class ToolManager():
         if not storage.status:
             raise StockClosed
             
-        toolCRUD.move_to_storage(self.tool, storage)
+        self.tool_crud.move_to(self.tool, storage)
+
 
 
     def break_tool(self) -> None:
         '''
         Сломать инструмент
         '''
-        toolCRUD.break_tool(self.tool)
+        self.tool_crud.modify_status(self.tool.id, False)
+        self.tool.status = False
     
 
 
@@ -65,4 +74,5 @@ class ToolManager():
         '''
         Починить инструмент
         '''
-        toolCRUD.fix_tool(self.tool)
+        self.tool_crud.modify_status(self.tool.id, True)
+        self.tool.status = True
