@@ -8,8 +8,8 @@ class EmailClient():
     Отправитель сообщений
     '''
 
-    default_template = "template_letter\default_template.txt"
-    default_setting = "app\settings\defoult_setting_email_client.ini"
+    default_template = r"template_letter\default_template.txt"
+    default_setting = r"app\settings\defoult_setting_email_client.ini"
 
     def __init__(self, 
                  setting=default_setting) -> None:
