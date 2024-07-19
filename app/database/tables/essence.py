@@ -18,6 +18,7 @@ class ToolTable(Base):
     end_date = Column(DateTime)
 
 
+
 class WorkerTable(Base):
     '''
     Модель таблицы worker
@@ -34,6 +35,7 @@ class WorkerTable(Base):
     status = Column(Boolean, default=True)
 
 
+
 class ConstructionTable(Base):
     '''
     Модель таблицы construction
@@ -46,6 +48,7 @@ class ConstructionTable(Base):
     status = Column(Boolean, default=True, nullable=False)
     start_date = Column(DateTime, default=datetime.now, nullable=False)
     end_date = Column(DateTime)
+
 
 
 class StorageTable(Base):
@@ -61,6 +64,7 @@ class StorageTable(Base):
     end_date = Column(DateTime)
 
 
+
 class AccountTable(Base):
     '''
     Модель таблицы account
@@ -72,3 +76,16 @@ class AccountTable(Base):
     email = Column(String(60), nullable=False, unique=True)
     confirmation_status = Column(Boolean)
     timezone = Column(String(40), nullable=False)
+
+
+
+class FirmTable(Base):
+    '''
+    Модель таблицы account
+    '''
+    __tablename__ = "firm"
+
+    name = Column(String(65), nullable=False)
+    status = Column(Boolean, default=True, nullable=False)
+    start_date = Column(DateTime, default=datetime.now, nullable=False)
+    end_date = Column(DateTime)
