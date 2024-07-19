@@ -81,7 +81,7 @@ class AccountTable(Base):
 
 class FirmTable(Base):
     '''
-    Модель таблицы account
+    Модель таблицы firm
     '''
     __tablename__ = "firm"
 

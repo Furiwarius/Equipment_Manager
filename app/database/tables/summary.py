@@ -48,3 +48,21 @@ class ToolsOnStorage(Base):
     place_id = Column(Integer, ForeignKey("storage.id"), nullable=False)
     DT_start = Column(DateTime, default=datetime.now, nullable=False)
     DT_end = Column(DateTime)
+
+
+
+class AccountRoles(Base):
+    '''
+    Модель таблицы account_roles
+    
+    Отслеживает роли аккаунтов в фирмах.
+    Существует 3 роли: супер админ (владелец),
+    админ (назначает супер админ), посетитель 
+    (назначает супер админ)
+    '''
+
+    __tablename__ = "account_roles"
+
+    firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
+    account_id = Column(Integer, ForeignKey("account.id"), nullable=False)
+    role = Column(String(16), nullable=False)
