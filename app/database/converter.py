@@ -35,12 +35,15 @@ class Converter():
                   "Firm": FirmT}
 
     
-    def conversion_to_data(self, item:AccT|ConstrT|StorT|WorkT|ToolT|FirmT) -> Acc|Constr|Stor|Work|Tool|Firm: 
+    def conversion_to_data(self, item:AccT|ConstrT|StorT|WorkT|ToolT|FirmT|None) -> Acc|Constr|Stor|Work|Tool|Firm|None: 
         ''' 
         Конвертация из объекта Table
         в объект бизнес логики с 
         голыми данными 
         ''' 
+        if item is None:
+            return None
+        
         # Получаем класс бизнес логики соответствующий переданному классу из таблицы
         class_ = self.compliance.get(item.__class__.__name__)
         
