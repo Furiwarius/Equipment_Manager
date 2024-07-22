@@ -11,6 +11,7 @@ class ToolTable(Base):
     '''
     __tablename__ = "tool"
 
+    firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
     name = Column(String(60), nullable=False)
     status = Column(Boolean, default=True, nullable=False)
     factory_number = Column(String(60))
@@ -25,6 +26,7 @@ class WorkerTable(Base):
     '''
     __tablename__ = "worker"
 
+    firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
     account_id = Column(Integer, ForeignKey("account.id"))
     name = Column(String(20), nullable=False)
     surname = Column(String(20), nullable=False)
@@ -42,6 +44,7 @@ class ConstructionTable(Base):
     '''
     __tablename__ = "construction"
 
+    firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
     name = Column(String(60), nullable=False)
     project = Column(String(60), nullable=False)
     address = Column(String(100), nullable=False)
@@ -57,6 +60,7 @@ class StorageTable(Base):
     '''
     __tablename__ = "storage"
 
+    firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
     name = Column(String(60), nullable=False)
     address = Column(String(100), nullable=False)
     status = Column(Boolean, default=True, nullable=False)
@@ -70,7 +74,7 @@ class AccountTable(Base):
     Модель таблицы account
     '''
     __tablename__ = "account"
-
+    
     login = Column(String(65), nullable=False, unique=True)
     password = Column(String(65), nullable=False)
     email = Column(String(60), nullable=False, unique=True)
