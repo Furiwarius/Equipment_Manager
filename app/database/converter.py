@@ -8,6 +8,8 @@ from app.database.tables.essence import ToolTable as ToolT
 from app.database.tables.essence import StorageTable as StorT
 from app.database.tables.essence import AccountTable as AccT
 from app.entities.account import Account as Acc
+from app.entities.firm import Firm
+from app.database.tables.essence import FirmTable as FirmT
 
 
 
@@ -24,14 +26,16 @@ class Converter():
                   "WorkerTable": Work,
                   "ToolTable": Tool,
                   "StorageTable": Stor,
+                  "FirmTable":Firm,
                   "Account": AccT,
                   "Construction": ConstrT,
                   "Worker": WorkT,
                   "Tool": ToolT,
-                  "Storage": StorT}
+                  "Storage": StorT,
+                  "Firm": FirmT}
 
     
-    def conversion_to_data(self, item:AccT|ConstrT|StorT|WorkT|ToolT) -> Acc|Constr|Stor|Work|Tool: 
+    def conversion_to_data(self, item:AccT|ConstrT|StorT|WorkT|ToolT|FirmT) -> Acc|Constr|Stor|Work|Tool|Firm: 
         ''' 
         Конвертация из объекта Table
         в объект бизнес логики с 
@@ -54,7 +58,7 @@ class Converter():
 
 
 
-    def conversion_to_table(self, item:Acc|Constr|Work|Tool|Stor) -> AccT|ConstrT|WorkT|ToolT|StorT:
+    def conversion_to_table(self, item:Acc|Constr|Work|Tool|Stor|Firm) -> AccT|ConstrT|WorkT|ToolT|StorT|FirmT:
         '''
         Конвертация из объекта 
         базнес логики с голыми
