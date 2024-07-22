@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.database.converter import Converter
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
+from app.entities.firm import Firm
 
 
 
@@ -62,7 +63,7 @@ class BaseCRUD():
             
 
     @logger.info
-    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
+    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm:
         '''
         Получить сущность по id
         '''
@@ -98,7 +99,7 @@ class BaseCRUD():
     
 
 
-    def get_last_one(self) -> Constr|Storage|Tool|Worker:
+    def get_last_one(self) -> Constr|Storage|Tool|Worker|Firm:
         '''
         Получить последнего добавленного в таблицу
         '''
