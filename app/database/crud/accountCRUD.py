@@ -2,6 +2,7 @@ from app.entities.account import Account
 from app.loggers.database_logger.db_logger import DatabaseLogger
 from app.database.tables.essence import Base, AccountTable
 from app.database.database import Database
+from app.database.converter import Converter
 
 
 
@@ -10,7 +11,8 @@ class AccountCRUD():
     '''
     Класс управления бд
     '''
-
+    
+    converter = Converter()
     logger = DatabaseLogger()
     logger.get_logger()
     
@@ -36,7 +38,7 @@ class AccountCRUD():
         with Database() as db:
             account = db.query(self.table).filter(AccountTable.login==login).all()
             
-        return account[0]
+        return self.converter.conversion_to_data(account[0])
 
 
     @logger.info
@@ -47,7 +49,7 @@ class AccountCRUD():
         with Database() as db:
             account = db.query(self.table).filter(AccountTable.email==email).all()
             
-        return account[0]
+        return self.converter.conversion_to_data(account[0])
 
 
 
@@ -71,7 +73,7 @@ class AccountCRUD():
 
             result = db.query(self.table).order_by(self.table.id.desc()).first()
         
-        return result
+        return self.converter.conversion_to_data(result)
 
     
 
