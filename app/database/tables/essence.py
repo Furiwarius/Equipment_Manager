@@ -78,7 +78,7 @@ class AccountTable(Base):
     login = Column(String(65), nullable=False, unique=True)
     password = Column(String(65), nullable=False)
     email = Column(String(60), nullable=False, unique=True)
-    confirmation_status = Column(Boolean)
+    confirmation_status = Column(Boolean, default=False)
     timezone = Column(String(40), nullable=False)
 
 
