@@ -46,27 +46,6 @@ class AccountCRUD(BaseCRUD):
             
         return self.converter.conversion_to_data(account[0])
 
-
-
-
-    @BaseCRUD.logger.info
-    def add_account(self, account:Account) -> Account:
-        '''
-        Добавить аккаунт в БД
-
-        login и password приходят в виде hash
-        timezone приходит в виде строки Europe/Moscow
-        '''
-        new_account = self.converter.conversion_to_table(account)
-
-        with Database() as db:
-            db.add(new_account)
-            db.commit()
-
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
-        
-        return result
-
     
 
     @BaseCRUD.logger.info

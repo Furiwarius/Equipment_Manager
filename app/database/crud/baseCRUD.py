@@ -31,7 +31,7 @@ class BaseCRUD():
 
 
     @logger.info
-    def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
+    def add(self, obj:Worker|Constr|Storage|Account) -> Worker|Constr|Storage|Account:
         '''
         Добавить сущности
         '''

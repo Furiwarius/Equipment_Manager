@@ -3,6 +3,8 @@ from app.entities.firm import Firm
 from app.database.crud.baseCRUD import BaseCRUD
 from app.database.database import Database
 from app.database.tables.summary import AccountRoles
+from app.errors.database_error.database_error import ThisIsSuperAdmin
+from app.errors.database_error.database_error import CannotGiveSuperadmin
 from enum import Enum
 
 
@@ -64,7 +66,7 @@ class FirmCRUD(BaseCRUD):
     # Этот метод находится тут, потому что нужно переопределить метод BaseCRUD.get_all
     # чтобы он искал по account_id, а не firm_id как у остальных круд-классов
     @BaseCRUD.logger.info
-    def get_all(account_id:int) -> list:
+    def get_all(self, account_id:int) -> list:
         '''
         Получить список id фирм принадлежащих
         этому аккаунту с account_id
@@ -90,6 +92,9 @@ class FirmCRUD(BaseCRUD):
         В случае, если запись с ролью уже существует, и она
         не является ролью super_admin, то обновляется на новую.
         '''
+        if role is Roles.super_admin.name:
+            raise CannotGiveSuperadmin
+
         with Database() as db:
             
             check = db.query(AccountRoles).filter(AccountRoles.account_id==account_id,
@@ -102,7 +107,10 @@ class FirmCRUD(BaseCRUD):
                                         role = role.name)   
                 db.add(new_role)
             
-            elif check:
+            elif check.role is Roles.super_admin.name:
+                raise ThisIsSuperAdmin
+
+            else:
                 db.query(AccountRoles).filter(AccountRoles.account_id==account_id,
                                               AccountRoles.firm_id==firm_id).update({
                                                   AccountRoles.role:role.name}, synchronize_session = False)
