@@ -38,20 +38,20 @@ class ToolCRUD(BaseCRUD):
         Для добавления нового инструмента, нужно также
         указать объект или склад, где он будет хранится.
         '''
-        tool = self.coverter.conversion_to_table(tool)
+        tool = self.converter.conversion_to_table(tool)
         with Database() as db:
 
             db.add(tool)     # добавляем в бд
             db.commit()
 
-            where = self.coverter.conversion_to_table(where)
+            where = self.converter.conversion_to_table(where)
             self.__move(db, tool, where)
             
             db.commit()     # сохраняем изменения
   
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return self.coverter.conversion_to_data(result)
+        return self.converter.conversion_to_data(result)
     
 
 
@@ -137,7 +137,7 @@ class ToolCRUD(BaseCRUD):
                                                                   ToolsOnStorage.DT_end==None).all()
                 constr = db.get(StorageTable, place[0])
             
-            return self.coverter.conversion_to_data(constr)
+            return self.converter.conversion_to_data(constr)
     
 
 

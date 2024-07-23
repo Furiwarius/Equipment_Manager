@@ -9,6 +9,7 @@ from app.database.converter import Converter
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
 from app.entities.firm import Firm
+from app.entities.account import Account
 
 
 
@@ -25,7 +26,7 @@ class BaseCRUD():
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
-        self.coverter = Converter()
+        self.converter = Converter()
 
 
 
@@ -34,7 +35,7 @@ class BaseCRUD():
         '''
         Добавить сущности
         '''
-        obj = self.coverter.conversion_to_table(obj)
+        obj = self.converter.conversion_to_table(obj)
         with Database() as db:
 
             db.add(obj)     # добавляем в бд
@@ -42,7 +43,7 @@ class BaseCRUD():
             
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return self.coverter.conversion_to_data(result)
+        return self.converter.conversion_to_data(result)
 
 
 
@@ -61,9 +62,10 @@ class BaseCRUD():
 
         return list(result)
             
+            
 
     @logger.info
-    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm:
+    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm|Account:
         '''
         Получить сущность по id
         '''
@@ -71,7 +73,7 @@ class BaseCRUD():
         with Database() as db:
             result = db.get(self.table, id)
         
-        return self.coverter.conversion_to_data(result)
+        return self.converter.conversion_to_data(result)
     
 
 
@@ -83,6 +85,7 @@ class BaseCRUD():
         with Database() as db:
             db.query(self.table).filter(self.table.id == obj_id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
+
 
 
     @logger.info
@@ -99,12 +102,12 @@ class BaseCRUD():
     
 
 
-    def get_last_one(self) -> Constr|Storage|Tool|Worker|Firm:
+    def get_last_one(self) -> Constr|Storage|Tool|Worker|Firm|Account:
         '''
         Получить последнего добавленного в таблицу
         '''
         with Database() as db:
             result = db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return self.coverter.conversion_to_data(result)
+        return self.converter.conversion_to_data(result)
 

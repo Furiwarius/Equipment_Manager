@@ -3,23 +3,18 @@ from app.loggers.database_logger.db_logger import DatabaseLogger
 from app.database.tables.essence import Base, AccountTable
 from app.database.database import Database
 from app.database.converter import Converter
+from app.database.crud.baseCRUD import BaseCRUD
 
 
 
-
-class AccountCRUD():
+class AccountCRUD(BaseCRUD):
     '''
     Класс управления бд
     '''
     
-    converter = Converter()
-    logger = DatabaseLogger()
-    logger.get_logger()
-    
-    
     
     def __init__(self) -> None:
-        self.table = AccountTable
+        super().__init__(table=AccountTable)
 
 
 
@@ -28,7 +23,7 @@ class AccountCRUD():
 
 
 
-    @logger.info
+    @BaseCRUD.logger.info
     def get_account_by_login(self, login:str) -> Account:
         '''
         Получение данных об аккаунте по логину
@@ -41,7 +36,7 @@ class AccountCRUD():
         return self.converter.conversion_to_data(account[0])
 
 
-    @logger.info
+    @BaseCRUD.logger.info
     def get_account_by_email(self, email:str) -> Account:
         '''
         Получение данных лю аккаунте по адресу почты
@@ -54,34 +49,39 @@ class AccountCRUD():
 
 
 
-    @logger.info
-    def add_account(self, login:str, password:str, email:str, timezone:str) -> Account:
+    @BaseCRUD.logger.info
+    def add_account(self, account:Account) -> Account:
         '''
         Добавить аккаунт в БД
 
         login и password приходят в виде hash
         timezone приходит в виде строки Europe/Moscow
         '''
+        new_account = self.converter.conversion_to_table(account)
 
         with Database() as db:
-            new_account = AccountTable(login=login,
-                                       password=password,
-                                       email=email,
-                                       timezone=timezone)
             db.add(new_account)
             db.commit()
 
             result = db.query(self.table).order_by(self.table.id.desc()).first()
         
-        return self.converter.conversion_to_data(result)
+        return result
 
     
 
-    @logger.info
-    def confirm(self, account_id:int) -> None:
+    @BaseCRUD.logger.info
+    def modify_status(self, account_id:int) -> None:
         '''
         Подтвердить аккаунт
         '''
         with Database() as db:
             db.query(self.table).filter(self.table.id == account_id).update({self.table.confirmation_status:True}, synchronize_session = False)
             db.commit()
+
+    
+
+    def retire(self) -> None:
+        '''
+        AccountCRUD наследует от BaseCRUD этот метод,
+        но не использует его
+        '''

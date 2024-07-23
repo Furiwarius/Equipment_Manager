@@ -40,7 +40,7 @@ class ConstructionCRUD(BaseCRUD):
         with Database() as db:
 
             tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.DT_end==None).all()
-            result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
+            result = {item[0]: self.converter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
     
@@ -57,7 +57,7 @@ class ConstructionCRUD(BaseCRUD):
         with Database() as db:
 
             works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
-            result = {item[0]: self.coverter.conversion_to_data(db.get(WorkerTable, item)) for item in works_id}
+            result = {item[0]: self.converter.conversion_to_data(db.get(WorkerTable, item)) for item in works_id}
 
         return result
     
@@ -75,7 +75,7 @@ class ConstructionCRUD(BaseCRUD):
             
             if place: 
                 constr_id = db.get(WorkerTable, place[0])
-                return self.coverter.conversion_to_data(constr_id)
+                return self.converter.conversion_to_data(constr_id)
 
               
               

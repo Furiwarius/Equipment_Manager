@@ -37,7 +37,7 @@ class WorkerCRUD(BaseCRUD):
 
             if place:
                 constr = db.get(ConstrTable, place[0])
-                return self.coverter.conversion_to_data(constr)
+                return self.converter.conversion_to_data(constr)
 
     
     @BaseCRUD.logger.info
@@ -54,4 +54,4 @@ class WorkerCRUD(BaseCRUD):
             
             if place: 
                 constr = db.get(ConstrTable, place[0])
-                return self.coverter.conversion_to_data(constr)
+                return self.converter.conversion_to_data(constr)
