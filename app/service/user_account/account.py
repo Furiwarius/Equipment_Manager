@@ -15,7 +15,7 @@ class AccountManager():
         self.account_crud = AccountCRUD()
 
         if email:
-            self.create(login, password, email)
+            self._create(login, password, email)
         else:
             self.account = self.is_correct(login, password)
         
@@ -46,7 +46,7 @@ class AccountManager():
 
 
 
-    def create(self, login:str, password:str, email:str) -> None:
+    def _create(self, login:str, password:str, email:str) -> None:
         '''
         Создание аккаунта
         '''
@@ -58,10 +58,12 @@ class AccountManager():
             # Если аккаунт с такой почтой уже есть
             raise EmailExists
         
-        self.account = self.account_crud.add_account(login=to_hash(login), 
-                                                    password=to_hash(password),
-                                                    email=email,
-                                                    timezone=get_localzone())
+        new_account = Account(login=to_hash(login), 
+                              password=to_hash(password),
+                              email=email,
+                              timezone=get_localzone())
+        
+        self.account = self.account_crud.add(new_account)
         
         # Отправка письма с проверочный кодом на почту
         self.verification(email)
@@ -87,6 +89,6 @@ class AccountManager():
             # Если проверочный код не совпадает
             raise CodeDoesntMatch
     
-        self.account_crud.confirm(self.account.id)
+        self.account_crud.modify_status(self.account.id)
         
 

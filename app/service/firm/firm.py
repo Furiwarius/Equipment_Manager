@@ -39,7 +39,7 @@ class ConstructionManager():
     
 
     
-    def give_role_admin(self, account_id:int, role:Roles) -> None:
+    def give_role(self, account_id:int, role:Roles) -> None:
         '''
         Выдать роль аккаунту
         '''

@@ -41,7 +41,7 @@ class AccountCRUD(BaseCRUD):
 
 
     @BaseCRUD.logger.info
-    def get_account_by_login(self, login:str) -> Account:
+    def get_account_by_login(self, login:str) -> Account|None:
         '''
         Получение данных об аккаунте по логину
 
@@ -49,20 +49,22 @@ class AccountCRUD(BaseCRUD):
         '''
         with Database() as db:
             account = db.query(self.table).filter(AccountTable.login==login).all()
-            
-        return self.converter.conversion_to_data(account[0])
+
+        if account:
+            return self.converter.conversion_to_data(account[0])
 
 
 
     @BaseCRUD.logger.info
-    def get_account_by_email(self, email:str) -> Account:
+    def get_account_by_email(self, email:str) -> Account|None:
         '''
         Получение данных лю аккаунте по адресу почты
         '''
         with Database() as db:
             account = db.query(self.table).filter(AccountTable.email==email).all()
             
-        return self.converter.conversion_to_data(account[0])
+        if account:
+            return self.converter.conversion_to_data(account[0])
 
 
 
