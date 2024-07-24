@@ -10,6 +10,8 @@ class Worker():
     id: int = None
     # id аккаунта, к которому привязан этот работник
     account_id: int = None
+    # id фирмы, к которой принадлежит работник
+    firm_id:int = None
     # Имя 
     name: str = None
     # Фамилия

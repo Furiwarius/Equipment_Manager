@@ -36,12 +36,13 @@ class DataGenerator():
 
 
 
-    def worker_generator(self, status=True) -> Worker:
+    def worker_generator(self, firm_id:int, status=True) -> Worker:
         '''
         Генератор работников
         '''
 
-        new_worker = Worker(name=self.fake.first_name(),
+        new_worker = Worker(firm_id=firm_id,
+                            name=self.fake.first_name(),
                             surname=self.fake.last_name(),
                             phone_number=self.fake.phone_number(),
                             job_title=self.fake.job(),
@@ -52,13 +53,14 @@ class DataGenerator():
     
 
 
-    def tool_generator(self, status=True) -> Tool:
+    def tool_generator(self, firm_id:int, status=True) -> Tool:
         '''
         Генератор инструментов
         '''
         random_number = self.__generate_number()
 
-        new_tool = Tool(name=f"tool{random_number}",
+        new_tool = Tool(firm_id=firm_id,
+                        name=f"tool{random_number}",
                         factory_number=self.fake.vin(),
                         status=status,
                         start_date=datetime.now(timezone.utc))
@@ -67,13 +69,14 @@ class DataGenerator():
     
 
 
-    def constr_generator(self, status=True) -> Construction:
+    def constr_generator(self, firm_id:int, status=True) -> Construction:
         '''
         Генератор объектов
         '''
         random_number = self.__generate_number()
 
-        new_construction = Construction(name=self.fake.company(),
+        new_construction = Construction(firm_id=firm_id,
+                                        name=self.fake.company(),
                                         project=f"project №{random_number}",
                                         address=self.fake.address(),
                                         status=status,
@@ -83,13 +86,14 @@ class DataGenerator():
 
 
 
-    def storage_generator(self, status=True) -> Storage:
+    def storage_generator(self, firm_id:int, status=True) -> Storage:
         '''
         Генератор данных склада
         '''
         random_number = f"S{self.__generate_number()}"
 
-        new_storage = Storage(name=f"storage №{random_number}",
+        new_storage = Storage(firm_id=firm_id,
+                              name=f"storage №{random_number}",
                               address=self.fake.address(),
                               status=status,
                               start_date=datetime.now(timezone.utc))

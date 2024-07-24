@@ -9,6 +9,8 @@ class Tool():
     '''
 
     id: int = None
+    # id фирмы, к которой принадлежит инструмент
+    firm_id:int = None
     # название инструмента
     name: str = None
     # статус инструмента

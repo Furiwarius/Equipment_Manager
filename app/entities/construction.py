@@ -10,6 +10,8 @@ class Construction():
     '''
 
     id: int = None
+    # id фирмы, к которой принадлежит стройка
+    firm_id:int = None
     # название объекта
     name: str = None
     # номер проекта или договора подряда

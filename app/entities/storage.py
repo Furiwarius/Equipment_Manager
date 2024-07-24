@@ -9,6 +9,8 @@ class Storage():
     '''
 
     id: int = None
+    # id фирмы, к которой принадлежит склад
+    firm_id:int = None
     # название склада
     name: str = None
     # адрес склада

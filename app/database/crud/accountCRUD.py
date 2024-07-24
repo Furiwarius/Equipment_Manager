@@ -64,6 +64,23 @@ class AccountCRUD(BaseCRUD):
             
         return self.converter.conversion_to_data(account[0])
 
+
+
+    @BaseCRUD.logger.info
+    def get_all(self) -> list:
+        '''
+        Получить id сущностей
+
+        Метод смотрит поле table,
+        и по нему ищет данные в БД
+        '''
+
+        with Database() as db:
+            result = db.query(self.table.id).all()
+            result = [item[0] for item in result]
+
+        return list(result)
+
     
 
     @BaseCRUD.logger.info

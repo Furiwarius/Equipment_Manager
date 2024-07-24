@@ -4,6 +4,23 @@ from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
+from app.database.crud.accountCRUD import AccountCRUD
+from app.database.crud.firmCRUD import FirmCRUD
+
+
+def create_firm() -> int:
+    '''
+    Создает фирму для тестов
+    '''
+    new_account = DataGenerator().account_generate()
+    new_firm = DataGenerator().firm_generate()
+
+    account = AccountCRUD().add(new_account)
+    firm = FirmCRUD().add(account_id=account.id, 
+                          new_firm=new_firm)
+    
+    return firm.id
+
 
 
 class TestDatabase():
@@ -21,12 +38,15 @@ class TestDatabase():
     cruds = (work_crud, tool_crud, constr_crud, stor_crud)
 
 
+    firm_id = create_firm()
+
+
     def test_add_construction(self):
         '''
         Тест метода по добавлению сущности (ConstructionCRUD.add())
         '''
 
-        constr = self.generator.constr_generator()
+        constr = self.generator.constr_generator(firm_id=self.firm_id)
         constr_db = self.constr_crud.add(constr)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
@@ -39,7 +59,7 @@ class TestDatabase():
         Тест метода по добавлению склада (StorageCRUD.add())
         '''
 
-        storage = self.generator.storage_generator()
+        storage = self.generator.storage_generator(firm_id=self.firm_id)
         storage_db = self.stor_crud.add(storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
@@ -52,7 +72,7 @@ class TestDatabase():
         Тест метода по добавлению работника (WorkerCRUD.add())
         '''
 
-        worker = self.generator.worker_generator()
+        worker = self.generator.worker_generator(firm_id=self.firm_id)
         worker_db = self.work_crud.add(worker)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
@@ -66,7 +86,7 @@ class TestDatabase():
         '''
         # Тк до этого добавляли склад, он есть в бд
         storage = self.stor_crud.get_by_id(id=1)
-        tool = self.generator.tool_generator()
+        tool = self.generator.tool_generator(firm_id=self.firm_id)
         tool_db = self.tool_crud.add(tool=tool, where=storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
@@ -93,10 +113,10 @@ class TestDatabase():
         '''
 
         # Тк предыдущие тесты добавляли сущности, их и будем получать
-        workers = self.work_crud.get_all()   
-        constructions = self.constr_crud.get_all()
-        tools = self.tool_crud.get_all()
-        storages = self.stor_crud.get_all()
+        workers = self.work_crud.get_all(self.firm_id)   
+        constructions = self.constr_crud.get_all(self.firm_id)
+        tools = self.tool_crud.get_all(self.firm_id)
+        storages = self.stor_crud.get_all(self.firm_id)
 
         assert workers and constructions and tools and storages
         
@@ -148,7 +168,7 @@ class TestDatabase():
         (StorageCRUD.get_tools() | ConstructionCRUD.get_tools())
         '''
 
-        new_constr = self.generator.constr_generator()
+        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
         constr = self.constr_crud.add(new_constr)
         
         tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1).id)
@@ -163,7 +183,7 @@ class TestDatabase():
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
         '''
-        new_worker = self.generator.worker_generator()
+        new_worker = self.generator.worker_generator(firm_id=self.firm_id)
         worker = self.work_crud.add(new_worker)    
         constr = self.constr_crud.get_last_one()
 
@@ -184,7 +204,7 @@ class TestDatabase():
         (ConstructionCRUD.transfer_worker(brigadir=True))
         '''
         # Генерация нового работника
-        new_worker = self.generator.worker_generator()    
+        new_worker = self.generator.worker_generator(firm_id=self.firm_id)    
         new_worker = self.work_crud.add(new_worker)
 
         constr = self.constr_crud.get_by_id(id=1)
@@ -212,7 +232,7 @@ class TestDatabase():
 
         assert old_constr
 
-        new_constr = self.generator.constr_generator()
+        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
         new_constr = self.constr_crud.add(new_constr)
 
 

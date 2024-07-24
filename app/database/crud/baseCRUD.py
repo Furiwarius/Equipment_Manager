@@ -47,16 +47,17 @@ class BaseCRUD():
 
 
     @logger.info
-    def get_all(self) -> list:
+    def get_all(self, firm_id:int) -> list:
         '''
-        Получить id сущност
+        Получить id сущностей привязанных
+        к определенной фирме
 
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
 
         with Database() as db:
-            result = db.query(self.table.id).all()
+            result = db.query(self.table.id).filter(self.table.firm_id == firm_id).all()
             result = [item[0] for item in result]
 
         return list(result)
