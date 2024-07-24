@@ -24,6 +24,23 @@ class AccountCRUD(BaseCRUD):
 
 
     @BaseCRUD.logger.info
+    def add(self, account:Account) -> Account:
+        '''
+        Добавить сущности
+        '''
+        account = self.converter.conversion_to_table(account)
+        with Database() as db:
+
+            db.add(account)     # добавляем в бд
+            db.commit()     # сохраняем изменения
+            
+            result = db.query(AccountTable).order_by(AccountTable.id.desc()).first()
+
+        return self.converter.conversion_to_data(result)
+
+
+
+    @BaseCRUD.logger.info
     def get_account_by_login(self, login:str) -> Account:
         '''
         Получение данных об аккаунте по логину
@@ -34,6 +51,7 @@ class AccountCRUD(BaseCRUD):
             account = db.query(self.table).filter(AccountTable.login==login).all()
             
         return self.converter.conversion_to_data(account[0])
+
 
 
     @BaseCRUD.logger.info
