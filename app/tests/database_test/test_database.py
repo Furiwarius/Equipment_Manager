@@ -1,25 +1,8 @@
-from app.tests.fake_data import DataGenerator
-from app.database.database import Database
+from app.tests.fake_data import DataGenerator, create_firm
 from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
-from app.database.crud.accountCRUD import AccountCRUD
-from app.database.crud.firmCRUD import FirmCRUD
-
-
-def create_firm() -> int:
-    '''
-    Создает фирму для тестов
-    '''
-    new_account = DataGenerator().account_generate()
-    new_firm = DataGenerator().firm_generate()
-
-    account = AccountCRUD().add(new_account)
-    firm = FirmCRUD().add(account_id=account.id, 
-                          new_firm=new_firm)
-    
-    return firm.id
 
 
 

@@ -16,7 +16,7 @@ class DataValidator():
     '''
 
     # Запрещенные символы
-    prohibited = '''/|!?}{[]"'`~+=()*^%$#<>'''
+    prohibited = '''|!?}{[]"'`~+=*^%$#<>'''
 
 
     def strings_with_number(self, string:str, length=0) -> None:
@@ -174,7 +174,7 @@ class ValidatorEssence():
         self.valid.only_strings(worker.name, length=20)
         self.valid.only_strings(worker.surname, length=20)
         self.valid.phone_number(worker.phone_number)
-        self.valid.only_strings(worker.job_title, length=20)
+        self.valid.only_strings(worker.job_title, length=40)
         self.valid.start_date(worker.start_date)
         self.valid.end_date(worker.start_date, worker.end_date)
 

@@ -9,6 +9,23 @@ from random import randrange
 from faker import Faker
 from app.service.password.password_generator.password_generator import PasswordGenerator
 from app.utilities.random_timezone import get_random_timezone
+from app.database.crud.accountCRUD import AccountCRUD
+from app.database.crud.firmCRUD import FirmCRUD
+
+
+
+def create_firm() -> int:
+    '''
+    Создает фирму для тестов
+    '''
+    new_account = DataGenerator().account_generate()
+    new_firm = DataGenerator().firm_generate()
+
+    account = AccountCRUD().add(new_account)
+    firm = FirmCRUD().add(account_id=account.id, 
+                          new_firm=new_firm)
+    
+    return firm.id
 
 
 
@@ -36,68 +53,72 @@ class DataGenerator():
 
 
 
-    def worker_generator(self, firm_id:int, status=True) -> Worker:
+    def worker_generator(self, firm_id:int=None, status=True) -> Worker:
         '''
         Генератор работников
         '''
 
-        new_worker = Worker(firm_id=firm_id,
-                            name=self.fake.first_name(),
+        new_worker = Worker(name=self.fake.first_name(),
                             surname=self.fake.last_name(),
-                            phone_number=self.fake.phone_number(),
+                            phone_number=''.join(list(filter(str.isdigit, list(self.fake.phone_number())))),
                             job_title=self.fake.job(),
                             start_date=datetime.now(timezone.utc),
                             status=status)
-        
+        if firm_id:
+            new_worker.firm_id = firm_id
+
         return new_worker
     
 
 
-    def tool_generator(self, firm_id:int, status=True) -> Tool:
+    def tool_generator(self, firm_id:int=None, status=True) -> Tool:
         '''
         Генератор инструментов
         '''
         random_number = self.__generate_number()
 
-        new_tool = Tool(firm_id=firm_id,
-                        name=f"tool{random_number}",
+        new_tool = Tool(name=f"tool{random_number}",
                         factory_number=self.fake.vin(),
                         status=status,
                         start_date=datetime.now(timezone.utc))
-        
+        if firm_id:
+            new_tool.firm_id = firm_id
+
         return new_tool
     
 
 
-    def constr_generator(self, firm_id:int, status=True) -> Construction:
+    def constr_generator(self, firm_id:int=None, status=True) -> Construction:
         '''
         Генератор объектов
         '''
         random_number = self.__generate_number()
 
-        new_construction = Construction(firm_id=firm_id,
-                                        name=self.fake.company(),
+        new_construction = Construction(name=self.fake.company(),
                                         project=f"project №{random_number}",
                                         address=self.fake.address(),
                                         status=status,
                                         start_date=datetime.now(timezone.utc))
-        
+        if firm_id:
+            new_construction.firm_id = firm_id
+
         return new_construction
 
 
 
-    def storage_generator(self, firm_id:int, status=True) -> Storage:
+    def storage_generator(self, firm_id:int=None, status=True) -> Storage:
         '''
         Генератор данных склада
         '''
         random_number = f"S{self.__generate_number()}"
 
-        new_storage = Storage(firm_id=firm_id,
-                              name=f"storage №{random_number}",
+        new_storage = Storage(name=f"storage №{random_number}",
                               address=self.fake.address(),
                               status=status,
                               start_date=datetime.now(timezone.utc))
-        
+        if firm_id:
+            new_storage.firm_id = firm_id
+
         return new_storage
 
 

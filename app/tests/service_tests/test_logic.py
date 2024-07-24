@@ -1,11 +1,9 @@
 import pytest
-from datetime import datetime
 from app.service.construction.construction import ConstructionManager as ConstrM
 from app.service.storage.storage import StorageManager as StorM
 from app.service.worker.worker import WorkerManager as WorkM
 from app.service.tool.tool import ToolManager as ToolM
-from app.tests.fake_data import DataGenerator
-from app.database.database import Database
+from app.tests.fake_data import DataGenerator, create_firm
 from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.constructionCRUD import ConstructionCRUD
@@ -27,13 +25,15 @@ class TestBusinessLogic():
     stor_crud = StorageCRUD()
     work_crud = WorkerCRUD()
     tool_crud = ToolCRUD()
-
+    
+    firm_id = create_firm()
+    
 
     def test_add_storage(self):
         '''
         Тестрирование метода по добавлению склада
         '''
-        new_storage = self.generator.storage_generator()
+        new_storage = self.generator.storage_generator(firm_id=self.firm_id)
 
         storage_manager = StorM(new_storage)
 
@@ -48,7 +48,7 @@ class TestBusinessLogic():
         '''
 
         with pytest.raises(BaseValidatorException):
-            broken_storage = self.generator.storage_generator()
+            broken_storage = self.generator.storage_generator(firm_id=self.firm_id)
             broken_storage.name = "   "
 
             StorM(broken_storage)
@@ -63,7 +63,7 @@ class TestBusinessLogic():
         инструмента на склад
         '''
 
-        new_tool = self.generator.tool_generator()  
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)  
         
         storage = self.stor_crud.get_last_one()
         stor_manager = StorM(storage)
@@ -79,7 +79,7 @@ class TestBusinessLogic():
         Тестирование метода по добавлению объекта строительства
         '''
 
-        new_constr = self.generator.constr_generator()
+        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
         constr_manager = ConstrM(new_constr)
 
         assert self.constr_crud.get_last_one().id is constr_manager.constr.id
@@ -95,7 +95,7 @@ class TestBusinessLogic():
 
         with pytest.raises(ResponsibleAbsent):
             
-            new_tool = self.generator.tool_generator()
+            new_tool = self.generator.tool_generator(firm_id=self.firm_id)
             constr = self.constr_crud.get_last_one()
             
             constr_m = ConstrM(constr)
@@ -108,7 +108,7 @@ class TestBusinessLogic():
         Тестирование метода по добавлению работника
         '''
 
-        new_worker = self.generator.worker_generator()
+        new_worker = self.generator.worker_generator(firm_id=self.firm_id)
         worker_manager = WorkM(new_worker)
 
         assert self.work_crud.get_last_one().id is worker_manager.worker.id
@@ -141,7 +141,7 @@ class TestBusinessLogic():
         с имеющимся ответственным лицом
         '''
 
-        new_tool = self.generator.tool_generator()
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)
         constr = self.constr_crud.get_last_one()
         
         assert self.constr_crud.get_responsible(constr.id)
@@ -163,7 +163,7 @@ class TestBusinessLogic():
         constr = self.constr_crud.get_last_one()
         assert self.constr_crud.get_responsible(constr.id)
 
-        worker = self.generator.worker_generator()
+        worker = self.generator.worker_generator(firm_id=self.firm_id)
         worker_m = WorkM(worker)
         worker_m.get_sick() 
         
@@ -188,7 +188,7 @@ class TestBusinessLogic():
         responsible = self.constr_crud.get_responsible(old_constr.id)
         assert responsible
 
-        new_constr = self.generator.constr_generator()
+        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
         constr_m = ConstrM(new_constr)
         constr_m.appointment_responsible(responsible)
 
@@ -204,18 +204,18 @@ class TestBusinessLogic():
         инструмента со склада на объект
         '''
 
-        new_storage = self.generator.storage_generator()
+        new_storage = self.generator.storage_generator(firm_id=self.firm_id)
         stor_m = StorM(new_storage)
 
         # Создаем объект строительства
-        new_constr = self.generator.constr_generator()
+        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
         constr_m = ConstrM(new_constr)
 
         # Создаем работника и назначаем его ответственным на объекте
-        new_worker = self.generator.worker_generator()
+        new_worker = self.generator.worker_generator(firm_id=self.firm_id)
         constr_m.appointment_responsible(WorkM(new_worker).worker)
 
-        new_tool = self.generator.tool_generator()
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)
         # Помещаем инструмент на склад
         tool = stor_m.add_tool(new_tool)
 
@@ -237,7 +237,7 @@ class TestBusinessLogic():
         storage = self.stor_crud.get_last_one()
         stor_m = StorM(storage)
 
-        new_tool = self.generator.tool_generator()
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)
         tool = stor_m.add_tool(new_tool)
 
         tool_m = ToolM(tool)
@@ -264,7 +264,7 @@ class TestBusinessLogic():
         constr = self.constr_crud.get_last_one()
         constr_m = ConstrM(constr)
 
-        new_tool = self.generator.tool_generator()
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)
         tool = constr_m.add_tool(new_tool)
 
         tool_m = ToolM(tool)
@@ -286,7 +286,7 @@ class TestBusinessLogic():
         stor = self.stor_crud.get_last_one()
         stor_m = StorM(stor)
 
-        new_tool = self.generator.tool_generator()
+        new_tool = self.generator.tool_generator(firm_id=self.firm_id)
         tool = stor_m.add_tool(new_tool)
 
         stor_m.delete_tool(tool)
