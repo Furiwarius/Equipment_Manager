@@ -4,7 +4,6 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.database.database import Database
-from sqlalchemy.orm import Session
 from app.database.converter import Converter
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
@@ -31,7 +30,7 @@ class BaseCRUD():
 
 
     @logger.info
-    def add(self, obj:Worker|Constr|Storage|Account) -> Worker|Constr|Storage|Account:
+    def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
