@@ -115,8 +115,9 @@ class DataGenerator():
         '''
         Генератор данных аккаунта
         '''
+        random_number = f"S{self.__generate_number()}"
 
-        new_account = Account(login=self.fake.first_name(),
+        new_account = Account(login=f"login{random_number}",
                               password=self.password.run_generation(size=16),
                               email=self.fake.email(),
                               confirmation_status=status,

@@ -49,6 +49,7 @@ class FirmCRUD(BaseCRUD):
         with Database() as db:
 
             db.add(new_firm)     # добавляем в бд
+            db.commit() 
 
             new_role = AccountRoles(firm_id = new_firm.id,
                                     account_id=account_id,
@@ -57,9 +58,8 @@ class FirmCRUD(BaseCRUD):
             db.add(new_role)
             db.commit()     # сохраняем изменения
 
-            result = db.query(FirmTable).order_by(FirmTable.id.desc()).first()
-
-        return self.converter.conversion_to_data(result)
+            result = db.query(self.table).order_by(self.table.id.desc()).first()
+        return result
 
 
 
@@ -98,23 +98,22 @@ class FirmCRUD(BaseCRUD):
         with Database() as db:
             
             check = db.query(AccountRoles).filter(AccountRoles.account_id==account_id,
-                                                             AccountRoles.firm_id==firm_id).all()[0]
+                                                             AccountRoles.firm_id==firm_id).all()
             
             if not check:
                 # Если такой записи не существует, то создает ее
                 new_role = AccountRoles(firm_id = firm_id,
                                         account_id=account_id,
-                                        role = role.name)   
+                                        role = role)   
                 db.add(new_role)
             
-            elif check.role is Roles.super_admin.name:
+            elif check and check[0].role==Roles.super_admin.name:
                 raise ThisIsSuperAdmin
 
             else:
                 db.query(AccountRoles).filter(AccountRoles.account_id==account_id,
                                               AccountRoles.firm_id==firm_id).update({
-                                                  AccountRoles.role:role.name}, synchronize_session = False)
-
+                                                  AccountRoles.role:role}, synchronize_session = False)
 
             db.commit()
 

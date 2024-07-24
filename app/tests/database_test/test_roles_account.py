@@ -103,7 +103,7 @@ class TestRoles():
 
         assert firm.id in firms_id
 
-    
+
 
     def test_give_role(self):
         '''
@@ -120,7 +120,7 @@ class TestRoles():
                                     firm_id=firm.id,
                                     role=role.name)
             
-            assert role.name is self.firm_crud.get_role(account_id=new_account.id,
+            assert role.name==self.firm_crud.get_role(account_id=new_account.id,
                                                             firm_id=firm.id)
         
         # Попытка назначить владельца фирмы на роль ниже суперадмина
