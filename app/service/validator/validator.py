@@ -3,6 +3,7 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.account import Account
+from app.entities.firm import Firm
 from datetime import datetime
 from app.errors.service_error.validator_error import PresenceNumbers, ForbiddenSymbols
 from app.errors.service_error.validator_error import NonDisplayableSymbols, NotDatetime
@@ -184,4 +185,12 @@ class ValidatorEssence():
         '''
         Валидатор для новой записи
         в таблицу account
+        '''
+
+    
+    
+    def validate_firm(self, firm:Firm) -> None:
+        '''
+        Валидатор для новой записи
+        в таблицу firm
         '''
