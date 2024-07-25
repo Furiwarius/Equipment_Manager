@@ -4,6 +4,7 @@ from app.database.tables.essence import Base, AccountTable
 from app.database.database import Database
 from app.database.converter import Converter
 from app.database.crud.baseCRUD import BaseCRUD
+from app.errors.service_error.account_error import LoginExists, EmailExists
 
 
 
@@ -94,7 +95,25 @@ class AccountCRUD(BaseCRUD):
             db.query(self.table).filter(self.table.id == account_id).update({self.table.confirmation_status:True}, synchronize_session = False)
             db.commit()
 
+
     
+    @BaseCRUD.logger.info
+    def check_data(self, email:str, login:str) -> None:
+        '''
+        Проверка логина и адреса почты на уникальность
+
+        Делается это в одном методе
+        '''
+        with Database() as db:
+            account = db.query(AccountTable).filter(AccountTable.email==email).all()
+            if account: 
+                raise EmailExists
+            
+            account = db.query(AccountTable).filter(AccountTable.login==login).all()
+            if account:
+                raise LoginExists
+            
+
 
     def retire(self) -> None:
         '''
