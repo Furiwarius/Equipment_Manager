@@ -86,8 +86,10 @@ class TestUserRoles():
 
         firm_m = FirmManager(firm=new_firm, 
                              account_id=account.id)
-
         assert firm_m.firm.id
+
+        firms = self.firm_crud.get_all(account_id=account.id)
+        assert firm_m.firm.id is firms
 
     
 
@@ -95,7 +97,3 @@ class TestUserRoles():
         '''
         Тестирование метода по выдаче роли аккаунту
         '''
-
-    
-    
-    
