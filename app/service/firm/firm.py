@@ -4,7 +4,7 @@ from app.service.validator.validator import ValidatorEssence, DataValidator
 from app.errors.service_error.firm_error import IdNotSent, WrongRolePassed
 
 
-class ConstructionManager():
+class FirmManager():
     '''
     Управляющий класс для фирмы
     '''
