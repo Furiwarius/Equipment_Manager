@@ -26,11 +26,6 @@ class AccountManager():
 
         self.account_crud = AccountCRUD()
 
-        # Сюда поступают чистые данные из слоя Api
-        # поэтому необходимо перед работой перевести их в hash
-        account.login = to_hash(account.login)
-        account.password = to_hash(account.password)
-
         if account.id is None:
             self._new_account(account, send_code)
 
@@ -43,6 +38,11 @@ class AccountManager():
         '''
         Операции для создания нового аккаунта
         '''
+        # Сюда поступают чистые данные из слоя Api
+        # поэтому необходимо перед работой перевести их в hash
+        new_account.login = to_hash(new_account.login)
+        new_account.password = to_hash(new_account.password)
+
         self._check_uniqueness(new_account)
         self._create(new_account)
 
