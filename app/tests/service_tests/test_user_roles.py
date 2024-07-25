@@ -1,6 +1,6 @@
 from app.tests.fake_data import DataGenerator
 from app.database.crud.accountCRUD import AccountCRUD
-from app.database.crud.firmCRUD import FirmCRUD
+from app.database.crud.firmCRUD import FirmCRUD, Roles
 from app.service.user_account.account import AccountManager
 from app.service.firm.firm import FirmManager
 from app.errors.service_error.account_error import (IncorrectLogin, 
@@ -97,3 +97,14 @@ class TestUserRoles():
         '''
         Тестирование метода по выдаче роли аккаунту
         '''
+        account = self.generator.account_generate()
+        acc_m = AccountManager(account, send_code=False)
+
+        firm = self.firm_crud.get_last_one()
+        firm_m = FirmManager(firm)
+
+        firm_m.give_role(account_id=acc_m.account.id,
+                         role=Roles.admin.name)
+        
+        assert self.firm_crud.get_role(account_id=acc_m.account.id,
+                                       firm_id=firm_m.firm.id) is Roles.admin.name
