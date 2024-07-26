@@ -95,8 +95,8 @@ class AccountManager():
         Сравнение паролей из бд и переданного
         '''
         acc = self.account_crud.get_account_by_login(account.login)
-    
-        if acc.password is account.password:
+        
+        if acc.password!=account.password:
             # Если пароль не совпадает с тем, который сохранен в бд
             raise IncorrectPassword
     

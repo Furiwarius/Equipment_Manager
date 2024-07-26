@@ -109,7 +109,7 @@ class AccountCRUD(BaseCRUD):
             if account: 
                 raise EmailExists
             
-            account = db.query(AccountTable).filter(AccountTable.login==login).all()
+            account = db.query(AccountTable).filter(AccountTable.login==login).all()       
             if account:
                 raise LoginExists
             

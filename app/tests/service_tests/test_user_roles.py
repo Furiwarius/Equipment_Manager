@@ -9,6 +9,7 @@ from app.errors.service_error.account_error import (IncorrectLogin,
                                                     CodeDoesntMatch, 
                                                     EmailExists)
 import pytest
+from copy import copy
 
 
 
@@ -53,7 +54,7 @@ class TestUserRoles():
         Тестирование работы исключений при работе с AccuntManager
         '''
         account = self.generator.account_generate()
-        AccountManager(account, send_code=False)
+        AccountManager(copy(account), send_code=False)
 
         with pytest.raises(LoginExists):
             new_account = self.generator.account_generate()
@@ -89,7 +90,7 @@ class TestUserRoles():
         assert firm_m.firm.id
 
         firms = self.firm_crud.get_all(account_id=account.id)
-        assert firm_m.firm.id is firms
+        assert firm_m.firm.id in firms
 
     
 
@@ -107,4 +108,4 @@ class TestUserRoles():
                          role=Roles.admin.name)
         
         assert self.firm_crud.get_role(account_id=acc_m.account.id,
-                                       firm_id=firm_m.firm.id) is Roles.admin.name
+                                       firm_id=firm_m.firm.id) == Roles.admin.name

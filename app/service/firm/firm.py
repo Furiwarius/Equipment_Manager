@@ -44,7 +44,7 @@ class FirmManager():
         Выдать роль аккаунту
         '''
        
-        if role!=Roles.admin.name or role!=Roles.visitor.name:
+        if role not in (Roles.admin.name, Roles.visitor.name):
             raise WrongRolePassed
         
 
