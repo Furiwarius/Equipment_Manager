@@ -17,7 +17,7 @@ class DataValidator():
     '''
 
     # Запрещенные символы
-    prohibited = '''|!?}{[]"'`~+=*^%$#<>'''
+    prohibited = '''|!?}{[]'`~+=*^%$#<>'''
 
 
     def strings_with_number(self, string:str, length=0) -> None:
@@ -186,6 +186,12 @@ class ValidatorEssence():
         Валидатор для новой записи
         в таблицу account
         '''
+        if not isinstance(account, Account):
+            raise WrongType
+        
+        self.valid.strings_with_number(account.login, length=65)
+        self.valid.strings_with_number(account.email, length=60)
+        self.valid.only_strings(account.timezone, length=40)
 
     
     
@@ -194,3 +200,9 @@ class ValidatorEssence():
         Валидатор для новой записи
         в таблицу firm
         '''
+        if not isinstance(firm, Firm):
+            raise WrongType
+        
+        self.valid.strings_with_number(firm.name, length=65)
+        self.valid.start_date(firm.start_date)
+        self.valid.end_date(firm.start_date, firm.end_date)
