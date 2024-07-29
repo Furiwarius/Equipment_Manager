@@ -1,5 +1,6 @@
 import dotenv
 import os
+from datetime import timedelta
 
 dotenv.load_dotenv()
 
@@ -11,3 +12,17 @@ DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 HOST = os.getenv("HOST")
 DATABASE_LOG_SETTINGS = os.getenv("DATABASE_LOG_SETTINGS")
 DEVELOPER_EMAIL = os.getenv("DEVELOPER_EMAIL")
+
+
+class JWTSettings():
+    '''
+    Настройки для работы с токенами
+    '''
+
+    JWT_KEY = os.getenv("JWT_KEY")
+
+    ALGORITHM = "HS256"
+
+    EXPIRATION_TIME = timedelta(minutes=30)
+
+jwt_settings = JWTSettings()
