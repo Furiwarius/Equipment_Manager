@@ -28,10 +28,19 @@ class DatabaseLoggerSetting():
 
     # Почта, на которую будут отправляться сообщения об ошибках
     DEVELOPER_EMAIL = os.getenv("DEVELOPER_EMAIL")
+    
+    # id телеграма разработчика, для отправки уведомлений об ошибках
+    DEVELOPER_USER_ID = os.getenv("DEVELOPER_USER_ID")
 
     # Флаг, регулирующий отправку писем с ошибками
     # Если равен True, то ошибки отправляются на DEVELOPER_EMAIL
     SEND_BY_MAIL = False
+
+    # Если равен True, то ошибки отправляются на DEVELOPER_EMAIL
+    SEND_BY_TELEGRAM = True
+    
+    # Токен для бота, который будет отправлять логи
+    TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
 
 
 
