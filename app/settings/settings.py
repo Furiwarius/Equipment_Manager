@@ -37,7 +37,7 @@ class DatabaseLoggerSetting():
     SEND_BY_MAIL = False
 
     # Если равен True, то ошибки отправляются на DEVELOPER_EMAIL
-    SEND_BY_TELEGRAM = True
+    SEND_BY_TELEGRAM = False
     
     # Токен для бота, который будет отправлять логи
     TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
