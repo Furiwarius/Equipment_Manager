@@ -1,4 +1,5 @@
-from flask import Flask, Blueprint
+from fastapi import FastAPI
+from app.api.routes.login_account import login_account
 
 
 class Application():
@@ -6,21 +7,11 @@ class Application():
     Приложение
     '''
 
-    def __init__(self) -> None:
-        self.app = Flask(__name__, 
-                         static_folder='app/api/static', 
-                         template_folder='app/api/templates')
-    
+    def create_app(self) -> FastAPI:
+        '''
+        Создание приложения
+        '''
+        self.app = FastAPI()
+        self.app.include_router(login_account)
 
-    def add_routes(self, bp:Blueprint):
-        '''
-        Добавить схему blueprint
-        '''
-        self.app.register_blueprint(bp)
-
-
-    def run_application(self, debug:bool):
-        '''
-        Запустить приожение
-        '''
-        self.app.run(debug=debug)
+        return self.app
