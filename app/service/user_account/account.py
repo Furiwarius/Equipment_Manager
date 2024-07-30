@@ -10,7 +10,7 @@ from app.entities.account import Account
 class AccountManager():
     
 
-    def __init__(self, account:Account, send_code:bool=True) -> None:
+    def __init__(self, account:Account, send_code:bool=True, new:bool=False) -> None:
         '''
         При инициализации передается экземпляр Accaunt
         в нем обязательно должны быть логин и пароль,
@@ -26,9 +26,13 @@ class AccountManager():
 
         self.account_crud = AccountCRUD()
 
-        if account.id is None:
-            self._new_account(account, send_code)
+        # Сюда поступают чистые данные из слоя Api
+        # поэтому необходимо перед работой перевести их в hash
+        account.login = to_hash(account.login)
+        account.password = to_hash(account.password)
 
+        if new:
+            self._new_account(account, send_code)
         else:
             self._exist_account(account)
         
@@ -38,10 +42,6 @@ class AccountManager():
         '''
         Операции для создания нового аккаунта
         '''
-        # Сюда поступают чистые данные из слоя Api
-        # поэтому необходимо перед работой перевести их в hash
-        new_account.login = to_hash(new_account.login)
-        new_account.password = to_hash(new_account.password)
 
         self._check_uniqueness(new_account)
         self._create(new_account)
@@ -56,14 +56,13 @@ class AccountManager():
         '''
         Операции для начала работы с существуюим аккаунтом
         '''
-        # Проверка на наличие аккаунта
         self._check_exist(account)
         # Проверка на коректность введенных данных
         self._is_correct(account)
 
         # Так как могут передаваться не все данные,
         # то вызывается этот метод, чтобы подтянуть их из БД
-        self.account = self.account_crud.get_by_id(id=account.id)
+        self.account = self.account_crud.get_account_by_login(account.login)
 
 
 
@@ -79,13 +78,13 @@ class AccountManager():
 
     
 
-    def _check_exist(self, account:Account) -> None:
+    def _check_exist(self, account:Account) -> bool:
         '''
         Проверка наличия аккаунта
         '''
-        bd_acc = self.account_crud.get_by_id(account.id)
+        bd_acc = self.account_crud.get_account_by_login(account.login)
 
-        if account.login!=bd_acc.login:
+        if not bd_acc:
             raise IncorrectLogin
         
 
