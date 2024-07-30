@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+	<h1>Добро пожаловать на сервис EquipmentManager</h1>
+	<a href="/">Назад</a>
+    
+    <form action="login" method="post">
+        <p>
+            Введите логин:<br>
+            <input name="login"/>
+        </p>
+        <p>
+            Введите пароль:<br>
+            <input name="password"/>
+        </p>
+        <input type="submit" value="Отправить" />
+    </form> 
+
+    <p>Если нет аккаунта, то <a href="/registr">зарегистрируйтесь</a></p>
+{% endblock %}

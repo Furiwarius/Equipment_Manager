@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+	<h1>Регистрация на сервисе EquipmentManager</h1>
+	<a href="/authorization">Назад</a>
+
+    <form action="registr" method="post">
+        <p>
+            Придумайте логин:<br>
+            <input name="login"/>
+        </p>
+        <p>
+            Придумайте пароль:<br>
+            <input name="password"/>
+        </p>
+        <p>
+            Введите вашу почту:<br>
+            <input name="email"/>
+        </p>
+        <input type="submit" value="Создать аккаунт" />
+    </form> 
+{% endblock %}
