@@ -44,7 +44,8 @@ async def new_user(user:NewUser, timezone:str):
     account_manager = AccountManager(Account(login=user.login,
                                              password=user.password,
                                              email=user.email,
-                                             timezone=timezone))
+                                             timezone=timezone),
+                                    new=True)
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
@@ -71,7 +72,7 @@ async def authorization(request:Request):
 
 
 @login_account.post("/login")
-async def login(request:Request, user:User):
+async def login(user:User):
     '''
     Вход
     '''
