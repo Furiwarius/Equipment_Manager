@@ -37,15 +37,19 @@ async def registr(request:Request):
 
 
 @login_account.post("/registr")
-async def new_user(user:NewUser, timezone:str):
+async def new_user(login: str = Form(min_length=6, max_length=20),
+                   password: str = Form(min_length=6, max_length=20),
+                   email: str = Form(min_length=6, max_length=60),
+                   timezone: str = Form()):
     '''
     Регистрация пользователя
     '''
-    account_manager = AccountManager(Account(login=user.login,
-                                             password=user.password,
-                                             email=user.email,
+    account_manager = AccountManager(Account(login=login,
+                                             password=password,
+                                             email=email,
                                              timezone=timezone),
-                                    new=True)
+                                    new=True,
+                                    send_code=False)
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
@@ -72,11 +76,11 @@ async def authorization(request:Request):
 
 
 @login_account.post("/login")
-async def login(user:User):
+async def login(login: str = Form(min_length=6, max_length=20),
+                password: str = Form(min_length=6, max_length=20)):
     '''
     Вход
     '''
-    login, password = to_hash(user.login), to_hash(user.password)
     account_manager = AccountManager(Account(login=login,
                                              password=password))
     

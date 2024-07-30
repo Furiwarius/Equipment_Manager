@@ -16,6 +16,13 @@
             Введите вашу почту:<br>
             <input name="email"/>
         </p>
+        <input id="timezone" name="timezone" type="hidden"/>
         <input type="submit" value="Создать аккаунт" />
     </form> 
+
+    <script>
+        const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('timezone').value = clientTimeZone;
+    </script>
+
 {% endblock %}
