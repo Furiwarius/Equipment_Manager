@@ -31,7 +31,7 @@ class TestUserRoles():
         '''
         new_account = self.generator.account_generate()
 
-        account_m = AccountManager(new_account, send_code=False)
+        account_m = AccountManager(new_account, send_code=False, new=True)
 
         assert account_m.account.id
 
@@ -41,11 +41,13 @@ class TestUserRoles():
         '''
         Тестирование метода по инициализации существующего аккаунта
         '''
-        account = self.acc_crud.get_last_one()
+        new_account = self.generator.account_generate()
 
-        account_m = AccountManager(account)
+        AccountManager(copy(new_account), send_code=False, new=True)
 
-        assert account.id is account_m.account.id
+        account_m = AccountManager(copy(new_account), send_code=False)
+
+        assert self.acc_crud.get_last_one().id is account_m.account.id
 
 
 
@@ -54,25 +56,25 @@ class TestUserRoles():
         Тестирование работы исключений при работе с AccuntManager
         '''
         account = self.generator.account_generate()
-        AccountManager(copy(account), send_code=False)
+        AccountManager(copy(account), send_code=False, new=True)
 
         with pytest.raises(LoginExists):
             new_account = self.generator.account_generate()
             new_account.login = account.login
-            AccountManager(new_account, send_code=False)
+            AccountManager(new_account, send_code=False, new=True)
 
         with pytest.raises(EmailExists):
             new_account = self.generator.account_generate()
             new_account.email = account.email
-            AccountManager(new_account, send_code=False)
+            AccountManager(new_account, send_code=False, new=True)
 
         with pytest.raises(IncorrectLogin):
-            incorrect_acc = self.acc_crud.get_last_one()
+            incorrect_acc = copy(account)
             incorrect_acc.login = "another_login"
             AccountManager(incorrect_acc)
 
         with pytest.raises(IncorrectPassword):
-            incorrect_acc = self.acc_crud.get_last_one()
+            incorrect_acc = copy(account)
             incorrect_acc.password = "another_password"
             AccountManager(incorrect_acc)
 
@@ -99,7 +101,7 @@ class TestUserRoles():
         Тестирование метода по выдаче роли аккаунту
         '''
         account = self.generator.account_generate()
-        acc_m = AccountManager(account, send_code=False)
+        acc_m = AccountManager(account, send_code=False, new=True)
 
         firm = self.firm_crud.get_last_one()
         firm_m = FirmManager(firm)
