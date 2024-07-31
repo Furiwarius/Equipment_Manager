@@ -1,12 +1,8 @@
-from fastapi import APIRouter, Depends,  Form, Request
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Form, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from app.service.user_account.account import AccountManager, Account
-from app.database.crud.accountCRUD import AccountCRUD
-from app.api.models.models import User, NewUser, Code
-from app.utilities.hashing import to_hash
-from app.api.dependencies import create_jwt_token, verify_jwt_token
+from app.api.dependencies import create_jwt_token
 
 
 login_account = APIRouter()
@@ -57,7 +53,7 @@ async def new_user(login: str = Form(min_length=6, max_length=20),
 
 
 @login_account.post("/confirmation-code") 
-async def confirmation_code(code:Code):
+async def confirmation_code(code: int = Form(length=5)):
     '''
     Получение кода подтверждения
     '''
