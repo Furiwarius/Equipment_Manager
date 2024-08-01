@@ -14,7 +14,7 @@ work_with_firm.mount("/static", staticfiles, name="static")
 
 
 @work_with_firm.get("/firms")
-async def get_firms(request:Request, token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
+async def get_firms(token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
     '''
     Страница со списком фирм, доступ к которым имеет аккаунт
     '''
@@ -23,14 +23,12 @@ async def get_firms(request:Request, token:str, firm_crud:FirmCRUD = Depends(Fir
         raise HTTPException(status_code=419, detail="Неправильный токен")
     firms:list = firm_crud.get_all(data.get("user_id"))
 
-    return templates.TemplateResponse("firms.html", {"request": request,
-                                                    "page_name": "Список фирм",
-                                                    "firms": firms})
+    return {"firms": firms}
 
 
 
 @work_with_firm.get("/firms/{firm_id}")
-async def firm_info(request:Request, firm_id:int, token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
+async def firm_info(firm_id:int, token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
     '''
     Подробная страница фирмы
     '''
@@ -44,14 +42,43 @@ async def firm_info(request:Request, firm_id:int, token:str, firm_crud:FirmCRUD 
 
     firm:Firm = firm_crud.get_by_id(firm_id)
         
-    return templates.TemplateResponse("firms.html", {"request": request,
-                                                    "page_name": "Информация о фирме",
-                                                    "firm": firm})
+    return {"firm": firm}
+
+
+
+@work_with_firm.get("/firms/create_firm")
+async def create_firm(request:Request, token:str):
+    '''
+    Страница для создания фирмы
+    '''
+    data = verify_jwt_token(token)
+    if not data:
+        raise HTTPException(status_code=419, detail="Неправильный токен")
+        
+    return templates.TemplateResponse("create_firm.html", {"request": request,
+                                                    "page_name": "Создать фирму"})
+
+
+
+@work_with_firm.post("/firms/create_firm")
+async def create_firm(token:str, name: str = Form(min_length=6, max_length=65)):
+    '''
+    Создание фирмы
+    '''
+    data = verify_jwt_token(token)
+    if not data:
+        raise HTTPException(status_code=419, detail="Неправильный токен")
+    
+    firm_manager = FirmManager(Firm(name=name), data.get("user_id"))
+    
+    return {"firm": firm_manager.firm}
 
 
 
 @work_with_firm.get("/firms/{firm_id}/constructions")
-async def firm_constructions(request:Request, firm_id:int, token:str, constr_crud:ConstructionCRUD = Depends(ConstructionCRUD)):
+async def firm_constructions(firm_id:int, token:str, 
+                             constr_crud:ConstructionCRUD = Depends(ConstructionCRUD),
+                             firm_crud:FirmCRUD = Depends(FirmCRUD)):
     '''
     Список объектов фирмы
     '''
@@ -59,9 +86,14 @@ async def firm_constructions(request:Request, firm_id:int, token:str, constr_cru
     if not data:
         raise HTTPException(status_code=419, detail="Неправильный токен")
     
+    elif not firm_crud.get_by_id(firm_id):
+        raise HTTPException(status_code=404, detail="Not found")
+
+    elif not firm_crud.get_role(data.get("user_id"), firm_id):
+        # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
+        raise HTTPException(status_code=403, detail="This account does not have access to data")
+    
     constructions:list = constr_crud.get_all(firm_id=firm_id)
         
 
-    return templates.TemplateResponse("firms.html", {"request": request,
-                                                    "page_name": "Список строительных объектов",
-                                                    "constructions": constructions})
+    return {"constructions": constructions}
