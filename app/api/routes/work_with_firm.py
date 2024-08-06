@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Form, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
 from app.service.firm.firm import Firm, FirmManager, FirmCRUD
 from app.service.construction.construction import ConstructionCRUD
 from app.api.dependencies import verify_jwt_token

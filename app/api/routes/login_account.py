@@ -1,12 +1,21 @@
 from fastapi import APIRouter, Form, Request
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.service.user_account.account import AccountManager, Account
 from app.api.dependencies import create_jwt_token
+from app.settings.settings import app_settings
 
 
 login_account = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+
+
+@login_account.get('/favicon.ico', include_in_schema=False)
+async def favicon():
+    '''
+    Возвращает иконку сайта
+    '''
+    return FileResponse(app_settings.favicon_path)
 
 
 

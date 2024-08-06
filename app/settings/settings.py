@@ -25,4 +25,14 @@ class JWTSettings():
 
     EXPIRATION_TIME = timedelta(minutes=30)
 
+
+class ApplicationSetting():
+    '''
+    Настройки приложения
+    '''
+
+    favicon_path = 'app/static/img/favicon.ico'
+
+
 jwt_settings = JWTSettings()
+app_settings = ApplicationSetting()
