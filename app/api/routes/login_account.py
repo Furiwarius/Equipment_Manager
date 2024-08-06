@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from app.service.user_account.account import AccountManager, Account
 from app.api.dependencies import create_jwt_token
 from app.settings.settings import app_settings
+from app.api.models.models import NewUser, User
 
 
 login_account = APIRouter()
@@ -40,19 +41,16 @@ async def registr(request:Request):
 
 
 @login_account.post("/registr")
-async def new_user(login: str = Form(min_length=6, max_length=20),
-                   password: str = Form(min_length=6, max_length=20),
-                   email: str = Form(min_length=6, max_length=60),
-                   timezone: str = Form()):
+async def new_user(new_user: NewUser):
     '''
     Регистрация пользователя
     '''
-    account_manager = AccountManager(Account(login=login,
-                                             password=password,
-                                             email=email,
-                                             timezone=timezone),
+    account_manager = AccountManager(Account(login=new_user.login,
+                                             password=new_user.password,
+                                             email=new_user.email,
+                                             timezone=new_user.timezone),
                                     new=True,
-                                    send_code=False)
+                                    send_code=False) #После разработки метода confirmation_code станет True
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
@@ -79,13 +77,12 @@ async def authorization(request:Request):
 
 
 @login_account.post("/login")
-async def login(login: str = Form(min_length=6, max_length=20),
-                password: str = Form(min_length=6, max_length=20)):
+async def login(user: User):
     '''
     Вход
     '''
-    account_manager = AccountManager(Account(login=login,
-                                             password=password))
+    account_manager = AccountManager(Account(login=user.login,
+                                             password=user.password))
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}

@@ -6,6 +6,7 @@ class NewUser(BaseModel):
     login: str
     email: str
     password: str
+    timezone: str
 
 
     @field_validator("email")
@@ -20,8 +21,8 @@ class NewUser(BaseModel):
     @classmethod
     def validate_password(cls, value):
         password_length = len(value)
-        if password_length < 8 or password_length > 16:
-            raise ValueError("The password must be between 8 and 16 characters long")
+        if password_length < 8 or password_length > 64:
+            raise ValueError("The password must be between 8 and 64 characters long")
         return value
 
 

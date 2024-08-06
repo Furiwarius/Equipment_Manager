@@ -3,23 +3,21 @@
 	<h1>Регистрация на сервисе EquipmentManager</h1>
 	<a href="/authorization">Назад</a>
 
-    <form action="registr" method="post">
-        <p>
-            Придумайте логин:<br>
-            <input name="login"/>
-        </p>
-        <p>
-            Придумайте пароль:<br>
-            <input name="password"/>
-        </p>
-        <p>
-            Введите вашу почту:<br>
-            <input name="email"/>
-        </p>
-        <input id="timezone" name="timezone" type="hidden"/>
-        <input type="submit" value="Создать аккаунт" />
-    </form> 
+    <p>
+        Придумайте логин: <br /> 
+        <input name="login" id="login" />
+    </p>
+     <p>
+        Придумайте пароль: <br /> 
+        <input name="password" id="password"/>
+    </p>
+    <p>
+        Введите вашу почту:<br>
+        <input name="email" id="email"/>
+    </p>
+    <button onclick="send_new_user()">Отправить</button>
 
-    <script src="/static/js/set_timezone.js"></script>
+
+    <script src="/static/js/send_new_user.js"></script>
 
 {% endblock %}
