@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Form, Request
+from fastapi import APIRouter, Form, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
 from app.service.user_account.account import AccountManager, Account
 from app.api.dependencies import create_jwt_token
 from app.settings.settings import app_settings
 from app.api.models.models import NewUser, User
+from app.errors.service_error.account_error import (IncorrectLogin, IncorrectPassword, 
+                                                    LoginExists, CodeDoesntMatch, EmailExists)
 
 
 login_account = APIRouter()
@@ -45,12 +47,18 @@ async def new_user(new_user: NewUser):
     '''
     Регистрация пользователя
     '''
-    account_manager = AccountManager(Account(login=new_user.login,
-                                             password=new_user.password,
-                                             email=new_user.email,
-                                             timezone=new_user.timezone),
-                                    new=True,
-                                    send_code=False) #После разработки метода confirmation_code станет True
+    try:
+        account_manager = AccountManager(Account(login=new_user.login,
+                                                password=new_user.password,
+                                                email=new_user.email,
+                                                timezone=new_user.timezone),
+                                        new=True,
+                                        send_code=False) #После разработки метода confirmation_code станет True
+    
+    except EmailExists as err:
+        raise HTTPException(status_code=422, detail="This email is already in use") from err
+    except LoginExists as err:
+        raise HTTPException(status_code=422, detail="This login is already taken") from err
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
@@ -81,8 +89,13 @@ async def login(user: User):
     '''
     Вход
     '''
-    account_manager = AccountManager(Account(login=user.login,
-                                             password=user.password))
+    try:
+        account_manager = AccountManager(Account(login=user.login,
+                                                password=user.password))
+    except IncorrectPassword as err:
+        raise HTTPException(status_code=401, detail="Wrong password") from err
+    except IncorrectLogin as err:
+        raise HTTPException(status_code=401, detail="Wrong login") from err
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
