@@ -8,8 +8,6 @@ from app.api.dependencies import verify_jwt_token
 
 work_with_firm = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
-staticfiles = StaticFiles(directory="app")
-work_with_firm.mount("/static", staticfiles, name="static")
 
 
 
@@ -20,7 +18,7 @@ async def get_firms(token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
     '''
     data = verify_jwt_token(token)
     if not data:
-        raise HTTPException(status_code=419, detail="Неправильный токен")
+        raise HTTPException(status_code=419, detail="Invalid token")
     firms:list = firm_crud.get_all(data.get("user_id"))
 
     return {"firms": firms}
@@ -34,7 +32,7 @@ async def firm_info(firm_id:int, token:str, firm_crud:FirmCRUD = Depends(FirmCRU
     '''
     data = verify_jwt_token(token)
     if not data:
-        raise HTTPException(status_code=419, detail="Неправильный токен")
+        raise HTTPException(status_code=419, detail="Invalid token")
     
     if not firm_crud.get_role(data.get("user_id"), firm_id):
         # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
@@ -53,7 +51,7 @@ async def create_firm(request:Request, token:str):
     '''
     data = verify_jwt_token(token)
     if not data:
-        raise HTTPException(status_code=419, detail="Неправильный токен")
+        raise HTTPException(status_code=419, detail="Invalid token")
         
     return templates.TemplateResponse("create_firm.html", {"request": request,
                                                     "page_name": "Создать фирму"})
@@ -67,7 +65,7 @@ async def create_firm(token:str, name: str = Form(min_length=6, max_length=65)):
     '''
     data = verify_jwt_token(token)
     if not data:
-        raise HTTPException(status_code=419, detail="Неправильный токен")
+        raise HTTPException(status_code=419, detail="Invalid token")
     
     firm_manager = FirmManager(Firm(name=name), data.get("user_id"))
     
@@ -84,7 +82,7 @@ async def firm_constructions(firm_id:int, token:str,
     '''
     data = verify_jwt_token(token)
     if not data:
-        raise HTTPException(status_code=419, detail="Неправильный токен")
+        raise HTTPException(status_code=419, detail="Invalid token")
     
     elif not firm_crud.get_by_id(firm_id):
         raise HTTPException(status_code=404, detail="Not found")

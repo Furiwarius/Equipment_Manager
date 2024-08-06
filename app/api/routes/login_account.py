@@ -7,8 +7,6 @@ from app.api.dependencies import create_jwt_token
 
 login_account = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
-staticfiles = StaticFiles(directory="app")
-login_account.mount("/static", staticfiles, name="static")
 
 
 

@@ -20,9 +20,6 @@
         <input type="submit" value="Создать аккаунт" />
     </form> 
 
-    <script>
-        const clientTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        document.getElementById('timezone').value = clientTimeZone;
-    </script>
+    <script src="/static/js/set_timezone.js"></script>
 
 {% endblock %}
