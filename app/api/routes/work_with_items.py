@@ -5,6 +5,7 @@ from app.service.construction.construction import ConstructionCRUD, Construction
 from app.api.dependencies import verify_jwt_token
 from app.api.models.models import NewConstruction
 from datetime import datetime, timezone
+from app.api.access_checks import access_to_changes, access_to_visit
 
 
 work_with_items = APIRouter()
@@ -23,9 +24,7 @@ async def constr_info(constr_id: int,
     '''
     data = verify_jwt_token(token)
     
-    if not firm_crud.get_role(data.get("user_id"), firm_id):
-        # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
-        raise HTTPException(status_code=403, detail="This account does not have access to data")
+    access_to_visit(firm_id, data.get("user_id"))
 
     constr: Construction = constr_crud.get_by_id(constr_id)
 
@@ -58,15 +57,3 @@ async def create_constr(new_constr: NewConstruction,
     constr_m = ConstructionManager(constr)
     
     return {"construction": constr_m.constr}
-
-
-
-def access_to_changes(firm_id:int, user_id:int, firm_crud: FirmCRUD = Depends(FirmCRUD)):
-    '''
-    Проверка прав доступа на добавление
-    или модификацию элементов фирмы
-    '''
-    role: str = firm_crud.get_role(user_id, firm_id)
-    if role != "admin" and role != "super_admin":
-        # Если у аккаунта роль ниже админа или суперадмина, то выдает исключение
-        raise HTTPException(status_code=403, detail="This account does not have access to data")

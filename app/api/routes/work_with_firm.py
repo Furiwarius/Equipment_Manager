@@ -4,6 +4,7 @@ from app.service.firm.firm import Firm, FirmManager, FirmCRUD
 from app.service.construction.construction import ConstructionCRUD
 from app.api.dependencies import verify_jwt_token
 from app.api.models.models import NewFirm
+from app.api.access_checks import access_to_visit
 
 
 work_with_firm = APIRouter()
@@ -31,9 +32,7 @@ async def firm_info(firm_id:int, token:str, firm_crud:FirmCRUD = Depends(FirmCRU
     '''
     data = verify_jwt_token(token)
     
-    if not firm_crud.get_role(data.get("user_id"), firm_id):
-        # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
-        raise HTTPException(status_code=403, detail="This account does not have access to data")
+    access_to_visit(firm_id, data.get("user_id"))
 
     firm:Firm = firm_crud.get_by_id(firm_id)
         
@@ -79,9 +78,7 @@ async def firm_constructions(firm_id:int,
     if not firm_crud.get_by_id(firm_id):
         raise HTTPException(status_code=404, detail="Not found")
 
-    elif not firm_crud.get_role(data.get("user_id"), firm_id):
-        # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
-        raise HTTPException(status_code=403, detail="This account does not have access to data")
+    access_to_visit(firm_id, data.get("user_id"))
     
     constructions:list = constr_crud.get_all(firm_id=firm_id)
         
