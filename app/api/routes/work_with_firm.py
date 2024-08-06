@@ -17,8 +17,7 @@ async def get_firms(token:str, firm_crud:FirmCRUD = Depends(FirmCRUD)):
     Страница со списком фирм, доступ к которым имеет аккаунт
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
+
     firms:list = firm_crud.get_all(data.get("user_id"))
 
     return {"firms": firms}
@@ -31,8 +30,6 @@ async def firm_info(firm_id:int, token:str, firm_crud:FirmCRUD = Depends(FirmCRU
     Подробная страница фирмы
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
     
     if not firm_crud.get_role(data.get("user_id"), firm_id):
         # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
@@ -49,9 +46,7 @@ async def create_firm(request:Request, token:str):
     '''
     Страница для создания фирмы
     '''
-    data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
+    verify_jwt_token(token)
         
     return templates.TemplateResponse("create_firm.html", {"request": request,
                                                     "page_name": "Создать фирму"})
@@ -64,8 +59,6 @@ async def create_firm(token:str, new_firm:NewFirm):
     Создание фирмы
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
     
     firm_manager = FirmManager(Firm(name=new_firm.name), data.get("user_id"))
     
@@ -82,10 +75,8 @@ async def firm_constructions(firm_id:int,
     Список объектов фирмы
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
     
-    elif not firm_crud.get_by_id(firm_id):
+    if not firm_crud.get_by_id(firm_id):
         raise HTTPException(status_code=404, detail="Not found")
 
     elif not firm_crud.get_role(data.get("user_id"), firm_id):

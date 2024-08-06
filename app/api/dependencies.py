@@ -1,6 +1,7 @@
 import jwt
 from datetime import datetime, timezone
 from app.settings.settings import jwt_settings
+from fastapi import HTTPException
 
 
 def create_jwt_token(data: dict) -> str:
@@ -18,7 +19,7 @@ def create_jwt_token(data: dict) -> str:
 
 
 
-def verify_jwt_token(token: str) -> dict|None:
+def verify_jwt_token(token: str) -> dict:
     '''
     Расшифровка токена
     '''
@@ -29,4 +30,4 @@ def verify_jwt_token(token: str) -> dict|None:
         return decoded_data
     
     except jwt.PyJWTError:
-        return None
+        raise HTTPException(status_code=419, detail="Invalid token")

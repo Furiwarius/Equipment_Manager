@@ -22,14 +22,11 @@ async def constr_info(constr_id: int,
     Подробная страница объекта строительства
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
     
     if not firm_crud.get_role(data.get("user_id"), firm_id):
         # Если аккаунт не имеет любого доступа к фирме, то выдает исключение
         raise HTTPException(status_code=403, detail="This account does not have access to data")
 
-    
     constr: Construction = constr_crud.get_by_id(constr_id)
 
     if constr is None:
@@ -50,8 +47,6 @@ async def create_constr(new_constr: NewConstruction,
     Подробная страница объекта строительства
     '''
     data = verify_jwt_token(token)
-    if not data:
-        raise HTTPException(status_code=419, detail="Invalid token")
     
     access_to_changes(firm_id, data.get("user_id"))
 
