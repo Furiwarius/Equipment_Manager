@@ -3,6 +3,7 @@ from fastapi.templating import Jinja2Templates
 from app.service.firm.firm import Firm, FirmManager, FirmCRUD
 from app.service.construction.construction import ConstructionCRUD
 from app.api.dependencies import verify_jwt_token
+from app.api.models.models import NewFirm
 
 
 work_with_firm = APIRouter()
@@ -58,7 +59,7 @@ async def create_firm(request:Request, token:str):
 
 
 @work_with_firm.post("/firms/create_firm")
-async def create_firm(token:str, name: str = Form(min_length=6, max_length=65)):
+async def create_firm(token:str, new_firm:NewFirm):
     '''
     Создание фирмы
     '''
@@ -66,14 +67,15 @@ async def create_firm(token:str, name: str = Form(min_length=6, max_length=65)):
     if not data:
         raise HTTPException(status_code=419, detail="Invalid token")
     
-    firm_manager = FirmManager(Firm(name=name), data.get("user_id"))
+    firm_manager = FirmManager(Firm(name=new_firm.name), data.get("user_id"))
     
     return {"firm": firm_manager.firm}
 
 
 
 @work_with_firm.get("/firms/{firm_id}/constructions")
-async def firm_constructions(firm_id:int, token:str, 
+async def firm_constructions(firm_id:int, 
+                             token:str, 
                              constr_crud:ConstructionCRUD = Depends(ConstructionCRUD),
                              firm_crud:FirmCRUD = Depends(FirmCRUD)):
     '''

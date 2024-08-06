@@ -42,3 +42,13 @@ class Code(BaseModel):
         if value!=5:
             raise ValueError("Code is invalid")
         return value 
+
+
+class NewFirm(BaseModel):
+    name:str
+
+
+class NewConstruction(BaseModel):
+    name: str
+    project: str
+    address: str
