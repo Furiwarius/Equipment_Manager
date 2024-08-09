@@ -47,9 +47,9 @@ class BaseCRUD():
 
 
     @logger.info
-    def get_all(self, firm_id:int) -> list:
+    def get_all(self, firm_id:int) -> dict:
         '''
-        Получить id сущностей привязанных
+        Получить словарь с id:сущность привязанных
         к определенной фирме
 
         Метод смотрит поле table,
@@ -57,10 +57,10 @@ class BaseCRUD():
         '''
 
         with Database() as db:
-            result = db.query(self.table.id).filter(self.table.firm_id == firm_id).all()
-            result = [item[0] for item in result]
+            result = db.query(self.table).filter(self.table.firm_id == firm_id).all()
+            result = {item.id:self.converter.conversion_to_data(item) for item in result}
 
-        return list(result)
+        return result
             
             
 
