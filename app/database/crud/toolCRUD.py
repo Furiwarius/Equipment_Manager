@@ -84,9 +84,7 @@ class ToolCRUD(BaseCRUD):
             place = ToolsOnConstr
 
         post = place(tool_id=tool.id,
-                     place_id=where.id,
-                     DT_start=datetime.now(),
-                     DT_end=None)
+                     place_id=where.id)
 
         db.add(post)
 
@@ -98,9 +96,9 @@ class ToolCRUD(BaseCRUD):
         '''
 
         constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool_id,
-                                                ToolsOnConstr.DT_end==None).all()
+                                                ToolsOnConstr.end_date==None).all()
         storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool_id,
-                                                ToolsOnStorage.DT_end==None).all()
+                                                ToolsOnStorage.end_date==None).all()
 
         if constr:
             return constr[0]
@@ -116,7 +114,7 @@ class ToolCRUD(BaseCRUD):
         '''
 
         db.query(type(location)).filter(type(location).id == location.id
-                                           ).update({type(location).DT_end:datetime.now()}, synchronize_session = False)
+                                           ).update({type(location).end_date:datetime.now()}, synchronize_session = False)
     
 
     @BaseCRUD.logger.info
@@ -128,13 +126,12 @@ class ToolCRUD(BaseCRUD):
 
         with Database() as db:
             place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool_id, 
-                                                                  ToolsOnConstr.DT_end==None).all()
-
+                                                                  ToolsOnConstr.end_date==None).all()
             if place:
                 constr = db.get(ConstrTable, place[0])
             else:
                 place = db.query(ToolsOnStorage.place_id).filter(ToolsOnStorage.tool_id==tool_id, 
-                                                                  ToolsOnStorage.DT_end==None).all()
+                                                                  ToolsOnStorage.end_date==None).all()
                 constr = db.get(StorageTable, place[0])
             
             return self.converter.conversion_to_data(constr)

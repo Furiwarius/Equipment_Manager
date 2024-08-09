@@ -39,7 +39,7 @@ class ConstructionCRUD(BaseCRUD):
 
         with Database() as db:
 
-            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.DT_end==None).all()
+            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.end_date==None).all()
             result = {item[0]: self.converter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result
@@ -56,7 +56,7 @@ class ConstructionCRUD(BaseCRUD):
 
         with Database() as db:
 
-            works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
+            works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.end_date==None).all()
             result = {item[0]: self.converter.conversion_to_data(db.get(WorkerTable, item)) for item in works_id}
 
         return result
@@ -70,7 +70,7 @@ class ConstructionCRUD(BaseCRUD):
         
         with Database() as db:
             place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, 
-                                                                    WorkOnConstr.DT_end==None,
+                                                                    WorkOnConstr.end_date==None,
                                                                     WorkOnConstr.is_brigadir==True).all()
             
             if place: 
@@ -97,9 +97,7 @@ class ConstructionCRUD(BaseCRUD):
 
             work_on_constr = WorkOnConstr(worker_id=worker_id,
                         construction_id=constr_id,
-                        is_brigadir=brigadir,
-                        DT_start=datetime.now(),
-                        DT_end=None)
+                        is_brigadir=brigadir)
 
             db.add(work_on_constr)
             db.commit()
@@ -112,7 +110,7 @@ class ConstructionCRUD(BaseCRUD):
         '''
 
         constr = db.query(WorkOnConstr).filter(WorkOnConstr.worker_id==worker_id,
-                                                WorkOnConstr.DT_end==None).all()
+                                                WorkOnConstr.end_date==None).all()
 
         if constr:
             return constr[0]
@@ -126,4 +124,4 @@ class ConstructionCRUD(BaseCRUD):
         '''
 
         db.query(WorkOnConstr).filter(WorkOnConstr.id == location.id
-                                           ).update({WorkOnConstr.DT_end:datetime.now()}, synchronize_session = False)
+                                           ).update({WorkOnConstr.end_date:datetime.now()}, synchronize_session = False)
