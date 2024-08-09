@@ -67,29 +67,6 @@ class DataValidator():
         # Если задана необходимая длина строки
         elif length and len(string)>length:
             raise InvalidLength
-
-
-
-    def start_date(self, date:datetime) -> None:
-        '''
-        Проверка даты начала работ
-        '''
-
-        if not isinstance(date, datetime):
-            raise NotDatetime
-
-
-
-    def end_date(self, start_date:datetime, end_date:datetime|None) -> None:
-        '''
-        Проверка даты окончания
-        '''
-        if end_date:
-            if not isinstance(start_date, datetime) or not isinstance(end_date, datetime):
-                raise NotDatetime
-            
-            elif end_date<start_date:
-                raise DateMismatch
     
 
 
@@ -126,8 +103,6 @@ class ValidatorEssence():
         self.valid.only_strings(constr.name, length=60)
         self.valid.strings_with_number(constr.address, length=100)
         self.valid.strings_with_number(constr.project, length=60)
-        self.valid.start_date(constr.start_date)
-        self.valid.end_date(constr.start_date, constr.end_date)
         
 
 
@@ -142,8 +117,6 @@ class ValidatorEssence():
 
         self.valid.only_strings(storage.name, length=60)
         self.valid.strings_with_number(storage.address, length=100)
-        self.valid.start_date(storage.start_date)
-        self.valid.end_date(storage.start_date, storage.end_date)
 
 
 
@@ -158,9 +131,6 @@ class ValidatorEssence():
         
         self.valid.only_strings(tool.name, length=60)
         self.valid.strings_with_number(tool.factory_number, length=60)
-        self.valid.start_date(tool.start_date)
-        self.valid.end_date(tool.start_date, tool.end_date)
-
 
 
     def validate_worker(self, worker:Worker) -> None:
@@ -176,8 +146,6 @@ class ValidatorEssence():
         self.valid.only_strings(worker.surname, length=20)
         self.valid.phone_number(worker.phone_number)
         self.valid.only_strings(worker.job_title, length=40)
-        self.valid.start_date(worker.start_date)
-        self.valid.end_date(worker.start_date, worker.end_date)
 
 
     
@@ -204,5 +172,3 @@ class ValidatorEssence():
             raise WrongType
         
         self.valid.strings_with_number(firm.name, length=65)
-        self.valid.start_date(firm.start_date)
-        self.valid.end_date(firm.start_date, firm.end_date)

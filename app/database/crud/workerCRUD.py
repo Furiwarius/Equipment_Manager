@@ -33,7 +33,7 @@ class WorkerCRUD(BaseCRUD):
 
         with Database() as db:
             place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
-                                                                  WorkOnConstr.DT_end==None).all()
+                                                                  WorkOnConstr.end_date==None).all()
 
             if place:
                 constr = db.get(ConstrTable, place[0])
@@ -49,7 +49,7 @@ class WorkerCRUD(BaseCRUD):
 
         with Database() as db:
             place = db.query(WorkOnConstr.construction_id).filter(WorkOnConstr.worker_id==worker_id, 
-                                                                  WorkOnConstr.DT_end==None,
+                                                                  WorkOnConstr.end_date==None,
                                                                   WorkOnConstr.is_brigadir==True).all()
             
             if place: 

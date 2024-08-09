@@ -24,5 +24,7 @@ class Worker():
     start_date: datetime = None
     # дата окончания работы работника
     end_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # Статус работника
     status: bool = None
