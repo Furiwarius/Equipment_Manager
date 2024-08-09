@@ -14,5 +14,7 @@ class Firm():
     status: bool = None
     # дата создания
     start_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # дата закрытия
     end_date: datetime = None

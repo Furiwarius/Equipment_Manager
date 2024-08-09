@@ -22,5 +22,7 @@ class Construction():
     status: bool = None
     # дата начала работы объекта
     start_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # дата окончания работы объекта
     end_date: datetime = None

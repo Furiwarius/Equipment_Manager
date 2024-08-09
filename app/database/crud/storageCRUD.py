@@ -35,7 +35,7 @@ class StorageCRUD(BaseCRUD):
         
         with Database() as db:
 
-            tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.place_id==storage_id, ToolsOnStorage.DT_end==None).all()
+            tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.place_id==storage_id, ToolsOnStorage.end_date==None).all()
             result = {item[0]: self.converter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
 
         return result

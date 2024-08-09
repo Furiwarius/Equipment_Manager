@@ -19,5 +19,7 @@ class Storage():
     status: bool = None
     # дата начала работы склада
     start_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # дата окончания работы склада
     end_date: datetime = None

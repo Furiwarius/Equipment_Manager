@@ -2,6 +2,7 @@ from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy import Column, DateTime, Boolean
 from datetime import datetime
 from app.database.tables.base import Base
+from sqlalchemy.sql import func
 
 
 class WorksOnConstructions(Base):
@@ -16,8 +17,8 @@ class WorksOnConstructions(Base):
     worker_id = Column(Integer, ForeignKey("worker.id"), nullable=False)
     construction_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
     is_brigadir = Column(Boolean, nullable=False)
-    DT_start = Column(DateTime, default=datetime.now, nullable=False)
-    DT_end = Column(DateTime)
+    start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
+    end_date = Column(DateTime)
 
 
 class ToolsOnConstructions(Base):
@@ -31,8 +32,8 @@ class ToolsOnConstructions(Base):
 
     tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
     place_id = Column(Integer, ForeignKey("construction.id"), nullable=False)
-    DT_start = Column(DateTime, default=datetime.now, nullable=False)
-    DT_end = Column(DateTime)
+    start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
+    end_date = Column(DateTime)
 
 
 class ToolsOnStorage(Base):
@@ -46,8 +47,8 @@ class ToolsOnStorage(Base):
 
     tool_id = Column(Integer, ForeignKey("tool.id"), nullable=False)
     place_id = Column(Integer, ForeignKey("storage.id"), nullable=False)
-    DT_start = Column(DateTime, default=datetime.now, nullable=False)
-    DT_end = Column(DateTime)
+    start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
+    end_date = Column(DateTime)
 
 
 

@@ -62,7 +62,6 @@ class DataGenerator():
                             surname=self.fake.last_name(),
                             phone_number=''.join(list(filter(str.isdigit, list(self.fake.phone_number())))),
                             job_title=self.fake.job(),
-                            start_date=datetime.now(timezone.utc),
                             status=status)
         if firm_id:
             new_worker.firm_id = firm_id
@@ -79,8 +78,7 @@ class DataGenerator():
 
         new_tool = Tool(name=f"tool{random_number}",
                         factory_number=self.fake.vin(),
-                        status=status,
-                        start_date=datetime.now(timezone.utc))
+                        status=status,)
         if firm_id:
             new_tool.firm_id = firm_id
 
@@ -97,8 +95,7 @@ class DataGenerator():
         new_construction = Construction(name=self.fake.company(),
                                         project=f"project №{random_number}",
                                         address=self.fake.address(),
-                                        status=status,
-                                        start_date=datetime.now(timezone.utc))
+                                        status=status)
         if firm_id:
             new_construction.firm_id = firm_id
 
@@ -114,8 +111,7 @@ class DataGenerator():
 
         new_storage = Storage(name=f"storage №{random_number}",
                               address=self.fake.address(),
-                              status=status,
-                              start_date=datetime.now(timezone.utc))
+                              status=status)
         if firm_id:
             new_storage.firm_id = firm_id
 
@@ -129,8 +125,7 @@ class DataGenerator():
         '''
 
         new_firm = Firm(name=self.fake.company(),
-                        status=status,
-                        start_date=datetime.now(timezone.utc))
+                        status=status)
 
         return new_firm
 
