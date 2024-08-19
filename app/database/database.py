@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, Engine
 from mysql.connector import connect, Error
-from app.settings.settings import TEST_DATABASE, DATABASE_PASSWORD, DATABASE_USER, HOST
+from app.settings.settings import db_setting
 from app.database.tables.base import Base
 from sqlalchemy.orm import Session
 
@@ -12,7 +12,7 @@ class Database():
     Имеет всего 1 экземпляр на все приложение
     '''
     # Переменная с именем БД
-    database_name = TEST_DATABASE
+    database_name = db_setting.TEST_DATABASE
 
 
     _instance = None  # Приватное поле для хранения единственного экземпляра
@@ -68,9 +68,9 @@ class Database():
         '''
         try:
             with connect(
-                host=HOST,
-                user=DATABASE_USER,
-                password=DATABASE_PASSWORD) as connection:
+                host=db_setting.HOST,
+                user=db_setting.DATABASE_USER,
+                password=db_setting.DATABASE_PASSWORD) as connection:
                 with connection.cursor() as cursor:
                     cursor.execute(request)
         except Error as e:
@@ -84,7 +84,7 @@ class Database():
         '''
         self.create_database()
         # строка подключения
-        mysql_database = f"mysql+pymysql://{DATABASE_USER}:{DATABASE_PASSWORD}@{HOST}/{self.database_name}"
+        mysql_database = f"mysql+pymysql://{db_setting.DATABASE_USER}:{db_setting.DATABASE_PASSWORD}@{db_setting.HOST}/{self.database_name}"
         # создаем движок SqlAlchemy
         self.engine = create_engine(mysql_database, echo=False)
 
