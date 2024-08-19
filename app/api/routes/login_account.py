@@ -27,8 +27,7 @@ async def index(request:Request):
     '''
     Главная страница
     '''
-    return templates.TemplateResponse("index.html", {"request": request,
-                                                     "page_name":"Сервис EquipmentManager"})
+    return templates.TemplateResponse(request, "index.html", {"page_name":"Сервис EquipmentManager"})
 
 
 
@@ -37,8 +36,7 @@ async def registr(request:Request):
     '''
     Страница с полями для регистрации
     '''
-    return templates.TemplateResponse("registr.html", {"request": request,
-                                                     "page_name":"Регистрация в EquipmentManager"})
+    return templates.TemplateResponse(request, "registr.html", {"page_name":"Регистрация в EquipmentManager"})
 
 
 
@@ -60,8 +58,7 @@ async def new_user(new_user: NewUser):
     except LoginExists as err:
         raise HTTPException(status_code=422, detail="This login is already taken") from err
     
-    token = create_jwt_token({"user_id": account_manager.account.id})
-    return {"token": token}
+    return {"message": "Accaunt created"}
 
 
 
@@ -79,8 +76,7 @@ async def authorization(request:Request):
     '''
     Страница с полями для входа
     '''
-    return templates.TemplateResponse("authorization.html", {"request": request,
-                                                     "page_name":"Вход в EquipmentManager"})
+    return templates.TemplateResponse(request, "authorization.html", {"page_name":"Вход в EquipmentManager"})
 
 
 
