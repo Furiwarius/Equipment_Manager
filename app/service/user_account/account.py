@@ -5,6 +5,7 @@ from app.errors.service_error.account_error import (IncorrectLogin, IncorrectPas
                                                     LoginExists, CodeDoesntMatch, EmailExists)
 from tzlocal import get_localzone
 from app.entities.account import Account
+from app.errors.base_exception import BaseException
 
 
 class AccountManager():
@@ -73,7 +74,7 @@ class AccountManager():
         try:
             self.account_crud.check_data(login=account.login,
                                      email=account.email)
-        except Exception as err:
+        except BaseException as err:
             raise err
 
     

@@ -1,6 +1,7 @@
+from app.errors.base_exception import BaseException
 
 
-class IdNotSent(Exception):
+class IdNotSent(BaseException):
     '''
     Вызывается, если попытаться создать фирму
     не передавая account_id в FirmManager
@@ -13,7 +14,7 @@ class IdNotSent(Exception):
 
 
 
-class WrongRolePassed(Exception):
+class WrongRolePassed(BaseException):
     '''
     Вызывается, если попытатся выдать
     аккаунту роль не admin или visitor
