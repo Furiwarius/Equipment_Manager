@@ -1,0 +1,6 @@
+env
+.env
+.pytest_cache
+__pycache__
+checking_work.py
+app/loggers/logs/database.log
