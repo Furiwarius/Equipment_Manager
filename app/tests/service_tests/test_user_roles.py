@@ -1,4 +1,3 @@
-from app.tests.fake_data import DataGenerator
 from app.database.crud.accountCRUD import AccountCRUD, Account
 from app.database.crud.firmCRUD import FirmCRUD, Roles
 from app.service.user_account.account import AccountManager
@@ -17,12 +16,6 @@ class TestUserRoles():
     '''
     Тестирование работы классов FirmManager и AccountManager
     '''
-
-    generator = DataGenerator()
-    
-    acc_crud = AccountCRUD()
-    firm_crud = FirmCRUD()
-
 
 
     def test_add_new_account(self, account:Account):
@@ -48,33 +41,60 @@ class TestUserRoles():
         assert acc_crud.get_last_one().id is account_m.account.id
 
 
-    @pytest.mark.skip()
-    def test_account_exception(self, account:Account, acc_crud:AccountCRUD):
+
+    def test_exception_IncorrectPassword(self, account:Account):
         '''
-        Тестирование работы исключений при работе с AccuntManager
+        Тестирование вызова исключения IncorrectPassword 
+        при работе с AccuntManager
         '''
-        account = self.generator.account_generate()
+        
+        AccountManager(copy(account), send_code=False, new=True)
+        
+        with pytest.raises(IncorrectPassword):
+            account.password+="string"
+            AccountManager(account)
+
+
+
+    def test_exception_IncorrectLogin(self, account:Account):
+        '''
+        Тестирование вызова исключения IncorrectLogin 
+        при работе с AccuntManager
+        '''
+
+        AccountManager(copy(account), send_code=False, new=True)
+        
+        with pytest.raises(IncorrectLogin):
+            account.login+="string"
+            AccountManager(account)
+
+
+
+    def test_exception_EmailExists(self, account:Account):
+        '''
+        Тестирование вызова исключения EmailExists 
+        при работе с AccuntManager
+        '''
+
         AccountManager(copy(account), send_code=False, new=True)
 
-        with pytest.raises(LoginExists):
-            new_account = self.generator.account_generate()
-            new_account.login = account.login
-            AccountManager(new_account, send_code=False, new=True)
-
         with pytest.raises(EmailExists):
-            new_account = self.generator.account_generate()
-            new_account.email = account.email
-            AccountManager(new_account, send_code=False, new=True)
+            account.login+="string"
+            AccountManager(account, send_code=False, new=True)
 
-        with pytest.raises(IncorrectLogin):
-            incorrect_acc = copy(account)
-            incorrect_acc.login = "another_login"
-            AccountManager(incorrect_acc)
 
-        with pytest.raises(IncorrectPassword):
-            incorrect_acc = copy(account)
-            incorrect_acc.password = "another_password"
-            AccountManager(incorrect_acc)
+
+    def test_exception_LoginExists(self, account:Account):
+        '''
+        Тестирование вызова исключения LoginExists 
+        при работе с AccuntManager
+        '''
+
+        AccountManager(copy(account), send_code=False, new=True)
+        
+        with pytest.raises(LoginExists):
+            account.email+="string"
+            AccountManager(account, send_code=False, new=True)
 
 
 
