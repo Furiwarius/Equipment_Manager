@@ -79,7 +79,7 @@ def firm(fake) -> Firm:
 
 
 
-@pytest_asyncio.fixture(scope="class")
+@pytest_asyncio.fixture(scope="session")
 def firm_id(fake) -> int:
     '''
     Создает фирму для тестов
