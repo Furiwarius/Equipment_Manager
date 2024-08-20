@@ -15,6 +15,8 @@ from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
+from app.database.crud.firmCRUD import FirmCRUD
+from app.database.crud.accountCRUD import AccountCRUD
 
 
 
@@ -30,13 +32,13 @@ def fake():
 
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 def password():
     return PasswordGenerator().run_generation(size=16)
 
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 def generate_number() -> int:
         '''
         Генерация уникальной цифры
@@ -48,8 +50,8 @@ def generate_number() -> int:
 
 
 
-@pytest_asyncio.fixture(scope="session")
-def account_generate(fake, generate_number, password) -> Account:
+@pytest_asyncio.fixture(scope="function")
+def account(fake, generate_number, password) -> Account:
     '''
     Генератор данных аккаунта
     '''
@@ -57,15 +59,15 @@ def account_generate(fake, generate_number, password) -> Account:
     new_account = Account(login=f"login{generate_number}",
                               password=password,
                               email=fake.email(),
-                              confirmation_status=True,
+                              confirmation_status=False,
                               timezone=get_random_timezone())
 
     return new_account
 
 
 
-@pytest_asyncio.fixture(scope="session")
-def firm_generate(fake) -> Firm:
+@pytest_asyncio.fixture(scope="function")
+def firm(fake) -> Firm:
     '''
     Генератор данных фирмы
     '''
@@ -78,14 +80,20 @@ def firm_generate(fake) -> Firm:
 
 
 @pytest_asyncio.fixture(scope="class")
-def firm_id(account_generate, firm_generate) -> int:
+def firm_id(fake) -> int:
     '''
     Создает фирму для тестов
     '''
 
-    account = AccountCRUD().add(account_generate)
+    new_account = Account(login=f"login{generate_number}",
+                              password=password,
+                              email=fake.email(),
+                              confirmation_status=True,
+                              timezone=get_random_timezone())
+
+    account = AccountCRUD().add(new_account)
     firm = FirmCRUD().add(account_id=account.id, 
-                          new_firm=firm_generate)
+                          new_firm=Firm(name=fake.company(), status=True))
     
     return firm.id
 
@@ -177,6 +185,20 @@ def tool_crud() -> ToolCRUD:
 def work_crud() -> WorkerCRUD:
      
     return WorkerCRUD()
+
+
+
+@pytest_asyncio.fixture(scope="session")
+def firm_crud() -> FirmCRUD:
+     
+    return FirmCRUD()
+
+
+
+@pytest_asyncio.fixture(scope="session")
+def acc_crud() -> AccountCRUD:
+     
+    return AccountCRUD()
 
 
 
