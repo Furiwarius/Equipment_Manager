@@ -17,13 +17,35 @@ from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
 from app.database.crud.firmCRUD import FirmCRUD
 from app.database.crud.accountCRUD import AccountCRUD
-
+from typing import AsyncGenerator, Generator
+from app import app
+from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 
 
 
 # набор уникальных цифр
 numbers = set([number for number in range(1000)])
 
+
+
+@pytest_asyncio.fixture(scope="session")
+def anyio_backend():
+    return "asyncio"
+
+
+
+@pytest_asyncio.fixture(scope="session")
+def client() -> Generator:
+    yield TestClient(app)
+
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def async_client(client) -> AsyncGenerator:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=client.base_url) as ac:
+        yield ac
+        
 
 
 @pytest_asyncio.fixture(scope="session")

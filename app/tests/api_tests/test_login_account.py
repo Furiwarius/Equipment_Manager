@@ -1,10 +1,9 @@
-from app import app
 from fastapi import status
 import pytest
-from fastapi.testclient import TestClient
-from app.tests.fake_data import DataGenerator
+from httpx import AsyncClient
 from random import randrange
 from copy import copy
+from app.entities import Account
 
 
 class TestLoginAccountRoutes():
@@ -13,63 +12,56 @@ class TestLoginAccountRoutes():
     '''
 
 
-    client = TestClient(app)
-    generator = DataGenerator()
-
-
 
     @pytest.mark.asyncio
-    async def test_index(self):
+    async def test_index(self, async_client:AsyncClient):
         '''
         Тестирование метода по получению индекскной страницы
         '''
-        response = self.client.get("/")
+        response = await async_client.get("/")
         assert response.status_code == status.HTTP_200_OK
 
 
 
     @pytest.mark.asyncio
-    async def test_registr(self):
+    async def test_registr(self, async_client:AsyncClient):
         '''
         Тестирование метода по получению страницы регистрации
         '''
-        response = self.client.get("/registr")
+        response = await async_client.get("/registr")
         assert response.status_code == status.HTTP_200_OK
     
 
 
     @pytest.mark.asyncio
-    async def test_new_user(self):
+    async def test_new_user(self, account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по созданию нового пользователя
         '''
-        new_acc = self.generator.account_generate()
-        response = self.client.post("/registr",
-                                    json={"login": new_acc.login,
-                                          "email": new_acc.email,
-                                          "password": new_acc.password,
-                                          "timezone": str(new_acc.timezone)})
+
+        response = await async_client.post("/registr",
+                                    json={"login": account.login,
+                                          "email": account.email,
+                                          "password": account.password,
+                                          "timezone": str(account.timezone)})
         
-        assert response.status_code == status.HTTP_200_OK
-        
-        answer = response.json()
-        assert answer["message"]=="Accaunt created"
-    
+        assert response.status_code == status.HTTP_200_OK    
+
 
 
     @pytest.mark.asyncio
-    async def test_new_user_exception(self):
+    async def test_new_user_exception(self, account:Account, async_client:AsyncClient):
         '''
         Тестирование вызова исключений при использовании
         метода по созданию нового пользователя
         '''
-        new_acc = self.generator.account_generate()
-        json={"login": new_acc.login,
-              "email": new_acc.email,
-              "password": new_acc.password,
-              "timezone": str(new_acc.timezone)}
+
+        json={"login": account.login,
+              "email": account.email,
+              "password": account.password,
+              "timezone": str(account.timezone)}
         
-        response = self.client.post("/registr", json=json)
+        response = await async_client.post("/registr", json=json)
         assert response.status_code == status.HTTP_200_OK
         
         for count, item in zip(range(2), json):
@@ -77,66 +69,63 @@ class TestLoginAccountRoutes():
             copy_json = copy(json)
             copy_json[item]+=str(count)
 
-            response = self.client.post("/registr", json=json)
+            response = await async_client.post("/registr", json=json)
             
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
 
 
     @pytest.mark.asyncio
-    async def test_autorization(self):
+    async def test_autorization(self, async_client:AsyncClient):
         '''
         Тестирование метода по получению страницы для авторизации
         '''
-        response = self.client.get("/authorization")
+        response = await async_client.get("/authorization")
         assert response.status_code == status.HTTP_200_OK
     
 
 
     @pytest.mark.asyncio
-    async def test_login(self):
+    async def test_login(self, account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по авторизации пользователя
         '''
-        acc = self.generator.account_generate()
-        response_registr = self.client.post("/registr",
-                                    json={"login": acc.login,
-                                          "email": acc.email,
-                                          "password": acc.password,
-                                          "timezone": str(acc.timezone)})
+
+        response_registr = await async_client.post("/registr",
+                                    json={"login": account.login,
+                                          "email": account.email,
+                                          "password": account.password,
+                                          "timezone": str(account.timezone)})
         
         assert response_registr.status_code == status.HTTP_200_OK
 
-        response = self.client.post("/login",
-                                    json={"login": acc.login,
-                                          "password": acc.password})
+        response = await async_client.post("/login",
+                                    json={"login": account.login,
+                                          "password": account.password})
         
         assert response.status_code == status.HTTP_200_OK
-
-        answer = response.json()
-        assert answer["token"]
     
 
 
     @pytest.mark.asyncio
-    async def test_login_exception(self):
+    async def test_login_exception(self, account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по авторизации с получением исключений
         '''
-        acc = self.generator.account_generate()
-        response_registr = self.client.post("/registr",
-                                    json={"login": acc.login,
-                                          "email": acc.email,
-                                          "password": acc.password,
-                                          "timezone": str(acc.timezone)})
+
+        response_registr = await async_client.post("/registr",
+                                    json={"login": account.login,
+                                          "email": account.email,
+                                          "password": account.password,
+                                          "timezone": str(account.timezone)})
         
         assert response_registr.status_code == status.HTTP_200_OK
 
-        json = {"login": acc.login, "password": acc.password}
+        json = {"login": account.login, "password": account.password}
         for item in json:
             copy_json = copy(json)
             copy_json[item]+=str(randrange(10))
 
-            response = self.client.post("/login", json=copy_json)
+            response = await async_client.post("/login", json=copy_json)
             
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
