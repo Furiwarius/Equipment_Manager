@@ -1,3 +1,8 @@
+from app.entities import Construction, Storage, Tool, Worker
+from app.database.crud.toolCRUD import ToolCRUD
+from app.database.crud.storageCRUD import StorageCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
+from app.database.crud.workerCRUD import WorkerCRUD
 
 
 
@@ -6,7 +11,7 @@ class TestDatabase():
     Класс для тестирования БД
     '''
 
-    def test_add_construction(self, constr, constr_crud):
+    def test_add_construction(self, constr:Construction, constr_crud:ConstructionCRUD):
         '''
         Тест метода по добавлению сущности (ConstructionCRUD.add())
         '''
@@ -18,7 +23,7 @@ class TestDatabase():
 
 
 
-    def test_add_storage(self, storage, stor_crud):
+    def test_add_storage(self, storage:Storage, stor_crud:StorageCRUD):
         '''
         Тест метода по добавлению склада (StorageCRUD.add())
         '''
@@ -30,7 +35,7 @@ class TestDatabase():
 
 
 
-    def test_add_worker(self, worker, work_crud):
+    def test_add_worker(self, worker:Worker, work_crud:WorkerCRUD):
         '''
         Тест метода по добавлению работника (WorkerCRUD.add())
         '''
@@ -42,7 +47,7 @@ class TestDatabase():
 
 
 
-    def test_add_tool(self, tool, storage, tool_crud, stor_crud):
+    def test_add_tool(self, tool:Tool, storage:Storage, tool_crud:ToolCRUD, stor_crud:StorageCRUD):
         '''
         Тест метода по добавлению инструмента (ToolCRUD.add())
         '''
@@ -58,7 +63,7 @@ class TestDatabase():
 
 
 
-    def test_get_by_id(self, item_cruds):
+    def test_get_by_id(self, item_cruds:tuple):
         '''
         Тест метода по получению сущности по id (Base.get_by_id())
         '''
@@ -70,7 +75,7 @@ class TestDatabase():
         
 
 
-    def test_get_all_item(self, constr_crud, tool_crud, work_crud, stor_crud, firm_id):
+    def test_get_all_item(self, constr_crud:ConstructionCRUD, tool_crud:ToolCRUD, work_crud:WorkerCRUD, stor_crud:StorageCRUD, firm_id:int):
         '''
         Тест метода по получению всех сущностей (Base.get_all())
         '''
@@ -88,7 +93,7 @@ class TestDatabase():
         
 
 
-    def test_downgrade(self, item_cruds):
+    def test_downgrade(self, item_cruds:tuple):
         '''
         Тестирование метода по изменению статуса на False (Base.modify_status(False))
         '''
@@ -103,7 +108,7 @@ class TestDatabase():
     
 
 
-    def test_increase(self, item_cruds):
+    def test_increase(self, item_cruds:tuple):
         '''
         Тестирование метода по изменению статуса на True (Base.modify_status(True))
         '''
@@ -118,7 +123,7 @@ class TestDatabase():
             
 
 
-    def __status_operations(self, cruds, items:list, mode=True):
+    def __status_operations(self, cruds:tuple, items:list, mode=True):
         '''
         Операции по изменению статуса у списка сущностей
         '''
@@ -128,7 +133,7 @@ class TestDatabase():
 
 
 
-    def test_get_tools(self, constr, storage, constr_crud, stor_crud, tool, tool_crud):
+    def test_get_tools(self, constr:Construction, storage:Storage, constr_crud:ConstructionCRUD, stor_crud:StorageCRUD, tool:Tool, tool_crud:ToolCRUD):
         '''
         Тестирование метода по получению инструмента с места хранения
         (StorageCRUD.get_tools() | ConstructionCRUD.get_tools())
@@ -146,7 +151,7 @@ class TestDatabase():
         
 
 
-    def test_transfer_worker(self, worker, work_crud, constr_crud):
+    def test_transfer_worker(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
@@ -165,7 +170,7 @@ class TestDatabase():
 
 
 
-    def test_transfer_brigadir(self, worker, work_crud, constr_crud):
+    def test_transfer_brigadir(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению ответственного лица на объект 
         (ConstructionCRUD.transfer_worker(brigadir=True))
@@ -188,7 +193,7 @@ class TestDatabase():
     
 
 
-    def test_move_tool(self, constr, tool_crud, constr_crud):
+    def test_move_tool(self, constr:Construction, tool_crud:ToolCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по перемещению инструмента
         (ToolCRUD.move_to())

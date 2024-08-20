@@ -1,7 +1,10 @@
-from app.database.crud.firmCRUD import (Roles,
+from app.database.crud.firmCRUD import (FirmCRUD, Roles,
                                         ThisIsSuperAdmin, 
                                         CannotGiveSuperadmin)
 import pytest
+from app.database.crud.accountCRUD import AccountCRUD
+from app.entities import Account, Firm
+
 
 
 class TestRoles():
@@ -10,7 +13,7 @@ class TestRoles():
     '''
 
 
-    def test_add_account(self, account, acc_crud):
+    def test_add_account(self, account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование метода по добавлению аккаунта в БД
         '''
@@ -21,7 +24,7 @@ class TestRoles():
     
 
 
-    def test_confirm_account(self, acc_crud):
+    def test_confirm_account(self, acc_crud:AccountCRUD):
         '''
         Тестирование метода по подтверждению аккаунта
         '''
@@ -37,7 +40,7 @@ class TestRoles():
     
 
 
-    def test_get_account_by_login(self, account, acc_crud):
+    def test_get_account_by_login(self, account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование метода получения аккаунта по логину
         '''
@@ -50,7 +53,7 @@ class TestRoles():
 
 
 
-    def test_get_account_by_email(self, account, acc_crud):
+    def test_get_account_by_email(self, account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование получения данных об аккаунте по адресу почты
         '''
@@ -66,7 +69,7 @@ class TestRoles():
     # Добавлять фирмы в бд можно только,
     # если есть аккаунт
     
-    def test_add_firm(self, firm, acc_crud, firm_crud):
+    def test_add_firm(self, firm:Firm, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
         '''
         Тестирование метода по добалению фирмы
         '''
@@ -79,7 +82,7 @@ class TestRoles():
 
 
 
-    def test_get_all_firm(self, account, acc_crud, firm_crud):
+    def test_get_all_firm(self, account:Account, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
         '''
         Тестирование метода по получению 
         списка id всех фирм аккаунта, где он super_admin
@@ -94,7 +97,7 @@ class TestRoles():
 
 
 
-    def test_give_role(self, account, acc_crud, firm_crud):
+    def test_give_role(self, account:Account, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
         '''
         Тестирование метода по выдаче роли аккаунту
         '''
