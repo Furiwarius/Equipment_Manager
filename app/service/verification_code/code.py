@@ -1,6 +1,7 @@
 from app.clients.email_client.email_client import EmailClient
 import random
-import time
+import threading
+from copy import copy
 from os import path
 from collections import namedtuple
 from app.settings.settings import code_setting
@@ -21,7 +22,7 @@ class SenderCode():
 
         self.__sender_settings()
         self.code = random.randrange(10000, 99999)
-        self.__email = EmailClient()
+        self.email = EmailClient()
 
 
 
@@ -43,9 +44,8 @@ class SenderCode():
         '''
         Главный метод-менеджер, генерирующий код, и отправляющий его на почту
         '''
-        self.__email.send(user_to = to_email, 
-                          message = self.code,
-                          template = path.abspath(self.__template),
-                          subject = code_setting.subject_letter)
-        
+        # Запускаем отправку сообщения в отдельный поток, чтобы она не тормозила приложение
+        threading.Thread(target=self.email.send,
+                        args=(to_email, self.code, path.abspath(self.__template), code_setting.subject_letter)).start()
+                            
         return SenderCode.Code(code=self.code, lifetime=self.code_lifetime)
