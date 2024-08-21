@@ -23,7 +23,7 @@ class TestUserRoles():
         Тестирование метода по добавлению нового аккаунта
         '''
 
-        account_m = AccountManager(account, send_code=False, new=True)
+        account_m = AccountManager(account, new=True)
 
         assert account_m.account.id
 
@@ -34,9 +34,9 @@ class TestUserRoles():
         Тестирование метода по инициализации существующего аккаунта
         '''
 
-        AccountManager(copy(account), send_code=False, new=True)
+        AccountManager(copy(account), new=True)
 
-        account_m = AccountManager(copy(account), send_code=False)
+        account_m = AccountManager(copy(account))
 
         assert acc_crud.get_last_one().id is account_m.account.id
 
@@ -48,7 +48,7 @@ class TestUserRoles():
         при работе с AccuntManager
         '''
         
-        AccountManager(copy(account), send_code=False, new=True)
+        AccountManager(copy(account), new=True)
         
         with pytest.raises(IncorrectPassword):
             account.password+="string"
@@ -62,7 +62,7 @@ class TestUserRoles():
         при работе с AccuntManager
         '''
 
-        AccountManager(copy(account), send_code=False, new=True)
+        AccountManager(copy(account), new=True)
         
         with pytest.raises(IncorrectLogin):
             account.login+="string"
@@ -76,11 +76,11 @@ class TestUserRoles():
         при работе с AccuntManager
         '''
 
-        AccountManager(copy(account), send_code=False, new=True)
+        AccountManager(copy(account), new=True)
 
         with pytest.raises(EmailExists):
             account.login+="string"
-            AccountManager(account, send_code=False, new=True)
+            AccountManager(account, new=True)
 
 
 
@@ -90,11 +90,11 @@ class TestUserRoles():
         при работе с AccuntManager
         '''
 
-        AccountManager(copy(account), send_code=False, new=True)
+        AccountManager(copy(account), new=True)
         
         with pytest.raises(LoginExists):
             account.email+="string"
-            AccountManager(account, send_code=False, new=True)
+            AccountManager(account, new=True)
 
 
 
@@ -118,7 +118,7 @@ class TestUserRoles():
         '''
         Тестирование метода по выдаче роли аккаунту
         '''
-        acc_m = AccountManager(account, send_code=False, new=True)
+        acc_m = AccountManager(account, new=True)
 
         firm = firm_crud.get_last_one()
         firm_m = FirmManager(firm)

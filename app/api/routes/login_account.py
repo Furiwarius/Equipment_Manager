@@ -50,8 +50,7 @@ async def new_user(new_user: NewUser):
                                                 password=new_user.password,
                                                 email=new_user.email,
                                                 timezone=new_user.timezone),
-                                        new=True,
-                                        send_code=False) #После разработки метода confirmation_code станет True
+                                        new=True)
     
     except EmailExists as err:
         raise HTTPException(status_code=422, detail="This email is already in use") from err
