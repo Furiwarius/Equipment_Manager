@@ -17,11 +17,10 @@ class SenderCode():
     Code = namedtuple("Code", ["code", "lifetime"])
 
 
-    def __init__(self, __to_email:str) -> bool:
+    def __init__(self) -> bool:
 
         self.__sender_settings()
         self.code = random.randrange(10000, 99999)
-        self.__to = __to_email
         self.__email = EmailClient()
 
 
@@ -40,11 +39,11 @@ class SenderCode():
 
 
 
-    def send_code (self) -> Code:
+    def send_code (self, to_email:str) -> Code:
         '''
         Главный метод-менеджер, генерирующий код, и отправляющий его на почту
         '''
-        self.__email.send(user_to = self.__to, 
+        self.__email.send(user_to = to_email, 
                           message = self.code,
                           template = path.abspath(self.__template),
                           subject = code_setting.subject_letter)
