@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Form, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
-from app.service.user_account.account import AccountManager, Account
+from app.service.user_account.account import AccountManager, Account, AccountCRUD
 from app.api.dependencies import create_jwt_token, verify_jwt_token
 from app.settings.settings import app_settings
-from app.api.models.models import NewUser, User, UserEmail, Code
+from app.api.models.models import NewUser, User, UserEmail, Code, AuthToken
 from app.errors.service_error.account_error import (IncorrectLogin, IncorrectPassword, 
                                                     LoginExists, CodeDoesntMatch, EmailExists)
 from app.service.verification_code.code import SenderCode
@@ -124,3 +124,22 @@ async def check_confirmation_code(data:Code):
         raise HTTPException(status_code=419, detail="Wrong code")
 
     return {"message": "Email has been successfully verified"}
+
+
+
+@login_account.get("/private_office")
+async def private_office(token:AuthToken, 
+                         request:Request, 
+                         acc_crud:AccountCRUD = Depends(AccountCRUD)):
+    '''
+    Личный кабинет
+    '''
+    try:
+        acc_data = verify_jwt_token(token.jwt)
+    except HTTPException:
+        raise HTTPException(status_code=419, detail="Invalid token")
+    
+    personal_data = acc_crud.get_by_id(acc_data["user_id"])
+    
+    return templates.TemplateResponse(request, "private_office.html", 
+                                      {"page_name":"Личный кабинет", "name":personal_data.login})

@@ -46,3 +46,7 @@ class NewConstruction(BaseModel):
 
 class UserEmail(BaseModel):
     email: EmailStr
+
+
+class AuthToken(BaseModel):
+    jwt:str

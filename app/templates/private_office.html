@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+	<h1>Здравствуйте {{personal_data.login}}</h1>
+	
+    <a href="/firms">Фирмы</a>
+
+    <a href="/reference">Справочный материал</a>
+    
+    <a href="/setting">Настройки</a>
+    
+    <button onclick="loguot()">Выйти из аккаунта</button>
+    
+    <script src="/static/js/loguot.js"></script>
+
+{% endblock %}
