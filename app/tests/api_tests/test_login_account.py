@@ -4,6 +4,8 @@ from httpx import AsyncClient
 from random import randrange
 from copy import copy
 from app.entities import Account
+from app.settings.settings import email_setting
+from app.api.dependencies import verify_jwt_token
 
 
 class TestLoginAccountRoutes():
@@ -129,3 +131,47 @@ class TestLoginAccountRoutes():
             response = await async_client.post("/login", json=copy_json)
             
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    
+
+    # Тест проходт успешно, но поставлен флаг скип,
+    # чтобы не спамить письмами на почту
+    @pytest.mark.skip
+    @pytest.mark.asyncio
+    async def test_confirmation_code(self, async_client:AsyncClient):
+        '''
+        Тестрирование метода по получению кода
+        '''
+        response = await async_client.post("/confirmation_code", 
+                                          json = {"email": email_setting.EMAIL})
+
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        assert data["code"]
+    
+
+
+    # Тест проходт успешно, но поставлен флаг скип,
+    # чтобы не спамить письмами на почту
+    @pytest.mark.skip
+    @pytest.mark.asyncio
+    async def test_check_confirmation_code(self, async_client:AsyncClient):
+        '''
+        Тестирование отправки проверочного кода
+        '''
+
+        get_code_response = await async_client.post("/confirmation_code", 
+                                          json = {"email": email_setting.EMAIL})
+
+        assert get_code_response.status_code == status.HTTP_200_OK
+        
+        jwt = get_code_response.json()["code"]
+        data = verify_jwt_token(jwt)
+
+        response = await async_client.post("/check_confirmation_code", 
+                                          json = {"code": data["code"],
+                                                  "jwt": jwt})
+        
+        assert response.status_code == status.HTTP_200_OK
+
+        

@@ -1,21 +1,18 @@
 import smtplib
-from configparser import ConfigParser
 import jinja2
 from app.settings.settings import email_setting
+
+
 
 class EmailClient():
     '''
     Отправитель сообщений
     '''
 
-    default_template = r"template_letter\default_template.txt"
-    default_setting = r"app\settings\defoult_setting_email_client.ini"
 
-    def __init__(self, 
-                 setting=default_setting) -> None:
+    def __init__(self) -> None:
         # Если не был передан путь с настройками
         # то используется путь по умолчанию
-        self.setting = setting
         self.__sender_settings()
         self.user = email_setting.EMAIL
         self.passwd = email_setting.PASSWORD
@@ -27,15 +24,11 @@ class EmailClient():
         Чтение настроек из файла ini
         '''
 
-        config = ConfigParser()
-        config.read(self.setting)
         # Настройки
-        self.mime = config.get("setting", "mime")
-        self.charset = config.get("setting", "charset")
-        self.server = config.get("setting", "server")
-        self.port = config.get("setting", "port")
-
-        self.subject = config.get("setting letter", "subject")
+        self.mime = email_setting.mime
+        self.charset = email_setting.charset
+        self.server = email_setting.server
+        self.port = email_setting.port
 
 
 
@@ -50,6 +43,7 @@ class EmailClient():
         return body
     
 
+
     def __send_bid(self, body_message:str) -> None:
         '''
         Отправка сообщения на почту
@@ -62,6 +56,7 @@ class EmailClient():
         # пробуем послать письмо
         smtp.sendmail(self.user, self.to, body_message.encode('utf-8'))
         smtp.quit()
+
 
 
     def __render_letter(self, message:str) -> str:
@@ -78,8 +73,9 @@ class EmailClient():
         return letter
 
 
+
     def send (self, user_to:str, message:str,
-              template=default_template, ) -> None:
+              template=email_setting.default_template, subject="new letter") -> None:
         '''
         Главный метод-менеджер, принимающий почту,
         на которую нужно отправить сообщение, само сообщение
@@ -90,5 +86,7 @@ class EmailClient():
         '''
         self.to = user_to
         self.filename = template
+        self.subject = subject
+
         text_letter = self.__render_letter(message)
         self.__send_bid(self.__setting_letter(text_letter))

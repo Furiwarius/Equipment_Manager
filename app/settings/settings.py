@@ -46,6 +46,12 @@ class EmailClientSetting():
         # Пароль приложения для автоматической отправки
         self.PASSWORD = os.getenv("PASSWORD")
 
+        self.mime = "MIME-Version: 1.0"
+        self.charset = "Content-Type: text/plain; charset=utf-8"
+        self.server = "smtp.yandex.ru"
+        self.port = 587
+        self.default_template = r"app\templates\default_template.txt"
+
 
 
 class DatabaseSetting():
@@ -105,8 +111,27 @@ class DatabaseLoggerSetting():
 
 
 
+class ConfirmationCodeSetting():
+    '''
+    Класс для настройки отправителя кода 
+    подтверждения аккаунта при регистрации
+    '''
+
+    @lru_cache
+    def __init__(self) -> None:
+
+        # Время жизни кода
+        self.lifetime = 600
+
+        self.template_letter = r"app\templates\code.txt"
+
+        self.subject_letter = "Verification code"
+
+
+
 db_log_setting = DatabaseLoggerSetting()
 jwt_settings = JWTSettings()
 app_settings = ApplicationSetting()
 db_setting = DatabaseSetting()
 email_setting = EmailClientSetting()
+code_setting = ConfirmationCodeSetting()
