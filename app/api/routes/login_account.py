@@ -116,7 +116,7 @@ async def check_confirmation_code(data:Code):
         raise HTTPException(status_code=419, detail="Incorrect token with source code")
 
     # Если истекло время ожидания кода
-    if int(jwt_data["start_time"])-time()>int(jwt_data["lifetime"]):
+    if time()-int(jwt_data["start_time"])>int(jwt_data["lifetime"]):
         raise HTTPException(status_code=419, detail="Code lifetime has expired")
     
     # Если код неверный
