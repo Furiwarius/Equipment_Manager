@@ -13,33 +13,14 @@ from time import time
 
 
 login_account = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
-
-
-@login_account.get('/favicon.ico', include_in_schema=False)
-async def favicon():
-    '''
-    Возвращает иконку сайта
-    '''
-    return FileResponse(app_settings.favicon_path)
-
 
 
 @login_account.get("/")
-async def index(request:Request):
+async def index():
     '''
     Главная страница
     '''
-    return templates.TemplateResponse(request, "index.html", {"page_name":"Сервис EquipmentManager"})
-
-
-
-@login_account.get("/registr")
-async def registr(request:Request):
-    '''
-    Страница с полями для регистрации
-    '''
-    return templates.TemplateResponse(request, "registr.html", {"page_name":"Регистрация в EquipmentManager"})
+    return FileResponse("app/templates/index.html")
 
 
 
@@ -60,15 +41,6 @@ async def new_user(new_user: NewUser):
         raise HTTPException(status_code=422, detail="This login is already taken") from err
     
     return {"message": "Accaunt created"}
-
-
-
-@login_account.get("/authorization")
-async def authorization(request:Request):
-    '''
-    Страница с полями для входа
-    '''
-    return templates.TemplateResponse(request, "authorization.html", {"page_name":"Вход в EquipmentManager"})
 
 
 
@@ -129,7 +101,6 @@ async def check_confirmation_code(data:Code):
 
 @login_account.get("/private_office")
 async def private_office(token:AuthToken, 
-                         request:Request, 
                          acc_crud:AccountCRUD = Depends(AccountCRUD)):
     '''
     Личный кабинет
@@ -141,5 +112,4 @@ async def private_office(token:AuthToken,
     
     personal_data = acc_crud.get_by_id(acc_data["user_id"])
     
-    return templates.TemplateResponse(request, "private_office.html", 
-                                      {"page_name":"Личный кабинет", "name":personal_data.login})
+    return {"name":personal_data.login}

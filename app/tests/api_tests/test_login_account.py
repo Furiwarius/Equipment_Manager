@@ -16,26 +16,6 @@ class TestLoginAccountRoutes():
 
 
     @pytest.mark.asyncio
-    async def test_index(self, async_client:AsyncClient):
-        '''
-        Тестирование метода по получению индекскной страницы
-        '''
-        response = await async_client.get("/")
-        assert response.status_code == status.HTTP_200_OK
-
-
-
-    @pytest.mark.asyncio
-    async def test_registr(self, async_client:AsyncClient):
-        '''
-        Тестирование метода по получению страницы регистрации
-        '''
-        response = await async_client.get("/registr")
-        assert response.status_code == status.HTTP_200_OK
-    
-
-
-    @pytest.mark.asyncio
     async def test_new_user(self, account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по созданию нового пользователя
@@ -75,16 +55,6 @@ class TestLoginAccountRoutes():
             
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-
-
-    @pytest.mark.asyncio
-    async def test_autorization(self, async_client:AsyncClient):
-        '''
-        Тестирование метода по получению страницы для авторизации
-        '''
-        response = await async_client.get("/authorization")
-        assert response.status_code == status.HTTP_200_OK
-    
 
 
     @pytest.mark.asyncio
@@ -132,6 +102,7 @@ class TestLoginAccountRoutes():
             
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
+
 
     # Тест проходт успешно, но поставлен флаг скип,
     # чтобы не спамить письмами на почту
