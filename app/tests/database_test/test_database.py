@@ -155,7 +155,7 @@ class TestDatabase():
         constr = self.constr_crud.add(new_constr)
         
         tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1).id)
-        tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(constr.id))
+        tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(constr.id).id)
 
         assert tools_on_stor and not tools_on_constr
         

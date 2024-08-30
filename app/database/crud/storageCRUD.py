@@ -6,6 +6,8 @@ from app.database.tables.essence import ToolTable
 from app.database.tables.summary import ToolsOnStorage
 from sqlalchemy.orm import Session
 from app.database.database import Database
+from app.database.converter import convertertation
+
 
 
 class StorageCRUD(BaseCRUD):
@@ -23,7 +25,7 @@ class StorageCRUD(BaseCRUD):
         return f"{__class__.__name__}"
 
 
-
+    @convertertation
     @BaseCRUD.logger.info
     def get_tools(self, storage_id:int) -> dict:
         '''
@@ -36,6 +38,4 @@ class StorageCRUD(BaseCRUD):
         with Database() as db:
 
             tools_id = db.query(ToolsOnStorage.tool_id).filter(ToolsOnStorage.place_id==storage_id, ToolsOnStorage.end_date==None).all()
-            result = {item[0]: self.converter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
-
-        return result
+            return {item[0]:db.get(ToolTable, item) for item in tools_id}

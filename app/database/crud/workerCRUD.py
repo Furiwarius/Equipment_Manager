@@ -6,6 +6,8 @@ from app.database.tables.essence import ConstructionTable as ConstrTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
 from app.database.database import Database
+from app.database.converter import convertertation
+
 
 
 class WorkerCRUD(BaseCRUD):
@@ -23,7 +25,8 @@ class WorkerCRUD(BaseCRUD):
         return f"{__class__.__name__}"       
 
 
-    
+
+    @convertertation
     @BaseCRUD.logger.info
     def get_construction(self, worker_id:int) -> Construction|None:
         '''
@@ -36,10 +39,11 @@ class WorkerCRUD(BaseCRUD):
                                                                   WorkOnConstr.end_date==None).all()
 
             if place:
-                constr = db.get(ConstrTable, place[0])
-                return self.converter.conversion_to_data(constr)
+                return db.get(ConstrTable, place[0])
+                    
 
-    
+
+    @convertertation
     @BaseCRUD.logger.info
     def is_brigadir(self, worker_id:int) -> Construction:
         '''
@@ -53,5 +57,5 @@ class WorkerCRUD(BaseCRUD):
                                                                   WorkOnConstr.is_brigadir==True).all()
             
             if place: 
-                constr = db.get(ConstrTable, place[0])
-                return self.converter.conversion_to_data(constr)
+                return db.get(ConstrTable, place[0])
+                

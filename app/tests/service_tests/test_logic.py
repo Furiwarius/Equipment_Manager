@@ -291,4 +291,4 @@ class TestBusinessLogic():
 
         stor_m.delete_tool(tool)
 
-        assert tool.id not in self.stor_crud.get_tools(stor)
+        assert tool.id not in self.stor_crud.get_tools(stor.id)
