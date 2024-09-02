@@ -58,42 +58,26 @@ class TestLoginAccountRoutes():
 
 
     @pytest.mark.asyncio
-    async def test_login(self, account:Account, async_client:AsyncClient):
+    async def test_login(self, exist_account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по авторизации пользователя
         '''
 
-        response_registr = await async_client.post("/registr",
-                                    json={"login": account.login,
-                                          "email": account.email,
-                                          "password": account.password,
-                                          "timezone": str(account.timezone)})
-        
-        assert response_registr.status_code == status.HTTP_200_OK
-
         response = await async_client.post("/login",
-                                    json={"login": account.login,
-                                          "password": account.password})
+                                    json={"login": exist_account.login,
+                                          "password": exist_account.password})
         
         assert response.status_code == status.HTTP_200_OK
     
 
 
     @pytest.mark.asyncio
-    async def test_login_exception(self, account:Account, async_client:AsyncClient):
+    async def test_login_exception(self, exist_account:Account, async_client:AsyncClient):
         '''
         Тестирование метода по авторизации с получением исключений
         '''
 
-        response_registr = await async_client.post("/registr",
-                                    json={"login": account.login,
-                                          "email": account.email,
-                                          "password": account.password,
-                                          "timezone": str(account.timezone)})
-        
-        assert response_registr.status_code == status.HTTP_200_OK
-
-        json = {"login": account.login, "password": account.password}
+        json = {"login": exist_account.login, "password": exist_account.password}
         for item in json:
             copy_json = copy(json)
             copy_json[item]+=str(randrange(10))
