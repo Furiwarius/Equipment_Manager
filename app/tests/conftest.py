@@ -27,13 +27,13 @@ numbers = set([number for number in range(1000)])
 
 
 @pytest_asyncio.fixture(scope="session")
-def fake():
+def fake() -> Faker:
     return Faker(locale="ru")
 
 
 
 @pytest_asyncio.fixture(scope="function")
-def password():
+def password() -> str:
     return PasswordGenerator().run_generation(size=16)
 
 
@@ -51,7 +51,7 @@ def generate_number() -> int:
 
 
 @pytest_asyncio.fixture(scope="function")
-def account(fake, generate_number, password) -> Account:
+def account(fake:Faker, generate_number:int, password:str) -> Account:
     '''
     Генератор данных аккаунта
     '''
@@ -67,7 +67,7 @@ def account(fake, generate_number, password) -> Account:
 
 
 @pytest_asyncio.fixture(scope="function")
-def firm(fake) -> Firm:
+def firm(fake:Faker) -> Firm:
     '''
     Генератор данных фирмы
     '''
@@ -80,7 +80,7 @@ def firm(fake) -> Firm:
 
 
 @pytest_asyncio.fixture(scope="session")
-def firm_id(fake) -> int:
+def firm_id(fake:Faker) -> int:
     '''
     Создает фирму для тестов
     '''
@@ -100,7 +100,7 @@ def firm_id(fake) -> int:
 
 
 @pytest_asyncio.fixture(scope="function")
-def storage(firm_id, generate_number, fake) -> Storage:
+def storage(firm_id:int, generate_number:int, fake:Faker) -> Storage:
     '''
     Генератор данных склада
     '''
@@ -115,7 +115,7 @@ def storage(firm_id, generate_number, fake) -> Storage:
 
 
 @pytest_asyncio.fixture(scope="function")
-def constr(firm_id, generate_number, fake) -> Construction:
+def constr(firm_id:int, generate_number:int, fake:Faker) -> Construction:
     '''
     Генератор объектов
     '''
@@ -131,7 +131,7 @@ def constr(firm_id, generate_number, fake) -> Construction:
 
 
 @pytest_asyncio.fixture(scope="function")
-def tool(firm_id, generate_number, fake) -> Tool:
+def tool(firm_id:int, generate_number:int, fake:Faker) -> Tool:
     '''
     Генератор инструментов
     '''
@@ -146,7 +146,7 @@ def tool(firm_id, generate_number, fake) -> Tool:
 
 
 @pytest_asyncio.fixture(scope="function")
-def worker(firm_id, fake) -> Worker:
+def worker(firm_id:int, fake:Faker) -> Worker:
     '''
     Генератор работников
     '''
@@ -203,6 +203,6 @@ def acc_crud() -> AccountCRUD:
 
 
 @pytest_asyncio.fixture(scope="session")
-def item_cruds(constr_crud, stor_crud, tool_crud, work_crud) -> tuple:
+def item_cruds(constr_crud:ConstructionCRUD, stor_crud:StorageCRUD, tool_crud:ToolCRUD, work_crud:WorkerCRUD) -> tuple:
      
     return (constr_crud, stor_crud, tool_crud, work_crud)
