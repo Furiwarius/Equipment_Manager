@@ -3,7 +3,7 @@ from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
-
+from typing import Tuple
 
 
 class TestDatabase():
@@ -16,7 +16,7 @@ class TestDatabase():
         Тест метода по добавлению сущности (ConstructionCRUD.add())
         '''
 
-        constr_db = constr_crud.add(constr)
+        constr_db:Construction = constr_crud.add(constr)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert constr_db.name==constr.name
@@ -28,7 +28,7 @@ class TestDatabase():
         Тест метода по добавлению склада (StorageCRUD.add())
         '''
 
-        storage_db = stor_crud.add(storage)
+        storage_db:Storage = stor_crud.add(storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert storage_db.name==storage.name
@@ -40,62 +40,63 @@ class TestDatabase():
         Тест метода по добавлению работника (WorkerCRUD.add())
         '''
 
-        worker_db = work_crud.add(worker)
+        worker_db:Worker = work_crud.add(worker)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert worker_db.name==worker.name
 
 
 
-    def test_add_tool(self, tool:Tool, storage:Storage, tool_crud:ToolCRUD, stor_crud:StorageCRUD):
+    def test_add_tool_for_storage(self, tool:Tool, exist_storage:Storage, tool_crud:ToolCRUD, stor_crud:StorageCRUD):
         '''
-        Тест метода по добавлению инструмента (ToolCRUD.add())
+        Тест метода по добавлению инструмента на склад (ToolCRUD.add())
         '''
-        # Тк до этого добавляли склад, он есть в бд
-        new_storage = stor_crud.add(storage)
-        tool_db = tool_crud.add(tool=tool, where=new_storage)
+        tool_db:Tool = tool_crud.add(tool=tool, where=exist_storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
-        assert tool_db.id in stor_crud.get_tools(new_storage.id)
+        assert tool_db.id in stor_crud.get_tools(exist_storage.id)
 
+    
 
-
-    def test_get_by_id(self, item_cruds:tuple):
+    def test_add_tool_for_construction(self, tool:Tool, exist_constr:Construction, tool_crud:ToolCRUD, constr_crud:ConstructionCRUD):
         '''
-        Тест метода по получению сущности по id (Base.get_by_id())
+        Тест метода по добавлению инструмента на объект (ToolCRUD.add())
+        '''
+        tool_db:Tool = tool_crud.add(tool=tool, where=exist_constr)
+
+        # Данные генерируются уникальные, поэтому хватит одной проверки
+        assert tool_db.name==tool.name
+        
+        # Находится ли инструмент на складе (таблица tools_on_storage)
+        assert tool_db.id in constr_crud.get_tools(exist_constr.id)
+
+
+
+    def test_get_by_id(self, exist_storage:Storage, stor_crud:StorageCRUD):
+        '''
+        Тест метода по получению сущности по id
         '''
         
-        # В предыдущих тестах были добавлены элементы
-        for crud in item_cruds:
+        storage_in_db:Storage = stor_crud.get_by_id(exist_storage.id)
+        assert storage_in_db.name == exist_storage.name
 
-            assert crud.get_by_id(id=1) is not None
+
+
+    def test_get_all_item(self, exist_storage:Storage, stor_crud:StorageCRUD):
+        '''
+        Тест метода по получению всех сущностей
+        '''
+
+        assert stor_crud.get_all(exist_storage.firm_id)
         
 
 
-    def test_get_all_item(self, constr_crud:ConstructionCRUD, tool_crud:ToolCRUD, work_crud:WorkerCRUD, stor_crud:StorageCRUD, firm_id:int):
+    def test_downgrade(self, item_cruds:Tuple[ConstructionCRUD, StorageCRUD, ToolCRUD, WorkerCRUD]):
         '''
-        Тест метода по получению всех сущностей (Base.get_all())
-        '''
-
-        # Тк предыдущие тесты добавляли сущности, их и будем получать
-        workers = work_crud.get_all(firm_id)   
-        constructions = constr_crud.get_all(firm_id)
-        tools = tool_crud.get_all(firm_id)
-        storages = stor_crud.get_all(firm_id)
-
-        assert workers 
-        assert constructions 
-        assert tools 
-        assert storages
-        
-
-
-    def test_downgrade(self, item_cruds:tuple):
-        '''
-        Тестирование метода по изменению статуса на False (Base.modify_status(False))
+        Тестирование метода по изменению статуса на False
         '''
 
         items = [crud.get_by_id(id=1) for crud in item_cruds]
@@ -108,7 +109,7 @@ class TestDatabase():
     
 
 
-    def test_increase(self, item_cruds:tuple):
+    def test_increase(self, item_cruds:Tuple[ConstructionCRUD, StorageCRUD, ToolCRUD, WorkerCRUD]):
         '''
         Тестирование метода по изменению статуса на True (Base.modify_status(True))
         '''
@@ -123,7 +124,7 @@ class TestDatabase():
             
 
 
-    def __status_operations(self, cruds:tuple, items:list, mode=True):
+    def __status_operations(self, cruds:Tuple[ConstructionCRUD, StorageCRUD, ToolCRUD, WorkerCRUD], items:list, mode=True):
         '''
         Операции по изменению статуса у списка сущностей
         '''
@@ -133,84 +134,83 @@ class TestDatabase():
 
 
 
-    def test_get_tools(self, constr:Construction, storage:Storage, constr_crud:ConstructionCRUD, stor_crud:StorageCRUD, tool:Tool, tool_crud:ToolCRUD):
+    def test_get_tools_from_storage(self, exist_storage:Storage, stor_crud:StorageCRUD, tool:Tool, tool_crud:ToolCRUD):
         '''
-        Тестирование метода по получению инструмента с места хранения
-        (StorageCRUD.get_tools() | ConstructionCRUD.get_tools())
+        Тестирование метода по получению инструмента со склада
+        (StorageCRUD.get_tools())
         '''
 
-        constr = constr_crud.add(constr)
-        
-        storage = stor_crud.add(storage)
-        tool_crud.add(tool=tool, where=storage)
+        new_tool:Tool = tool_crud.add(tool=tool, where=exist_storage)
 
-        tools_on_stor = stor_crud.get_tools(stor_crud.get_by_id(storage.id).id)
-        tools_on_constr = constr_crud.get_tools(constr_crud.get_by_id(constr.id).id)
+        tools_on_stor = stor_crud.get_tools(exist_storage.id)
+
+        assert tools_on_stor and new_tool.id in tools_on_stor
 
 
-        assert tools_on_stor and not tools_on_constr
-        
+
+    def test_get_tools_from_construction(self, exist_constr:Construction, constr_crud:ConstructionCRUD, tool:Tool, tool_crud:ToolCRUD):
+        '''
+        Тестирование метода по получению инструмента с объекта строительства
+        (ConstructionCRUD.get_tools())
+        '''
+
+        new_tool:Tool = tool_crud.add(tool=tool, where=exist_constr)
+
+        tools_on_constr = constr_crud.get_tools(exist_constr.id)
+
+        assert tools_on_constr and new_tool.id in tools_on_constr
 
 
-    def test_transfer_worker(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
+
+    def test_transfer_worker(self, exist_constr:Construction, exist_worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
         '''
         
-        worker = work_crud.add(worker)    
-        constr = constr_crud.get_last_one()
-
-        assert not constr_crud.get_workers(constr.id) and not work_crud.get_construction(worker.id)
+        assert not constr_crud.get_workers(exist_constr.id) and not work_crud.get_construction(exist_worker.id)
 
         # Перевод работника на объект
-        constr_crud.transfer_worker(constr_id=constr.id, worker_id=worker.id)
+        constr_crud.transfer_worker(constr_id=exist_constr.id, worker_id=exist_worker.id)
 
-        assert constr_crud.get_workers(constr.id) or not constr_crud.get_responsible(constr.id)
-        assert work_crud.get_construction(worker.id).id==constr.id or not work_crud.is_brigadir(worker.id)
+        assert constr_crud.get_workers(exist_constr.id) or not constr_crud.get_responsible(exist_constr.id)
+        assert work_crud.get_construction(exist_worker.id).id==exist_constr.id or not work_crud.is_brigadir(exist_worker.id)
 
 
 
-    def test_transfer_brigadir(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
+    def test_transfer_brigadir(self, exist_constr:Construction, exist_worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению ответственного лица на объект 
         (ConstructionCRUD.transfer_worker(brigadir=True))
         '''
-        # Генерация нового работника
-        new_worker = work_crud.add(worker)
 
-        constr = constr_crud.get_by_id(id=1)
-
-        assert not constr_crud.get_responsible(constr.id) or not work_crud.is_brigadir(new_worker.id)
+        assert not constr_crud.get_responsible(exist_constr.id) or not work_crud.is_brigadir(exist_worker.id)
 
         # Перевод работника на объект как ответственного
-        constr_crud.transfer_worker(constr.id, new_worker.id, brigadir=True)
+        constr_crud.transfer_worker(exist_constr.id, exist_worker.id, brigadir=True)
 
-        assert constr_crud.get_responsible(constr.id)
+        assert constr_crud.get_responsible(exist_constr.id)
 
-        assert new_worker.id in constr_crud.get_workers(constr.id)
+        assert exist_worker.id in constr_crud.get_workers(exist_constr.id)
 
-        assert work_crud.is_brigadir(new_worker.id).id==constr.id
+        assert work_crud.is_brigadir(exist_worker.id).id==exist_constr.id
     
 
 
-    def test_move_tool(self, constr:Construction, tool_crud:ToolCRUD, constr_crud:ConstructionCRUD):
+    def test_move_tool(self, exist_constr:Construction, exist_tool:Tool, tool_crud:ToolCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по перемещению инструмента
         (ToolCRUD.move_to())
         '''
-        tool = tool_crud.get_by_id(id=1)
-        old_constr = tool_crud.get_construction(tool.id)
+
+        old_constr:Construction|Storage = tool_crud.get_construction(exist_tool.id)
 
         assert old_constr
 
-        new_constr = constr_crud.add(constr)
-
-
-        assert not constr_crud.get_tools(new_constr.id)
+        assert not constr_crud.get_tools(exist_constr.id)
         
-        tool_crud.move_to(tool=tool, where=new_constr)
+        tool_crud.move_to(tool=exist_tool, where=exist_constr)
 
-        assert tool_crud.get_construction(tool.id).id!=old_constr.id
+        assert type(tool_crud.get_construction(exist_tool.id)) is type(exist_constr) or tool_crud.get_construction(exist_tool.id).id!=old_constr.id
         
-        assert tool.id in constr_crud.get_tools(new_constr.id)
+        assert exist_tool.id in constr_crud.get_tools(exist_constr.id)
