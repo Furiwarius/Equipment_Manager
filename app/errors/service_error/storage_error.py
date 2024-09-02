@@ -1,7 +1,7 @@
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
-class StockClosed(BaseException):
+class StockClosed(BaseApplicationException):
     '''
     Вызывается, если попытаться переместить
     инструмент на закрытый склад
@@ -13,7 +13,7 @@ class StockClosed(BaseException):
         super().__init__(message)
 
 
-class ImpossibleCloseStock(BaseException):
+class ImpossibleCloseStock(BaseApplicationException):
     '''
     Вызывается, если попытаться закрыть склад,
     на котором хранится инструмент

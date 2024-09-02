@@ -1,8 +1,8 @@
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
 
-class ThisIsSuperAdmin(BaseException):
+class ThisIsSuperAdmin(BaseApplicationException):
     '''
     Вызывается при попытке сменить роль
     super_admin на другую
@@ -15,7 +15,7 @@ class ThisIsSuperAdmin(BaseException):
 
 
 
-class CannotGiveSuperadmin(BaseException):
+class CannotGiveSuperadmin(BaseApplicationException):
     '''
     Вызывается при попытке назначить роль super_admin
     '''

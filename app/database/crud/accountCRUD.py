@@ -1,6 +1,5 @@
 from app.entities.account import Account
-from app.loggers.database_logger.db_logger import DatabaseLogger
-from app.database.tables.essence import Base, AccountTable
+from app.database.tables.essence import AccountTable
 from app.database.database import Database
 from app.utilities.converter import convertertation
 from app.database.crud.baseCRUD import BaseCRUD

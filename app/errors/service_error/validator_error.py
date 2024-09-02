@@ -1,8 +1,8 @@
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
 
-class BaseValidatorException(BaseException):
+class BaseValidatorException(BaseApplicationException):
     '''
     Базовое исключение родитель
     для удобного отслеживания

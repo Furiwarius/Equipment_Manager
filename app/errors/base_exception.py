@@ -1,6 +1,6 @@
 
 
-class BaseException(Exception):
+class BaseApplicationException(Exception):
     '''
     Базовое исключений для приложения.
     Все пользовательские исключения будут наследовать его.

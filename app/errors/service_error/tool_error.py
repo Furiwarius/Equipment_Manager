@@ -1,8 +1,8 @@
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
 
-class ToolBroken(BaseException):
+class ToolBroken(BaseApplicationException):
     '''
     Вызывается, если попытаться переместить
     сломанный инструмент на объект строительства
