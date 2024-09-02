@@ -4,7 +4,7 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.database.database import Database
-from app.database.converter import Converter
+from app.utilities.converter import convertertation
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
 from app.entities.firm import Firm
@@ -25,27 +25,23 @@ class BaseCRUD():
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
-        self.converter = Converter()
 
 
-
+    @convertertation
     @logger.info
     def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
-        obj = self.converter.conversion_to_table(obj)
         with Database() as db:
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
             
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
-
-        return self.converter.conversion_to_data(result)
+        return db.query(self.table).order_by(self.table.id.desc()).first()
 
 
-
+    @convertertation
     @logger.info
     def get_all(self, firm_id:int) -> dict:
         '''
@@ -57,23 +53,19 @@ class BaseCRUD():
         '''
 
         with Database() as db:
-            result = db.query(self.table).filter(self.table.firm_id == firm_id).all()
-            result = {item.id:self.converter.conversion_to_data(item) for item in result}
-
-        return result
+            return db.query(self.table).filter(self.table.firm_id == firm_id).all()
             
             
 
+    @convertertation
     @logger.info
-    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm|Account:
+    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm|Account|None:
         '''
         Получить сущность по id
         '''
         
         with Database() as db:
-            result = db.get(self.table, id)
-        
-        return self.converter.conversion_to_data(result)
+            return db.get(self.table, id)
     
 
 
@@ -102,12 +94,12 @@ class BaseCRUD():
     
 
 
+    @convertertation
     def get_last_one(self) -> Constr|Storage|Tool|Worker|Firm|Account:
         '''
         Получить последнего добавленного в таблицу
         '''
         with Database() as db:
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
+            return db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return self.converter.conversion_to_data(result)
 

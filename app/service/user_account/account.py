@@ -2,7 +2,7 @@ from app.utilities.hashing import to_hash
 from app.database.crud.accountCRUD import AccountCRUD
 from app.errors.service_error.account_error import IncorrectLogin, IncorrectPassword
 from app.entities.account import Account
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
 class AccountManager():
@@ -67,7 +67,7 @@ class AccountManager():
         try:
             self.account_crud.check_data(login=account.login,
                                      email=account.email)
-        except BaseException as err:
+        except BaseApplicationException as err:
             raise err
 
     

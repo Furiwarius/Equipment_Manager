@@ -1,7 +1,7 @@
-from app.errors.base_exception import BaseException
+from app.errors.base_exception import BaseApplicationException
 
 
-class ImpossibleDismiss(BaseException):
+class ImpossibleDismiss(BaseApplicationException):
     '''
     Вызывается, если пользователь
     пытается уволить работника,
@@ -14,7 +14,7 @@ class ImpossibleDismiss(BaseException):
         super().__init__(message)
 
 
-class WorkerDoesntWork(BaseException):
+class WorkerDoesntWork(BaseApplicationException):
     '''
     Вызывается, если пользователь
     пытается переместить на объект

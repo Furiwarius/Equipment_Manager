@@ -11,6 +11,7 @@ from app.database.tables.summary import ToolsOnStorage
 from app.database.tables.essence import ConstructionTable as ConstrTable
 from datetime import datetime
 from app.database.database import Database
+from app.utilities.converter import convertertation
 
 
 
@@ -28,8 +29,9 @@ class ToolCRUD(BaseCRUD):
     def __repr__(self) -> str:
         return f"{__class__.__name__}"
 
-      
-      
+
+     
+    @convertertation
     @BaseCRUD.logger.info
     def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''
@@ -38,23 +40,20 @@ class ToolCRUD(BaseCRUD):
         Для добавления нового инструмента, нужно также
         указать объект или склад, где он будет хранится.
         '''
-        tool = self.converter.conversion_to_table(tool)
         with Database() as db:
 
             db.add(tool)     # добавляем в бд
             db.commit()
 
-            where = self.converter.conversion_to_table(where)
             self.__move(db, tool, where)
             
             db.commit()     # сохраняем изменения
   
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
-
-        return self.converter.conversion_to_data(result)
+            return db.query(self.table).order_by(self.table.id.desc()).first()
     
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
@@ -71,6 +70,7 @@ class ToolCRUD(BaseCRUD):
             
             db.commit() # сохраняем изменения
     
+
 
     @BaseCRUD.logger.info
     def __move(self, db:Session, tool:Tool, where:Storage|StorageTable|Construction|ConstrTable) -> None:
@@ -117,6 +117,8 @@ class ToolCRUD(BaseCRUD):
                                            ).update({type(location).end_date:datetime.now()}, synchronize_session = False)
     
 
+
+    @convertertation
     @BaseCRUD.logger.info
     def get_construction(self, tool_id:int) -> Construction|None:
         '''
@@ -134,7 +136,7 @@ class ToolCRUD(BaseCRUD):
                                                                   ToolsOnStorage.end_date==None).all()
                 constr = db.get(StorageTable, place[0])
             
-            return self.converter.conversion_to_data(constr)
+            return constr
     
 
 

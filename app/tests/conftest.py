@@ -21,6 +21,10 @@ from typing import AsyncGenerator, Generator
 from app import app
 from fastapi.testclient import TestClient
 from httpx import ASGITransport, AsyncClient
+from app.utilities.hashing import to_hash
+from copy import copy
+from app.service.construction.construction import ConstructionManager
+from app.service.storage.storage import StorageManager
 
 
 
@@ -49,13 +53,13 @@ async def async_client(client) -> AsyncGenerator:
 
 
 @pytest_asyncio.fixture(scope="session")
-def fake():
+def fake() -> Faker:
     return Faker(locale="ru")
 
 
 
 @pytest_asyncio.fixture(scope="function")
-def password():
+def password() -> str:
     return PasswordGenerator().run_generation(size=16)
 
 
@@ -73,12 +77,12 @@ def generate_number() -> int:
 
 
 @pytest_asyncio.fixture(scope="function")
-def account(fake, generate_number, password) -> Account:
+def account(fake:Faker, generate_number:int, password:str) -> Account:
     '''
     Генератор данных аккаунта
     '''
 
-    new_account = Account(login=f"login{generate_number}",
+    new_account = Account(login=f"{fake.first_name()}{generate_number}",
                               password=password,
                               email=fake.email(),
                               confirmation_status=False,
@@ -89,7 +93,7 @@ def account(fake, generate_number, password) -> Account:
 
 
 @pytest_asyncio.fixture(scope="function")
-def firm(fake) -> Firm:
+def firm(fake:Faker) -> Firm:
     '''
     Генератор данных фирмы
     '''
@@ -101,20 +105,14 @@ def firm(fake) -> Firm:
 
 
 
-@pytest_asyncio.fixture(scope="session")
-def firm_id(fake) -> int:
+@pytest_asyncio.fixture(scope="function")
+def firm_id(fake:Faker, account:Account) -> int:
     '''
     Создает фирму для тестов
     '''
 
-    new_account = Account(login=f"login{generate_number}",
-                              password=password,
-                              email=fake.email(),
-                              confirmation_status=True,
-                              timezone=get_random_timezone())
-
-    account = AccountCRUD().add(new_account)
-    firm = FirmCRUD().add(account_id=account.id, 
+    account = AccountCRUD().add(account)
+    firm:Firm = FirmCRUD().add(account_id=account.id, 
                           new_firm=Firm(name=fake.company(), status=True))
     
     return firm.id
@@ -122,7 +120,7 @@ def firm_id(fake) -> int:
 
 
 @pytest_asyncio.fixture(scope="function")
-def storage(firm_id, generate_number, fake) -> Storage:
+def storage(firm_id:int, generate_number:int, fake:Faker) -> Storage:
     '''
     Генератор данных склада
     '''
@@ -137,7 +135,7 @@ def storage(firm_id, generate_number, fake) -> Storage:
 
 
 @pytest_asyncio.fixture(scope="function")
-def constr(firm_id, generate_number, fake) -> Construction:
+def constr(firm_id:int, generate_number:int, fake:Faker) -> Construction:
     '''
     Генератор объектов
     '''
@@ -153,7 +151,7 @@ def constr(firm_id, generate_number, fake) -> Construction:
 
 
 @pytest_asyncio.fixture(scope="function")
-def tool(firm_id, generate_number, fake) -> Tool:
+def tool(firm_id:int, generate_number:int, fake:Faker) -> Tool:
     '''
     Генератор инструментов
     '''
@@ -168,7 +166,7 @@ def tool(firm_id, generate_number, fake) -> Tool:
 
 
 @pytest_asyncio.fixture(scope="function")
-def worker(firm_id, fake) -> Worker:
+def worker(firm_id:int, fake:Faker) -> Worker:
     '''
     Генератор работников
     '''
@@ -181,6 +179,77 @@ def worker(firm_id, fake) -> Worker:
                             firm_id=firm_id)
 
     return new_worker
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def exist_worker(worker:Worker, work_crud:WorkerCRUD) -> Worker:
+    '''
+    Генератор работника занесенного в бд
+    '''
+    return work_crud.add(worker)
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def exist_constr(constr:Construction, constr_crud:ConstructionCRUD) -> Construction:
+    '''
+    Генератор конструкции занесенного в бд
+    '''
+    return constr_crud.add(constr)
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def exist_storage(storage:Storage, stor_crud:StorageCRUD) -> Storage:
+    '''
+    Генератор склада занесенного в бд
+    '''
+    return stor_crud.add(storage)
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def exist_tool(tool:Tool, tool_crud:ToolCRUD, exist_storage:Storage) -> Tool:
+    '''
+    Генератор инструмента занесенного в бд
+    '''
+    return tool_crud.add(tool, exist_storage)
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def constr_with_responsible(exist_constr:Construction, exist_worker:Worker) -> Construction:
+    '''
+    Генератор конструкции занесенной в бд с назначенным ответственным
+    '''
+
+    ConstructionManager(exist_constr).appointment_responsible(exist_worker)
+
+    return exist_constr
+
+
+@pytest_asyncio.fixture(scope="function")
+def storage_with_tool(exist_storage:Storage, tool:Tool) -> Storage:
+    '''
+    Генератор склада занесенного в бд с инструментами в нем
+    '''
+
+    StorageManager(exist_storage).add_tool(tool)
+
+    return exist_storage
+
+
+
+@pytest_asyncio.fixture(scope="function")
+def constr_with_tool(constr_with_responsible:Construction, tool:Tool) -> Storage:
+    '''
+    Генератор склада занесенного в бд с инструментами в нем
+    '''
+
+    ConstructionManager(constr_with_responsible).add_tool(tool)
+
+    return constr_with_responsible
 
 
 
@@ -223,8 +292,31 @@ def acc_crud() -> AccountCRUD:
     return AccountCRUD()
 
 
+@pytest_asyncio.fixture(scope="function")
+def exist_account(account:Account, acc_crud:AccountCRUD) -> Account:
+    '''
+    Генератор данных аккаунта добавленного в бд
+    '''
+    new_account = copy(account)
+    new_account.login = to_hash(new_account.login)
+    new_account.password = to_hash(new_account.password)
+    
+    new_account:Account = acc_crud.add(new_account)
+    account.id = new_account.id
+
+    return account
+
+
+@pytest_asyncio.fixture(scope="function")
+def exist_firm(firm:Firm, exist_account:Account, firm_crud:FirmCRUD) -> Firm:
+    '''
+    Генератор данных фирмы добавленной в бд
+    '''
+    return firm_crud.add(exist_account.id, firm)
+
+
 
 @pytest_asyncio.fixture(scope="session")
-def item_cruds(constr_crud, stor_crud, tool_crud, work_crud) -> tuple:
+def item_cruds(constr_crud:ConstructionCRUD, stor_crud:StorageCRUD, tool_crud:ToolCRUD, work_crud:WorkerCRUD) -> tuple:
      
     return (constr_crud, stor_crud, tool_crud, work_crud)

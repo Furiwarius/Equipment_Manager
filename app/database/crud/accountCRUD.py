@@ -1,8 +1,7 @@
 from app.entities.account import Account
-from app.loggers.database_logger.db_logger import DatabaseLogger
-from app.database.tables.essence import Base, AccountTable
+from app.database.tables.essence import AccountTable
 from app.database.database import Database
-from app.database.converter import Converter
+from app.utilities.converter import convertertation
 from app.database.crud.baseCRUD import BaseCRUD
 from app.errors.service_error.account_error import LoginExists, EmailExists
 
@@ -23,24 +22,23 @@ class AccountCRUD(BaseCRUD):
         return f"{__class__.__name__}"
 
 
-
+    @convertertation
     @BaseCRUD.logger.info
     def add(self, account:Account) -> Account:
         '''
         Добавить сущности
         '''
-        account = self.converter.conversion_to_table(account)
+
         with Database() as db:
 
             db.add(account)     # добавляем в бд
             db.commit()     # сохраняем изменения
             
-            result = db.query(AccountTable).order_by(AccountTable.id.desc()).first()
-
-        return self.converter.conversion_to_data(result)
+            return db.query(AccountTable).order_by(AccountTable.id.desc()).first()
 
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def get_account_by_login(self, login:str) -> Account|None:
         '''
@@ -49,40 +47,18 @@ class AccountCRUD(BaseCRUD):
         login передаются в виде hash
         '''
         with Database() as db:
-            account = db.query(self.table).filter(AccountTable.login==login).all()
-
-        if account:
-            return self.converter.conversion_to_data(account[0])
+            return db.query(self.table).filter(AccountTable.login==login).one_or_none()
 
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def get_account_by_email(self, email:str) -> Account|None:
         '''
         Получение данных лю аккаунте по адресу почты
         '''
         with Database() as db:
-            account = db.query(self.table).filter(AccountTable.email==email).all()
-            
-        if account:
-            return self.converter.conversion_to_data(account[0])
-
-
-
-    @BaseCRUD.logger.info
-    def get_all(self) -> list:
-        '''
-        Получить id сущностей
-
-        Метод смотрит поле table,
-        и по нему ищет данные в БД
-        '''
-
-        with Database() as db:
-            result = db.query(self.table.id).all()
-            result = [item[0] for item in result]
-
-        return list(result)
+            return db.query(self.table).filter(AccountTable.email==email).one_or_none()
 
     
 
@@ -112,11 +88,3 @@ class AccountCRUD(BaseCRUD):
             account = db.query(AccountTable).filter(AccountTable.login==login).all()       
             if account:
                 raise LoginExists
-            
-
-
-    def retire(self) -> None:
-        '''
-        AccountCRUD наследует от BaseCRUD этот метод,
-        но не использует его
-        '''

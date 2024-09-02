@@ -10,6 +10,7 @@ from app.database.tables.essence import AccountTable as AccT
 from app.entities.account import Account as Acc
 from app.entities.firm import Firm
 from app.database.tables.essence import FirmTable as FirmT
+import functools 
 
 
 
@@ -80,3 +81,73 @@ class Converter():
         return class_instance
 
         
+    
+    def conversion_input_args(self, args:tuple) -> tuple:
+        '''
+        Переводит entities экземпляры в образы таблиц 
+        '''
+
+        new_args = list()
+        for arg in args:
+            if isinstance(arg, (Acc, Constr, Work, Tool, Stor, Firm)):
+                new_args.append(self.conversion_to_table(arg))
+            else:
+                new_args.append(arg)
+        
+        return new_args
+
+
+
+    def conversion_input_kwargs(self, kwargs:dict) -> dict:
+        '''
+        Переводит entities экземпляры в образы таблиц   
+        '''
+        new_kwargs = dict()
+        for key, item in kwargs.items():
+            if isinstance(item, (Acc, Constr, Work, Tool, Stor, Firm)):
+                new_kwargs[key] = self.conversion_to_table(item)
+            else:
+                new_kwargs[key] = item
+        return new_kwargs
+    
+
+
+    def conversion_result_func(self, result:list|dict|AccT|ConstrT|WorkT|ToolT|StorT|FirmT):
+        
+        if isinstance(result, list):
+            result = [self.conversion_to_data(item) for item in result]
+        
+        elif isinstance(result, dict):
+            result = {key:self.conversion_to_data(item) for key, item in result.items()}
+
+        elif isinstance(result, (AccT, ConstrT, WorkT, ToolT, StorT, FirmT)):
+            result = self.conversion_to_data(result)
+        
+        return result
+    
+
+
+converter = Converter()
+
+
+
+def convertertation(func) -> Acc|Constr|Work|Tool|Stor|Firm|None:
+    '''
+    Конвертор декоратор
+
+    Переводит входящие даннные в круды к табличным представлениям, 
+    а результат к классам entities
+    '''
+    
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> Acc|Constr|Work|Tool|Stor|Firm|dict|list|None:        
+        
+        try:
+            result = func(*converter.conversion_input_args(args), 
+                          **converter.conversion_input_kwargs(kwargs))
+        except Exception as er:
+            raise er
+
+        return converter.conversion_result_func(result)
+
+    return wrapper

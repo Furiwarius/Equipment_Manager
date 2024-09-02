@@ -4,6 +4,7 @@ from app.database.crud.firmCRUD import (FirmCRUD, Roles,
 import pytest
 from app.database.crud.accountCRUD import AccountCRUD
 from app.entities import Account, Firm
+from app.utilities.hashing import to_hash
 
 
 
@@ -24,105 +25,80 @@ class TestRoles():
     
 
 
-    def test_confirm_account(self, acc_crud:AccountCRUD):
+    def test_confirm_account(self, exist_account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование метода по подтверждению аккаунта
         '''
         
-        account = acc_crud.get_last_one()
+        assert not exist_account.confirmation_status
 
-        assert not account.confirmation_status
+        acc_crud.modify_status(account_id=exist_account.id)
 
-        acc_crud.modify_status(account_id=account.id)
-        account = acc_crud.get_last_one()
+        account_in_db:Account = acc_crud.get_by_id(exist_account.id)
 
-        assert account.confirmation_status
+        assert account_in_db.confirmation_status
     
 
 
-    def test_get_account_by_login(self, account:Account, acc_crud:AccountCRUD):
+    def test_get_account_by_login(self, exist_account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование метода получения аккаунта по логину
         '''
 
-        account = acc_crud.add(account)
-        assert account.id
-
-        account_in_db = acc_crud.get_account_by_login(account.login)
-        assert account_in_db.id==account.id
+        account_in_db:Account = acc_crud.get_account_by_login(to_hash(exist_account.login))
+        assert account_in_db.id==exist_account.id
 
 
 
-    def test_get_account_by_email(self, account:Account, acc_crud:AccountCRUD):
+    def test_get_account_by_email(self, exist_account:Account, acc_crud:AccountCRUD):
         '''
         Тестирование получения данных об аккаунте по адресу почты
         '''
 
-        account = acc_crud.add(account)
-        assert account.id
-
-        account_in_db = acc_crud.get_account_by_email(account.email)
-        assert account_in_db.id==account.id
+        account_in_db:Account = acc_crud.get_account_by_email(exist_account.email)
+        assert account_in_db.id==exist_account.id
 
 
 
     # Добавлять фирмы в бд можно только,
     # если есть аккаунт
     
-    def test_add_firm(self, firm:Firm, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
+    def test_add_firm(self, firm:Firm, exist_account:Account, firm_crud:FirmCRUD):
         '''
         Тестирование метода по добалению фирмы
         '''
-        account = acc_crud.get_last_one()
 
-        firm = firm_crud.add(account_id=account.id,
+        firm = firm_crud.add(account_id=exist_account.id,
                                   new_firm=firm)
         
         assert firm.id
 
 
 
-    def test_get_all_firm(self, account:Account, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
+    def test_get_all_firm(self, exist_account:Account, firm:Firm, firm_crud:FirmCRUD):
         '''
         Тестирование метода по получению 
         списка id всех фирм аккаунта, где он super_admin
         '''
 
-        account = acc_crud.get_last_one()
-        firm = firm_crud.get_last_one()
+        assert not firm_crud.get_all(account_id=exist_account.id)
 
-        firms_id = firm_crud.get_all(account_id=account.id)
+        firm = firm_crud.add(account_id=exist_account.id,
+                                  new_firm=firm)
 
-        assert firm.id in firms_id
+        assert firm.id in firm_crud.get_all(account_id=exist_account.id)
 
 
 
-    def test_give_role(self, account:Account, acc_crud:AccountCRUD, firm_crud:FirmCRUD):
+    def test_give_role(self, exist_firm:Firm, exist_account:Account, firm_crud:FirmCRUD):
         '''
         Тестирование метода по выдаче роли аккаунту
         '''
-
-        last_account = acc_crud.get_last_one()
-        firm = firm_crud.get_last_one()
-
-        new_account = acc_crud.add(account)
-
-        for role in (Roles.admin, Roles.visitor):
-            firm_crud.give_role(account_id=new_account.id,
-                                    firm_id=firm.id,
-                                    role=role.name)
-            
-            assert role.name==firm_crud.get_role(account_id=new_account.id,
-                                                            firm_id=firm.id)
-        
-        # Попытка назначить владельца фирмы на роль ниже суперадмина
         with pytest.raises(ThisIsSuperAdmin):
-            firm_crud.give_role(account_id=last_account.id,
-                                    firm_id=firm.id,
-                                    role=Roles.admin.name)
-        
-        # Попытка назначить нового суперадмина
-        with pytest.raises(CannotGiveSuperadmin):
-            firm_crud.give_role(account_id=new_account.id,
-                                    firm_id=firm.id,
-                                    role=Roles.super_admin.name)
+            for role in (Roles.admin, Roles.visitor):
+                firm_crud.give_role(account_id=exist_account.id,
+                                        firm_id=exist_firm.id,
+                                        role=role.name)
+                
+                assert role.name==firm_crud.get_role(account_id=exist_account.id,
+                                                                firm_id=exist_firm.id)

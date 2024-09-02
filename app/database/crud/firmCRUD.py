@@ -6,6 +6,8 @@ from app.database.tables.summary import AccountRoles
 from app.errors.database_error.database_error import ThisIsSuperAdmin
 from app.errors.database_error.database_error import CannotGiveSuperadmin
 from enum import Enum
+from app.utilities.converter import convertertation
+
 
 
 class Roles(Enum):
@@ -36,6 +38,7 @@ class FirmCRUD(BaseCRUD):
 
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def add(self, account_id:int, new_firm:Firm) -> Firm:
         '''
@@ -45,7 +48,6 @@ class FirmCRUD(BaseCRUD):
         super_admin.
         '''
 
-        new_firm = self.converter.conversion_to_table(new_firm)
         with Database() as db:
 
             db.add(new_firm)     # добавляем в бд
@@ -65,8 +67,9 @@ class FirmCRUD(BaseCRUD):
 
     # Этот метод находится тут, потому что нужно переопределить метод BaseCRUD.get_all
     # чтобы он искал по account_id, а не firm_id как у остальных круд-классов
+    @convertertation
     @BaseCRUD.logger.info
-    def get_all(self, account_id:int) -> list:
+    def get_all(self, account_id:int) -> dict:
         '''
         Получить список id фирм принадлежащих
         этому аккаунту с account_id
@@ -77,9 +80,7 @@ class FirmCRUD(BaseCRUD):
             firms_id = db.query(AccountRoles.firm_id).filter(AccountRoles.account_id==account_id,
                                                              AccountRoles.role==Roles.super_admin.name).all()
 
-            result = [item[0] for item in firms_id]
-
-            return result
+            return {item[0]:self.get_by_id(item[0]) for item in firms_id}
 
     
 
