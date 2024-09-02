@@ -1,7 +1,7 @@
-from app.tests.fake_data import DataGenerator, create_firm
-from app.database.crud.constructionCRUD import ConstructionCRUD
-from app.database.crud.storageCRUD import StorageCRUD
+from app.entities import Construction, Storage, Tool, Worker
 from app.database.crud.toolCRUD import ToolCRUD
+from app.database.crud.storageCRUD import StorageCRUD
+from app.database.crud.constructionCRUD import ConstructionCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
 
 
@@ -11,218 +11,206 @@ class TestDatabase():
     Класс для тестирования БД
     '''
 
-    generator = DataGenerator()
-    
-    constr_crud = ConstructionCRUD()
-    stor_crud = StorageCRUD()
-    work_crud = WorkerCRUD()
-    tool_crud = ToolCRUD()
-
-    cruds = (work_crud, tool_crud, constr_crud, stor_crud)
-
-
-    firm_id = create_firm()
-
-
-    def test_add_construction(self):
+    def test_add_construction(self, constr:Construction, constr_crud:ConstructionCRUD):
         '''
         Тест метода по добавлению сущности (ConstructionCRUD.add())
         '''
 
-        constr = self.generator.constr_generator(firm_id=self.firm_id)
-        constr_db = self.constr_crud.add(constr)
+        constr_db = constr_crud.add(constr)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert constr_db.name==constr.name
 
 
 
-    def test_add_storage(self):
+    def test_add_storage(self, storage:Storage, stor_crud:StorageCRUD):
         '''
         Тест метода по добавлению склада (StorageCRUD.add())
         '''
 
-        storage = self.generator.storage_generator(firm_id=self.firm_id)
-        storage_db = self.stor_crud.add(storage)
+        storage_db = stor_crud.add(storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert storage_db.name==storage.name
 
 
 
-    def test_add_worker(self):
+    def test_add_worker(self, worker:Worker, work_crud:WorkerCRUD):
         '''
         Тест метода по добавлению работника (WorkerCRUD.add())
         '''
 
-        worker = self.generator.worker_generator(firm_id=self.firm_id)
-        worker_db = self.work_crud.add(worker)
+        worker_db = work_crud.add(worker)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert worker_db.name==worker.name
 
 
 
-    def test_add_tool(self):
+    def test_add_tool(self, tool:Tool, storage:Storage, tool_crud:ToolCRUD, stor_crud:StorageCRUD):
         '''
         Тест метода по добавлению инструмента (ToolCRUD.add())
         '''
         # Тк до этого добавляли склад, он есть в бд
-        storage = self.stor_crud.get_by_id(id=1)
-        tool = self.generator.tool_generator(firm_id=self.firm_id)
-        tool_db = self.tool_crud.add(tool=tool, where=storage)
+        new_storage = stor_crud.add(storage)
+        tool_db = tool_crud.add(tool=tool, where=new_storage)
 
         # Данные генерируются уникальные, поэтому хватит одной проверки
         assert tool_db.name==tool.name
         
         # Находится ли инструмент на складе (таблица tools_on_storage)
-        assert tool_db.id in self.stor_crud.get_tools(storage.id)
+        assert tool_db.id in stor_crud.get_tools(new_storage.id)
 
 
 
-    def test_get_by_id(self):
+    def test_get_by_id(self, item_cruds:tuple):
         '''
         Тест метода по получению сущности по id (Base.get_by_id())
         '''
         
-        # В предыдущем тесте добавлен инструмент
-        assert self.tool_crud.get_by_id(id=1) is not None
+        # В предыдущих тестах были добавлены элементы
+        for crud in item_cruds:
+
+            assert crud.get_by_id(id=1) is not None
         
 
 
-    def test_get_all_item(self):
+    def test_get_all_item(self, constr_crud:ConstructionCRUD, tool_crud:ToolCRUD, work_crud:WorkerCRUD, stor_crud:StorageCRUD, firm_id:int):
         '''
         Тест метода по получению всех сущностей (Base.get_all())
         '''
 
         # Тк предыдущие тесты добавляли сущности, их и будем получать
-        workers = self.work_crud.get_all(self.firm_id)   
-        constructions = self.constr_crud.get_all(self.firm_id)
-        tools = self.tool_crud.get_all(self.firm_id)
-        storages = self.stor_crud.get_all(self.firm_id)
+        workers = work_crud.get_all(firm_id)   
+        constructions = constr_crud.get_all(firm_id)
+        tools = tool_crud.get_all(firm_id)
+        storages = stor_crud.get_all(firm_id)
 
-        assert workers and constructions and tools and storages
+        assert workers 
+        assert constructions 
+        assert tools 
+        assert storages
         
 
 
-    def test_downgrade(self):
+    def test_downgrade(self, item_cruds:tuple):
         '''
         Тестирование метода по изменению статуса на False (Base.modify_status(False))
         '''
 
-        items = [crud.get_by_id(id=1) for crud in self.cruds]
+        items = [crud.get_by_id(id=1) for crud in item_cruds]
         
-        self.__status_operations(items=items, mode=False)
+        self.__status_operations(cruds=item_cruds, items=items, mode=False)
 
-        for crud in self.cruds:
+        for crud in item_cruds:
             # Если статус сущности не False, тест провален
             assert not crud.get_by_id(id=1).status
     
 
 
-    def test_increase(self):
+    def test_increase(self, item_cruds:tuple):
         '''
         Тестирование метода по изменению статуса на True (Base.modify_status(True))
         '''
 
-        items = [crud.get_by_id(id=1) for crud in self.cruds]
+        items = [crud.get_by_id(id=1) for crud in item_cruds]
         
-        self.__status_operations(items=items)
+        self.__status_operations(cruds=item_cruds, items=items)
 
-        for crud in self.cruds:
+        for crud in item_cruds:
             # Если статус сущности не True, тест провален
             assert crud.get_by_id(id=1).status
             
 
 
-    def __status_operations(self, items:list, mode=True):
+    def __status_operations(self, cruds:tuple, items:list, mode=True):
         '''
         Операции по изменению статуса у списка сущностей
         '''
 
         # Изменяем статус каждой сущности в зависимости от mode
-        [crud.modify_status(obj_id=item.id, status=mode) for item, crud in zip(items, self.cruds)]
+        [crud.modify_status(obj_id=item.id, status=mode) for item, crud in zip(items, cruds)]
 
 
 
-    def test_get_tools(self):
+    def test_get_tools(self, constr:Construction, storage:Storage, constr_crud:ConstructionCRUD, stor_crud:StorageCRUD, tool:Tool, tool_crud:ToolCRUD):
         '''
         Тестирование метода по получению инструмента с места хранения
         (StorageCRUD.get_tools() | ConstructionCRUD.get_tools())
         '''
 
-        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
-        constr = self.constr_crud.add(new_constr)
+        constr = constr_crud.add(constr)
         
-        tools_on_stor = self.stor_crud.get_tools(self.stor_crud.get_by_id(id=1).id)
-        tools_on_constr = self.constr_crud.get_tools(self.constr_crud.get_by_id(constr.id).id)
+        storage = stor_crud.add(storage)
+        tool_crud.add(tool=tool, where=storage)
+
+        tools_on_stor = stor_crud.get_tools(stor_crud.get_by_id(storage.id).id)
+        tools_on_constr = constr_crud.get_tools(constr_crud.get_by_id(constr.id).id)
+
 
         assert tools_on_stor and not tools_on_constr
         
 
 
-    def test_transfer_worker(self):
+    def test_transfer_worker(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по переводу работника на объект 
         (ConstructionCRUD.transfer_worker(brigadir=False))
         '''
-        new_worker = self.generator.worker_generator(firm_id=self.firm_id)
-        worker = self.work_crud.add(new_worker)    
-        constr = self.constr_crud.get_last_one()
+        
+        worker = work_crud.add(worker)    
+        constr = constr_crud.get_last_one()
 
-        assert not self.constr_crud.get_workers(constr.id) and not self.work_crud.get_construction(worker.id)
+        assert not constr_crud.get_workers(constr.id) and not work_crud.get_construction(worker.id)
 
         # Перевод работника на объект
-        self.constr_crud.transfer_worker(constr_id=constr.id, worker_id=worker.id)
+        constr_crud.transfer_worker(constr_id=constr.id, worker_id=worker.id)
 
-        assert self.constr_crud.get_workers(constr.id) or not self.constr_crud.get_responsible(constr.id)
-        
-        assert self.work_crud.get_construction(worker.id).id==constr.id or not self.work_crud.is_brigadir(worker.id)
-
+        assert constr_crud.get_workers(constr.id) or not constr_crud.get_responsible(constr.id)
+        assert work_crud.get_construction(worker.id).id==constr.id or not work_crud.is_brigadir(worker.id)
 
 
-    def test_transfer_brigadir(self):
+
+    def test_transfer_brigadir(self, worker:Worker, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению ответственного лица на объект 
         (ConstructionCRUD.transfer_worker(brigadir=True))
         '''
         # Генерация нового работника
-        new_worker = self.generator.worker_generator(firm_id=self.firm_id)    
-        new_worker = self.work_crud.add(new_worker)
+        new_worker = work_crud.add(worker)
 
-        constr = self.constr_crud.get_by_id(id=1)
+        constr = constr_crud.get_by_id(id=1)
 
-        assert not self.constr_crud.get_responsible(constr.id) or not self.work_crud.is_brigadir(new_worker.id)
+        assert not constr_crud.get_responsible(constr.id) or not work_crud.is_brigadir(new_worker.id)
 
         # Перевод работника на объект как ответственного
-        self.constr_crud.transfer_worker(constr.id, new_worker.id, brigadir=True)
+        constr_crud.transfer_worker(constr.id, new_worker.id, brigadir=True)
 
-        assert self.constr_crud.get_responsible(constr.id)
+        assert constr_crud.get_responsible(constr.id)
 
-        assert new_worker.id in self.constr_crud.get_workers(constr.id)
+        assert new_worker.id in constr_crud.get_workers(constr.id)
 
-        assert self.work_crud.is_brigadir(new_worker.id).id==constr.id
+        assert work_crud.is_brigadir(new_worker.id).id==constr.id
     
 
 
-    def test_move_tool(self):
+    def test_move_tool(self, constr:Construction, tool_crud:ToolCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по перемещению инструмента
         (ToolCRUD.move_to())
         '''
-        tool = self.tool_crud.get_by_id(id=1)
-        old_constr = self.tool_crud.get_construction(tool.id)
+        tool = tool_crud.get_by_id(id=1)
+        old_constr = tool_crud.get_construction(tool.id)
 
         assert old_constr
 
-        new_constr = self.generator.constr_generator(firm_id=self.firm_id)
-        new_constr = self.constr_crud.add(new_constr)
+        new_constr = constr_crud.add(constr)
 
 
-        assert not self.constr_crud.get_tools(new_constr.id)
+        assert not constr_crud.get_tools(new_constr.id)
         
-        self.tool_crud.move_to(tool=tool, where=new_constr)
+        tool_crud.move_to(tool=tool, where=new_constr)
 
-        assert self.tool_crud.get_construction(tool.id).id!=old_constr.id
+        assert tool_crud.get_construction(tool.id).id!=old_constr.id
         
-        assert tool.id in self.constr_crud.get_tools(new_constr.id)
+        assert tool.id in constr_crud.get_tools(new_constr.id)
