@@ -140,7 +140,7 @@ def convertertation(func) -> Acc|Constr|Work|Tool|Stor|Firm|None:
     '''
     
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):        
+    def wrapper(*args, **kwargs) -> Acc|Constr|Work|Tool|Stor|Firm|dict|list|None:        
         
         try:
             result = func(*converter.conversion_input_args(args), 

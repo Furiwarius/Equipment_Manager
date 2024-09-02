@@ -4,7 +4,7 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.database.database import Database
-from app.database.converter import Converter, convertertation
+from app.utilities.converter import convertertation
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
 from app.entities.firm import Firm

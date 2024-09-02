@@ -6,7 +6,7 @@ from app.database.tables.essence import ConstructionTable as ConstrTable
 from sqlalchemy.orm import Session
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
 from app.database.database import Database
-from app.database.converter import convertertation
+from app.utilities.converter import convertertation
 
 
 
