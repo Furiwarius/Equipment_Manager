@@ -109,6 +109,9 @@ class DatabaseLoggerSetting():
         # Токен для бота, который будет отправлять логи
         self.TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
 
+        # Тема письма
+        self.SUBJECT_LETTER = "Database Error"
+
 
 
 class ConfirmationCodeSetting():
