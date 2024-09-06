@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 
@@ -23,3 +23,5 @@ class Account():
     start_date: datetime = None
     # Время обновления данных
     update_date: datetime = None
+    # Фирмы, в который аккаунт имеет роли
+    firms: list[int] = field(default_factory=list)

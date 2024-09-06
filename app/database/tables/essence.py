@@ -2,7 +2,12 @@ from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy import Column, DateTime, Boolean
 from datetime import datetime
 from app.database.tables.base import Base
+from app.database.tables.summary import AccountRoles
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped
+from typing import List
+
 
 
 class ToolTable(Base):
@@ -73,6 +78,22 @@ class StorageTable(Base):
 
 
 
+class FirmTable(Base):
+    '''
+    Модель таблицы firm
+    '''
+    __tablename__ = "firm"
+
+    name = Column(String(65), nullable=False)
+    status = Column(Boolean, default=True, nullable=False)
+    start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
+    update_date = Column(DateTime, default=func.now(), server_default=func.now(), onupdate=func.now())
+    end_date = Column(DateTime)
+
+    accounts = relationship("AccountRoles", back_populates="firm", lazy="joined")
+
+
+
 class AccountTable(Base):
     '''
     Модель таблицы account
@@ -87,16 +108,4 @@ class AccountTable(Base):
     start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
     update_date = Column(DateTime, default=func.now(), server_default=func.now(), onupdate=func.now())
 
-
-
-class FirmTable(Base):
-    '''
-    Модель таблицы firm
-    '''
-    __tablename__ = "firm"
-
-    name = Column(String(65), nullable=False)
-    status = Column(Boolean, default=True, nullable=False)
-    start_date = Column(DateTime, default=func.now(), server_default=func.now(), nullable=False)
-    update_date = Column(DateTime, default=func.now(), server_default=func.now(), onupdate=func.now())
-    end_date = Column(DateTime)
+    firms = relationship("AccountRoles", back_populates="account", lazy="joined")

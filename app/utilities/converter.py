@@ -10,6 +10,8 @@ from app.database.tables.essence import AccountTable as AccT
 from app.entities.account import Account as Acc
 from app.entities.firm import Firm
 from app.database.tables.essence import FirmTable as FirmT
+from app.entities.account_roles import Roles
+from app.database.tables.summary import AccountRoles as AccRolesTable
 import functools 
 
 
@@ -28,12 +30,14 @@ class Converter():
                   "ToolTable": Tool,
                   "StorageTable": Stor,
                   "FirmTable":Firm,
+                  "AccountRoles": Roles,
                   "Account": AccT,
                   "Construction": ConstrT,
                   "Worker": WorkT,
                   "Tool": ToolT,
                   "Storage": StorT,
-                  "Firm": FirmT}
+                  "Firm": FirmT,
+                  "Roles": AccRolesTable}
 
     
     def conversion_to_data(self, item:AccT|ConstrT|StorT|WorkT|ToolT|FirmT|None) -> Acc|Constr|Stor|Work|Tool|Firm|None: 
@@ -56,7 +60,10 @@ class Converter():
 
         # Заполнение полей
         for atr in param_names:
-            setattr(class_instance, atr, getattr(item, atr))
+            value = getattr(item, atr)
+            if isinstance(value, list):
+                value = [self.conversion_to_data(elem) for elem in value]
+            setattr(class_instance, atr, value)
         
         return class_instance 
 

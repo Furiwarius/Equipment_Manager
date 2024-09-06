@@ -3,6 +3,7 @@ from sqlalchemy import Column, DateTime, Boolean
 from datetime import datetime
 from app.database.tables.base import Base
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 
 class WorksOnConstructions(Base):
@@ -67,3 +68,6 @@ class AccountRoles(Base):
     firm_id = Column(Integer, ForeignKey("firm.id"), nullable=False)
     account_id = Column(Integer, ForeignKey("account.id"), nullable=False)
     role = Column(String(16), nullable=False)
+
+    account = relationship("AccountTable", back_populates="firms")
+    firm = relationship("FirmTable", back_populates="accounts")
