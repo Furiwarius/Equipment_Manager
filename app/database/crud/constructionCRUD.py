@@ -10,6 +10,8 @@ from app.database.tables.summary import ToolsOnConstructions as ToolOnConstr
 from app.database.tables.summary import WorksOnConstructions as WorkOnConstr
 from datetime import datetime
 from app.database.database import Database
+from app.utilities.converter import convertertation
+
 
 
 class ConstructionCRUD(BaseCRUD):
@@ -28,23 +30,22 @@ class ConstructionCRUD(BaseCRUD):
     
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def get_tools(self, constr_id:int) -> dict:
         '''
         Получить инструменты на объекте 
 
-
         Выдает словарь в виде id: Tool 
         '''
-
         with Database() as db:
 
-            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.DT_end==None).all()
-            result = {item[0]: self.coverter.conversion_to_data(db.get(ToolTable, item)) for item in tools_id}
+            tools_id = db.query(ToolOnConstr.tool_id).filter(ToolOnConstr.place_id==constr_id, ToolOnConstr.end_date==None).all()
+            return {item[0]:db.get(ToolTable, item) for item in tools_id}
 
-        return result
-    
 
+
+    @convertertation
     @BaseCRUD.logger.info
     def get_workers(self, constr_id:int) -> dict:
         '''
@@ -56,12 +57,12 @@ class ConstructionCRUD(BaseCRUD):
 
         with Database() as db:
 
-            works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.DT_end==None).all()
-            result = {item[0]: self.coverter.conversion_to_data(db.get(WorkerTable, item)) for item in works_id}
+            works_id = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, WorkOnConstr.end_date==None).all()
+            return {item[0]:db.get(WorkerTable, item) for item in works_id}
 
-        return result
-    
-    
+
+
+    @convertertation
     @BaseCRUD.logger.info
     def get_responsible(self, constr_id:int) -> Worker:
         '''
@@ -70,12 +71,11 @@ class ConstructionCRUD(BaseCRUD):
         
         with Database() as db:
             place = db.query(WorkOnConstr.worker_id).filter(WorkOnConstr.construction_id==constr_id, 
-                                                                    WorkOnConstr.DT_end==None,
+                                                                    WorkOnConstr.end_date==None,
                                                                     WorkOnConstr.is_brigadir==True).all()
             
             if place: 
-                constr_id = db.get(WorkerTable, place[0])
-                return self.coverter.conversion_to_data(constr_id)
+                return db.get(WorkerTable, place[0])
 
               
               
@@ -97,12 +97,11 @@ class ConstructionCRUD(BaseCRUD):
 
             work_on_constr = WorkOnConstr(worker_id=worker_id,
                         construction_id=constr_id,
-                        is_brigadir=brigadir,
-                        DT_start=datetime.now(),
-                        DT_end=None)
+                        is_brigadir=brigadir)
 
             db.add(work_on_constr)
             db.commit()
+
 
     
     @BaseCRUD.logger.info
@@ -112,11 +111,12 @@ class ConstructionCRUD(BaseCRUD):
         '''
 
         constr = db.query(WorkOnConstr).filter(WorkOnConstr.worker_id==worker_id,
-                                                WorkOnConstr.DT_end==None).all()
+                                                WorkOnConstr.end_date==None).all()
 
         if constr:
             return constr[0]
     
+
 
     @BaseCRUD.logger.info
     def __close_post(self, db:Session, location:WorkOnConstr) -> None:
@@ -126,4 +126,4 @@ class ConstructionCRUD(BaseCRUD):
         '''
 
         db.query(WorkOnConstr).filter(WorkOnConstr.id == location.id
-                                           ).update({WorkOnConstr.DT_end:datetime.now()}, synchronize_session = False)
+                                           ).update({WorkOnConstr.end_date:datetime.now()}, synchronize_session = False)

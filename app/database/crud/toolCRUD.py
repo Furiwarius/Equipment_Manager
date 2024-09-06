@@ -11,6 +11,7 @@ from app.database.tables.summary import ToolsOnStorage
 from app.database.tables.essence import ConstructionTable as ConstrTable
 from datetime import datetime
 from app.database.database import Database
+from app.utilities.converter import convertertation
 
 
 
@@ -28,8 +29,9 @@ class ToolCRUD(BaseCRUD):
     def __repr__(self) -> str:
         return f"{__class__.__name__}"
 
-      
-      
+
+     
+    @convertertation
     @BaseCRUD.logger.info
     def add(self, tool:Tool, where:Storage|Construction) -> Tool:
         '''
@@ -38,23 +40,20 @@ class ToolCRUD(BaseCRUD):
         Для добавления нового инструмента, нужно также
         указать объект или склад, где он будет хранится.
         '''
-        tool = self.coverter.conversion_to_table(tool)
         with Database() as db:
 
             db.add(tool)     # добавляем в бд
             db.commit()
 
-            where = self.coverter.conversion_to_table(where)
             self.__move(db, tool, where)
             
             db.commit()     # сохраняем изменения
   
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
-
-        return self.coverter.conversion_to_data(result)
+            return db.query(self.table).order_by(self.table.id.desc()).first()
     
 
 
+    @convertertation
     @BaseCRUD.logger.info
     def move_to(self, tool:Tool, where:Construction|Storage) -> None:
         '''
@@ -72,6 +71,7 @@ class ToolCRUD(BaseCRUD):
             db.commit() # сохраняем изменения
     
 
+
     @BaseCRUD.logger.info
     def __move(self, db:Session, tool:Tool, where:Storage|StorageTable|Construction|ConstrTable) -> None:
         '''
@@ -84,9 +84,7 @@ class ToolCRUD(BaseCRUD):
             place = ToolsOnConstr
 
         post = place(tool_id=tool.id,
-                     place_id=where.id,
-                     DT_start=datetime.now(),
-                     DT_end=None)
+                     place_id=where.id)
 
         db.add(post)
 
@@ -98,9 +96,9 @@ class ToolCRUD(BaseCRUD):
         '''
 
         constr = db.query(ToolsOnConstr).filter(ToolsOnConstr.tool_id==tool_id,
-                                                ToolsOnConstr.DT_end==None).all()
+                                                ToolsOnConstr.end_date==None).all()
         storage = db.query(ToolsOnStorage).filter(ToolsOnStorage.tool_id==tool_id,
-                                                ToolsOnStorage.DT_end==None).all()
+                                                ToolsOnStorage.end_date==None).all()
 
         if constr:
             return constr[0]
@@ -116,9 +114,11 @@ class ToolCRUD(BaseCRUD):
         '''
 
         db.query(type(location)).filter(type(location).id == location.id
-                                           ).update({type(location).DT_end:datetime.now()}, synchronize_session = False)
+                                           ).update({type(location).end_date:datetime.now()}, synchronize_session = False)
     
 
+
+    @convertertation
     @BaseCRUD.logger.info
     def get_construction(self, tool_id:int) -> Construction|None:
         '''
@@ -128,16 +128,15 @@ class ToolCRUD(BaseCRUD):
 
         with Database() as db:
             place = db.query(ToolsOnConstr.place_id).filter(ToolsOnConstr.tool_id==tool_id, 
-                                                                  ToolsOnConstr.DT_end==None).all()
-
+                                                                  ToolsOnConstr.end_date==None).all()
             if place:
                 constr = db.get(ConstrTable, place[0])
             else:
                 place = db.query(ToolsOnStorage.place_id).filter(ToolsOnStorage.tool_id==tool_id, 
-                                                                  ToolsOnStorage.DT_end==None).all()
+                                                                  ToolsOnStorage.end_date==None).all()
                 constr = db.get(StorageTable, place[0])
             
-            return self.coverter.conversion_to_data(constr)
+            return constr
     
 
 

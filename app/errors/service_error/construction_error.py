@@ -1,6 +1,8 @@
+from app.errors.base_exception import BaseApplicationException
 
 
-class ConstructionClosed(Exception):
+
+class ConstructionClosed(BaseApplicationException):
     '''
     Вызывается, если попытаться переместить
     инструмент на закрытый объект
@@ -12,7 +14,7 @@ class ConstructionClosed(Exception):
         super().__init__(message)
 
 
-class ImpossibleCloseConstruction(Exception):
+class ImpossibleCloseConstruction(BaseApplicationException):
     '''
     Вызывается, если попытаться закрыть объект,
     на котором хранится инструмент
@@ -24,7 +26,7 @@ class ImpossibleCloseConstruction(Exception):
         super().__init__(message)
 
 
-class ResponsibleAbsent(Exception):
+class ResponsibleAbsent(BaseApplicationException):
     '''
     Вызывается, если попытаться перевести инструмент
     на объект, на котором отсутствует ответственный

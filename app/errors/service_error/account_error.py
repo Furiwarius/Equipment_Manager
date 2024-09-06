@@ -1,6 +1,8 @@
+from app.errors.base_exception import BaseApplicationException
 
 
-class IncorrectLogin(Exception):
+
+class IncorrectLogin(BaseApplicationException):
     '''
     Вызывается при попытке использовать несуществующий аккаунт
     '''
@@ -11,7 +13,7 @@ class IncorrectLogin(Exception):
         super().__init__(message)
     
 
-class IncorrectPassword(Exception):
+class IncorrectPassword(BaseApplicationException):
     '''
     Вызывается, если при авторизации введенный 
     пароль не совпадает с сохраненным
@@ -23,7 +25,7 @@ class IncorrectPassword(Exception):
         super().__init__(message)
 
 
-class LoginExists(Exception):
+class LoginExists(BaseApplicationException):
     '''
     Вызывается, если при создании аккаунта
     указывается уже существующий логин
@@ -36,7 +38,7 @@ class LoginExists(Exception):
 
 
 
-class EmailExists(Exception):
+class EmailExists(BaseApplicationException):
     '''
     Вызывается, если при создании аккаунта
     указывается уже используемая на другом
@@ -50,7 +52,7 @@ class EmailExists(Exception):
 
 
 
-class CodeDoesntMatch(Exception):
+class CodeDoesntMatch(BaseApplicationException):
     '''
     Вызывается, если не совпадает проверочный код
     '''

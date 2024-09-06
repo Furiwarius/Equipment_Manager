@@ -10,6 +10,8 @@ class Construction():
     '''
 
     id: int = None
+    # id фирмы, к которой принадлежит стройка
+    firm_id:int = None
     # название объекта
     name: str = None
     # номер проекта или договора подряда
@@ -20,5 +22,7 @@ class Construction():
     status: bool = None
     # дата начала работы объекта
     start_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # дата окончания работы объекта
     end_date: datetime = None

@@ -4,10 +4,11 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.database.database import Database
-from sqlalchemy.orm import Session
-from app.database.converter import Converter
+from app.utilities.converter import convertertation
 from datetime import datetime, timezone
 from app.loggers.database_logger.db_logger import DatabaseLogger
+from app.entities.firm import Firm
+from app.entities.account import Account
 
 
 
@@ -24,53 +25,47 @@ class BaseCRUD():
     def __init__(self, table:Base) -> None:
         
         self.table:Base = table
-        self.coverter = Converter()
 
 
-
+    @convertertation
     @logger.info
     def add(self, obj:Worker|Constr|Storage) -> Worker|Constr|Storage:
         '''
         Добавить сущности
         '''
-        obj = self.coverter.conversion_to_table(obj)
         with Database() as db:
 
             db.add(obj)     # добавляем в бд
             db.commit()     # сохраняем изменения
             
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
-
-        return self.coverter.conversion_to_data(result)
+        return db.query(self.table).order_by(self.table.id.desc()).first()
 
 
-
+    @convertertation
     @logger.info
-    def get_all(self) -> list:
+    def get_all(self, firm_id:int) -> dict:
         '''
-        Получить id сущност
+        Получить словарь с id:сущность привязанных
+        к определенной фирме
 
         Метод смотрит поле table,
         и по нему ищет данные в БД
         '''
 
         with Database() as db:
-            result = db.query(self.table.id).all()
-            result = [item[0] for item in result]
-
-        return list(result)
+            return db.query(self.table).filter(self.table.firm_id == firm_id).all()
+            
             
 
+    @convertertation
     @logger.info
-    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker:
+    def get_by_id(self, id:int) -> Tool|Constr|Storage|Worker|Firm|Account|None:
         '''
         Получить сущность по id
         '''
         
         with Database() as db:
-            result = db.get(self.table, id)
-        
-        return self.coverter.conversion_to_data(result)
+            return db.get(self.table, id)
     
 
 
@@ -82,6 +77,7 @@ class BaseCRUD():
         with Database() as db:
             db.query(self.table).filter(self.table.id == obj_id).update({self.table.status:status}, synchronize_session = False)
             db.commit()
+
 
 
     @logger.info
@@ -98,12 +94,12 @@ class BaseCRUD():
     
 
 
-    def get_last_one(self) -> Constr|Storage|Tool|Worker:
+    @convertertation
+    def get_last_one(self) -> Constr|Storage|Tool|Worker|Firm|Account:
         '''
         Получить последнего добавленного в таблицу
         '''
         with Database() as db:
-            result = db.query(self.table).order_by(self.table.id.desc()).first()
+            return db.query(self.table).order_by(self.table.id.desc()).first()
 
-        return self.coverter.conversion_to_data(result)
 

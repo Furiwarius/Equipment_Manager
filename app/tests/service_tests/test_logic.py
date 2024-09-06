@@ -1,11 +1,8 @@
 import pytest
-from datetime import datetime
 from app.service.construction.construction import ConstructionManager as ConstrM
 from app.service.storage.storage import StorageManager as StorM
 from app.service.worker.worker import WorkerManager as WorkM
 from app.service.tool.tool import ToolManager as ToolM
-from app.tests.fake_data import DataGenerator
-from app.database.database import Database
 from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.storageCRUD import StorageCRUD
 from app.database.crud.constructionCRUD import ConstructionCRUD
@@ -14,6 +11,7 @@ from app.errors.service_error.validator_error import BaseValidatorException
 from app.errors.service_error.construction_error import ResponsibleAbsent
 from app.errors.service_error.worker_error import WorkerDoesntWork
 from app.errors.service_error.tool_error import ToolBroken
+from app.entities import Construction, Storage, Tool, Worker
 
 
 class TestBusinessLogic():
@@ -21,72 +19,59 @@ class TestBusinessLogic():
     Тестовый класс для Storekeeper и управляемых объектов
     '''
 
-    generator = DataGenerator()
-    # круды
-    constr_crud = ConstructionCRUD()
-    stor_crud = StorageCRUD()
-    work_crud = WorkerCRUD()
-    tool_crud = ToolCRUD()
 
-
-    def test_add_storage(self):
+    def test_add_storage(self, storage:Storage, stor_crud:StorageCRUD):
         '''
         Тестрирование метода по добавлению склада
         '''
-        new_storage = self.generator.storage_generator()
 
-        storage_manager = StorM(new_storage)
+        storage_manager = StorM(storage)
 
-        assert self.stor_crud.get_last_one().id is storage_manager.storage.id
+        assert stor_crud.get_last_one().id is storage_manager.storage.id
 
 
     
-    def test_add_broken_storage(self):
+    def test_add_broken_storage(self, storage:Storage, stor_crud:StorageCRUD):
         '''
         Тестирование исключений выпадающих 
         при добавлении склада с неправильными атрибутами
         '''
 
         with pytest.raises(BaseValidatorException):
-            broken_storage = self.generator.storage_generator()
-            broken_storage.name = "   "
+            storage.name = "   "
 
-            StorM(broken_storage)
+            StorM(storage)
         
-        assert self.stor_crud.get_last_one().name != broken_storage.name     
+        assert stor_crud.get_last_one().name != storage.name     
 
 
 
-    def test_add_tool_in_storage(self):
+    def test_add_tool_in_storage(self, tool:Tool, exist_storage:Storage, stor_crud:StorageCRUD):
         '''
         Тестирование метода по добавлению 
         инструмента на склад
         '''
-
-        new_tool = self.generator.tool_generator()  
         
-        storage = self.stor_crud.get_last_one()
-        stor_manager = StorM(storage)
+        stor_manager:StorM = StorM(exist_storage)
         
-        tool = stor_manager.add_tool(new_tool)      
+        tool:Tool = stor_manager.add_tool(tool)      
 
-        assert tool.id in self.stor_crud.get_tools(storage.id) 
+        assert tool.id in stor_crud.get_tools(exist_storage.id) 
 
 
 
-    def test_add_construction(self):
+    def test_add_construction(self, constr:Construction, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по добавлению объекта строительства
-        '''
+        ''' 
 
-        new_constr = self.generator.constr_generator()
-        constr_manager = ConstrM(new_constr)
+        constr_manager:ConstrM = ConstrM(constr)
 
-        assert self.constr_crud.get_last_one().id is constr_manager.constr.id
-
+        assert constr_crud.get_last_one().id is constr_manager.constr.id
 
 
-    def test_add_tool_in_construction_without_responsible(self):
+
+    def test_add_tool_in_construction_without_responsible(self, tool:Tool, exist_constr:Construction, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по добавлению 
         инструмента на объект строительства
@@ -95,200 +80,153 @@ class TestBusinessLogic():
 
         with pytest.raises(ResponsibleAbsent):
             
-            new_tool = self.generator.tool_generator()
-            constr = self.constr_crud.get_last_one()
-            
-            constr_m = ConstrM(constr)
-            constr_m.add_tool(new_tool)
+            constr_m:ConstrM = ConstrM(exist_constr)
+            constr_m.add_tool(tool)
 
 
     
-    def test_add_worker(self):
+    def test_add_worker(self, worker:Worker, work_crud:WorkerCRUD):
         '''
         Тестирование метода по добавлению работника
         '''
 
-        new_worker = self.generator.worker_generator()
-        worker_manager = WorkM(new_worker)
+        worker_manager:WorkM = WorkM(worker)
 
-        assert self.work_crud.get_last_one().id is worker_manager.worker.id
-
+        assert work_crud.get_last_one().id is worker_manager.worker.id
 
 
-    def test_appointment_healthy_responsible(self):
+
+    def test_appointment_healthy_responsible(self, exist_worker:Worker, exist_constr:Construction, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению ответственного лица на объект (Работник здоров)
         '''
 
-        worker = self.work_crud.get_last_one()
-        assert worker.status
+        assert exist_worker.status
 
-        constr = self.constr_crud.get_last_one()
-        assert not self.constr_crud.get_responsible(constr.id)
+        assert not constr_crud.get_responsible(exist_constr.id)
 
-        constr_m = ConstrM(constr)
-        constr_m.appointment_responsible(worker)
+        constr_m:ConstrM = ConstrM(exist_constr)
+        constr_m.appointment_responsible(exist_worker)
         
-        assert self.work_crud.is_brigadir(worker.id).id is constr.id
-        assert self.constr_crud.get_responsible(constr.id).id is worker.id
+        assert work_crud.is_brigadir(exist_worker.id).id is exist_constr.id
+        assert constr_crud.get_responsible(exist_constr.id).id is exist_worker.id
     
 
 
-    def test_add_tool_in_construction_with_responsible(self):
+    def test_add_tool_in_construction_with_responsible(self, tool:Tool, constr_with_responsible:Construction, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по добавлению 
         инструмента на объект строительства
         с имеющимся ответственным лицом
         '''
+     
+        assert constr_crud.get_responsible(constr_with_responsible.id)
 
-        new_tool = self.generator.tool_generator()
-        constr = self.constr_crud.get_last_one()
+        constr_m = ConstrM(constr_with_responsible)
+        assert constr_m.constr.id is constr_with_responsible.id
+
+        tool:Tool = constr_m.add_tool(tool)
         
-        assert self.constr_crud.get_responsible(constr.id)
-
-        constr_m = ConstrM(constr)
-        assert constr_m.constr.id is constr.id
-
-        tool = constr_m.add_tool(new_tool)
-        
-        assert tool.id in self.constr_crud.get_tools(constr_m.constr.id)
+        assert tool.id in constr_crud.get_tools(constr_m.constr.id)
 
 
 
-    def test_appointment_sick_responsible(self):
+    def test_appointment_sick_responsible(self, exist_worker:Worker, exist_constr:Construction, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению ответственного лица на объект (Работник болен)
         '''
 
-        constr = self.constr_crud.get_last_one()
-        assert self.constr_crud.get_responsible(constr.id)
+        assert not constr_crud.get_responsible(exist_constr.id)
 
-        worker = self.generator.worker_generator()
-        worker_m = WorkM(worker)
+        worker_m:WorkM = WorkM(exist_worker)
         worker_m.get_sick() 
         
         assert not worker_m.worker.status
 
-        constr_m = ConstrM(constr)
+        constr_m:ConstrM = ConstrM(exist_constr)
 
         with pytest.raises(WorkerDoesntWork):
             constr_m.appointment_responsible(worker_m.worker)
         
-        assert self.constr_crud.get_responsible(constr_m.constr.id).id!=worker_m.worker.id
+        assert not constr_crud.get_responsible(constr_m.constr.id)
 
 
     
-    def test_appointment_engaged_responsible(self):
+    def test_appointment_engaged_responsible(self, constr:Construction, constr_with_responsible:Construction, work_crud:WorkerCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по назначению на объект ответственного 
         лица с уже имеющимся объектом и инструментами на нем
         '''
         
-        old_constr = self.constr_crud.get_last_one()
-        responsible = self.constr_crud.get_responsible(old_constr.id)
+        responsible:Worker = constr_crud.get_responsible(constr_with_responsible.id)
         assert responsible
 
-        new_constr = self.generator.constr_generator()
-        constr_m = ConstrM(new_constr)
+        constr_m = ConstrM(constr)
         constr_m.appointment_responsible(responsible)
 
-        assert self.constr_crud.get_responsible(constr_m.constr.id).id is responsible.id
-        assert not self.constr_crud.get_responsible(old_constr.id)
-        assert self.work_crud.is_brigadir(responsible.id).id is constr_m.constr.id
+        assert constr_crud.get_responsible(constr_m.constr.id).id is responsible.id
+        assert not constr_crud.get_responsible(constr_with_responsible.id)
+        assert work_crud.is_brigadir(responsible.id).id is constr_m.constr.id
 
 
 
-    def test_move_tool(self):
+    def test_move_tool(self, storage_with_tool:Storage, exist_tool:Tool, constr_with_responsible:Construction, stor_crud:StorageCRUD, constr_crud:ConstructionCRUD):
         '''
         Тестирование метода по перемещению работающего 
         инструмента со склада на объект
         '''
 
-        new_storage = self.generator.storage_generator()
-        stor_m = StorM(new_storage)
+        assert stor_crud.get_tools(storage_with_tool.id)
 
-        # Создаем объект строительства
-        new_constr = self.generator.constr_generator()
-        constr_m = ConstrM(new_constr)
-
-        # Создаем работника и назначаем его ответственным на объекте
-        new_worker = self.generator.worker_generator()
-        constr_m.appointment_responsible(WorkM(new_worker).worker)
-
-        new_tool = self.generator.tool_generator()
-        # Помещаем инструмент на склад
-        tool = stor_m.add_tool(new_tool)
-
-        assert tool.id in self.stor_crud.get_tools(stor_m.storage.id)
-
-        tool_m = ToolM(tool)
-        tool_m.move_tool_to_construction(constr_m.constr)
+        tool_m:ToolM = ToolM(exist_tool)
+        tool_m.move_tool_to_construction(constr_with_responsible)
         
-        assert tool.id in self.constr_crud.get_tools(constr_m.constr.id)    
-        assert tool.id not in self.stor_crud.get_tools(stor_m.storage.id)
+        assert tool_m.tool.id in constr_crud.get_tools(constr_with_responsible.id)    
+        assert tool_m.tool.id not in stor_crud.get_tools(storage_with_tool.id)
 
         
 
-    def test_move_broken_tool(self):
+    def test_move_broken_tool(self, exist_tool:Tool, storage_with_tool:Storage, constr_with_responsible:Construction, constr_crud:ConstructionCRUD, tool_crud:ToolCRUD):
         '''
         Тестирование метода по перемещению сломанного
         инструмента со склада на объект
         '''
-        storage = self.stor_crud.get_last_one()
-        stor_m = StorM(storage)
 
-        new_tool = self.generator.tool_generator()
-        tool = stor_m.add_tool(new_tool)
-
-        tool_m = ToolM(tool)
+        tool_m:ToolM = ToolM(exist_tool)
         tool_m.break_tool()
 
         assert not tool_m.tool.status
 
-        constr = self.constr_crud.get_last_one()
-        assert self.constr_crud.get_responsible(constr.id)
-
         with pytest.raises(ToolBroken):
-            stor_m.move_tool_to_construction(self.tool_crud.get_by_id(tool.id), constr)
+            StorM(storage_with_tool).move_tool_to_construction(tool_crud.get_by_id(exist_tool.id), constr_with_responsible)
 
-        assert tool.id not in self.constr_crud.get_tools(constr.id)
+        assert exist_tool.id not in constr_crud.get_tools(constr_with_responsible.id)
 
 
 
-    def test_move_broken_tool_to_storage(self):
+    def test_move_broken_tool_to_storage(self, exist_tool:Tool, constr_with_tool:Construction, exist_storage:Storage, constr_crud:ConstructionCRUD, stor_crud:StorageCRUD):
         '''
         Тестирование метода по перемещению сломанного
         инструмента со объекта на склад
         '''
-
-        constr = self.constr_crud.get_last_one()
-        constr_m = ConstrM(constr)
-
-        new_tool = self.generator.tool_generator()
-        tool = constr_m.add_tool(new_tool)
-
-        tool_m = ToolM(tool)
+        tool_m:ToolM = ToolM(exist_tool)
         tool_m.break_tool()
 
-        storage = self.stor_crud.get_last_one()
+        ConstrM(constr_with_tool).move_tool_to_storage(exist_tool, exist_storage)
 
-        constr_m.move_tool_to_storage(tool, storage)
-
-        assert tool.id not in self.constr_crud.get_tools(constr.id)
-        assert tool.id in self.stor_crud.get_tools(storage.id)
+        assert exist_tool.id not in constr_crud.get_tools(constr_with_tool.id)
+        assert exist_tool.id in stor_crud.get_tools(exist_storage.id)
 
 
 
-    def test_remove_tool_from_stock(self):
+    def test_remove_tool_from_stock(self, tool:Tool, exist_storage:Storage, stor_crud:StorageCRUD):
         '''
         Удаление инструмента со склада
         '''
-        stor = self.stor_crud.get_last_one()
-        stor_m = StorM(stor)
+        stor_m = StorM(exist_storage)
 
-        new_tool = self.generator.tool_generator()
-        tool = stor_m.add_tool(new_tool)
+        tool:Tool = stor_m.add_tool(tool)
 
         stor_m.delete_tool(tool)
 
-        assert tool.id not in self.stor_crud.get_tools(stor)
+        assert tool.id not in stor_crud.get_tools(exist_storage.id)

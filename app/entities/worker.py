@@ -10,6 +10,8 @@ class Worker():
     id: int = None
     # id аккаунта, к которому привязан этот работник
     account_id: int = None
+    # id фирмы, к которой принадлежит работник
+    firm_id:int = None
     # Имя 
     name: str = None
     # Фамилия
@@ -22,5 +24,7 @@ class Worker():
     start_date: datetime = None
     # дата окончания работы работника
     end_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
     # Статус работника
     status: bool = None

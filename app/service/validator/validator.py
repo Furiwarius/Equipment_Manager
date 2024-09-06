@@ -3,6 +3,7 @@ from app.entities.storage import Storage
 from app.entities.tool import Tool
 from app.entities.worker import Worker
 from app.entities.account import Account
+from app.entities.firm import Firm
 from datetime import datetime
 from app.errors.service_error.validator_error import PresenceNumbers, ForbiddenSymbols
 from app.errors.service_error.validator_error import NonDisplayableSymbols, NotDatetime
@@ -16,7 +17,7 @@ class DataValidator():
     '''
 
     # Запрещенные символы
-    prohibited = '''/|!?}{[]"'`~+=()*^%$#<>'''
+    prohibited = '''|!?}{[]'`~+=*^%$#<>'''
 
 
     def strings_with_number(self, string:str, length=0) -> None:
@@ -66,29 +67,6 @@ class DataValidator():
         # Если задана необходимая длина строки
         elif length and len(string)>length:
             raise InvalidLength
-
-
-
-    def start_date(self, date:datetime) -> None:
-        '''
-        Проверка даты начала работ
-        '''
-
-        if not isinstance(date, datetime):
-            raise NotDatetime
-
-
-
-    def end_date(self, start_date:datetime, end_date:datetime|None) -> None:
-        '''
-        Проверка даты окончания
-        '''
-        if end_date:
-            if not isinstance(start_date, datetime) or not isinstance(end_date, datetime):
-                raise NotDatetime
-            
-            elif end_date<start_date:
-                raise DateMismatch
     
 
 
@@ -125,8 +103,6 @@ class ValidatorEssence():
         self.valid.only_strings(constr.name, length=60)
         self.valid.strings_with_number(constr.address, length=100)
         self.valid.strings_with_number(constr.project, length=60)
-        self.valid.start_date(constr.start_date)
-        self.valid.end_date(constr.start_date, constr.end_date)
         
 
 
@@ -141,8 +117,6 @@ class ValidatorEssence():
 
         self.valid.only_strings(storage.name, length=60)
         self.valid.strings_with_number(storage.address, length=100)
-        self.valid.start_date(storage.start_date)
-        self.valid.end_date(storage.start_date, storage.end_date)
 
 
 
@@ -157,9 +131,6 @@ class ValidatorEssence():
         
         self.valid.only_strings(tool.name, length=60)
         self.valid.strings_with_number(tool.factory_number, length=60)
-        self.valid.start_date(tool.start_date)
-        self.valid.end_date(tool.start_date, tool.end_date)
-
 
 
     def validate_worker(self, worker:Worker) -> None:
@@ -174,9 +145,7 @@ class ValidatorEssence():
         self.valid.only_strings(worker.name, length=20)
         self.valid.only_strings(worker.surname, length=20)
         self.valid.phone_number(worker.phone_number)
-        self.valid.only_strings(worker.job_title, length=20)
-        self.valid.start_date(worker.start_date)
-        self.valid.end_date(worker.start_date, worker.end_date)
+        self.valid.only_strings(worker.job_title, length=40)
 
 
     
@@ -185,3 +154,21 @@ class ValidatorEssence():
         Валидатор для новой записи
         в таблицу account
         '''
+        if not isinstance(account, Account):
+            raise WrongType
+        
+        self.valid.strings_with_number(account.login, length=65)
+        self.valid.strings_with_number(account.email, length=60)
+        self.valid.only_strings(account.timezone, length=40)
+
+    
+    
+    def validate_firm(self, firm:Firm) -> None:
+        '''
+        Валидатор для новой записи
+        в таблицу firm
+        '''
+        if not isinstance(firm, Firm):
+            raise WrongType
+        
+        self.valid.strings_with_number(firm.name, length=65)

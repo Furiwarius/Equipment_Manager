@@ -1,0 +1,22 @@
+from dataclasses import dataclass, field
+from datetime import datetime
+
+@dataclass
+class Firm():
+    '''
+    Фирма
+    '''
+
+    id: int = None
+    # название название фирмы
+    name: str = None
+    # статус фирмы
+    status: bool = None
+    # дата создания
+    start_date: datetime = None
+    # Время обновления данных
+    update_date: datetime = None
+    # дата закрытия
+    end_date: datetime = None
+    # роли аккаунтов
+    accounts: list[int] = field(default_factory=list)
