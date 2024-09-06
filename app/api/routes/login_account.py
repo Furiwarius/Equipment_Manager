@@ -5,8 +5,7 @@ from app.service.user_account.account import AccountManager, Account, AccountCRU
 from app.api.dependencies import create_jwt_token, verify_jwt_token
 from app.settings.settings import app_settings
 from app.api.models.models import NewUser, User, UserEmail, Code, AuthToken
-from app.errors.service_error.account_error import (IncorrectLogin, IncorrectPassword, 
-                                                    LoginExists, CodeDoesntMatch, EmailExists)
+from app.errors.service_error.account_error import (IncorrectInputData, LoginExists, CodeDoesntMatch, EmailExists)
 from app.service.verification_code.code import SenderCode
 from time import time
 
@@ -52,10 +51,8 @@ async def login(user: User):
     try:
         account_manager = AccountManager(Account(login=user.login,
                                                 password=user.password))
-    except IncorrectPassword as err:
-        raise HTTPException(status_code=401, detail="Wrong password") from err
-    except IncorrectLogin as err:
-        raise HTTPException(status_code=401, detail="Wrong login") from err
+    except IncorrectInputData as err:
+        raise HTTPException(status_code=401, detail="Wrong login/password") from err
     
     token = create_jwt_token({"user_id": account_manager.account.id})
     return {"token": token}
