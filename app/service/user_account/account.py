@@ -64,10 +64,9 @@ class AccountManager():
         '''
         Проверка уникальности передаваемых значений
         '''
-        try:
-            self.account_crud.check_data(login=account.login,
+        err = self.account_crud.check_data(login=account.login,
                                      email=account.email)
-        except BaseApplicationException as err:
+        if err:
             raise err
 
     

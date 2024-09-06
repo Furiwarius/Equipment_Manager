@@ -74,17 +74,17 @@ class AccountCRUD(BaseCRUD):
 
     
     @BaseCRUD.logger.info
-    def check_data(self, email:str, login:str) -> None:
+    def check_data(self, email:str, login:str) -> None|EmailExists|LoginExists:
         '''
         Проверка логина и адреса почты на уникальность
 
         Делается это в одном методе
         '''
         with Database() as db:
-            account = db.query(AccountTable).filter(AccountTable.email==email).all()
-            if account: 
-                raise EmailExists
-            
-            account = db.query(AccountTable).filter(AccountTable.login==login).all()       
-            if account:
-                raise LoginExists
+            for field, value, err in zip((AccountTable.email, AccountTable.login),
+                                         (email, login),
+                                         (EmailExists, LoginExists)):
+                account = db.query(AccountTable).filter(field==value).all()
+                
+                if account: 
+                    return err

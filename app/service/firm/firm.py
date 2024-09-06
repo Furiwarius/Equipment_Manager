@@ -48,10 +48,11 @@ class FirmManager():
             raise WrongRolePassed
         
 
-        self.firm_crud.give_role(account_id=account_id,
-                                 firm_id=self.firm.id,
-                                 role=role)
-
+        err = self.firm_crud.give_role(account_id=account_id,
+                                          firm_id=self.firm.id,
+                                          role=role)
+        if err:
+            raise err
 
 
     
