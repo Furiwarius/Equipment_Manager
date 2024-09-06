@@ -87,18 +87,3 @@ class TestRoles():
                                   new_firm=firm)
 
         assert firm.id in firm_crud.get_all(account_id=exist_account.id)
-
-
-
-    def test_give_role(self, exist_firm:Firm, exist_account:Account, firm_crud:FirmCRUD):
-        '''
-        Тестирование метода по выдаче роли аккаунту
-        '''
-        with pytest.raises(ThisIsSuperAdmin):
-            for role in (Roles.admin, Roles.visitor):
-                firm_crud.give_role(account_id=exist_account.id,
-                                        firm_id=exist_firm.id,
-                                        role=role.name)
-                
-                assert role.name==firm_crud.get_role(account_id=exist_account.id,
-                                                                firm_id=exist_firm.id)

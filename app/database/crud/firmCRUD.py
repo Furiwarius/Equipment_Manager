@@ -85,7 +85,7 @@ class FirmCRUD(BaseCRUD):
     
 
     @BaseCRUD.logger.info
-    def give_role(self, account_id:int, firm_id:int, role:str) -> None:
+    def give_role(self, account_id:int, firm_id:int, role:str) -> None|CannotGiveSuperadmin|ThisIsSuperAdmin:
         '''
         Выдать роль аккаунту
         
@@ -94,7 +94,7 @@ class FirmCRUD(BaseCRUD):
         не является ролью super_admin, то обновляется на новую.
         '''
         if role is Roles.super_admin.name:
-            raise CannotGiveSuperadmin
+            return CannotGiveSuperadmin
 
         with Database() as db:
             
@@ -109,7 +109,7 @@ class FirmCRUD(BaseCRUD):
                 db.add(new_role)
             
             elif check and check[0].role==Roles.super_admin.name:
-                raise ThisIsSuperAdmin
+                return ThisIsSuperAdmin
 
             else:
                 db.query(AccountRoles).filter(AccountRoles.account_id==account_id,
