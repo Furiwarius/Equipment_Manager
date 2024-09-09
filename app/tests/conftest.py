@@ -29,7 +29,7 @@ from app.service.storage.storage import StorageManager
 
 
 # набор уникальных цифр
-numbers = set([number for number in range(1000)])
+numbers = set([number for number in range(100, 10000)])
 
 
 
