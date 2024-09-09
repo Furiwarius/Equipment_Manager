@@ -22,11 +22,10 @@ class TestLoginAccountRoutes():
         '''
 
         response = await async_client.post("/registr",
-                                    json={"login": account.login,
-                                          "email": account.email,
-                                          "password": account.password,
+                                    data={"username": account.login,
+                                          "password": account.password},
+                                    json={"email": account.email,
                                           "timezone": str(account.timezone)})
-        
         assert response.status_code == status.HTTP_200_OK    
 
 
@@ -38,20 +37,20 @@ class TestLoginAccountRoutes():
         метода по созданию нового пользователя
         '''
 
-        json={"login": account.login,
+        data={"username": account.login,
               "email": account.email,
               "password": account.password,
               "timezone": str(account.timezone)}
         
-        response = await async_client.post("/registr", json=json)
+        response = await async_client.post("/registr", data=data)
         assert response.status_code == status.HTTP_200_OK
         
-        for count, item in zip(range(2), json):
+        for count, item in zip(range(2), data):
 
-            copy_json = copy(json)
-            copy_json[item]+=str(count)
+            copy_data = copy(data)
+            copy_data[item]+=str(count)
 
-            response = await async_client.post("/registr", json=json)
+            response = await async_client.post("/registr", data=copy_data)
             
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -63,9 +62,10 @@ class TestLoginAccountRoutes():
         Тестирование метода по авторизации пользователя
         '''
 
-        response = await async_client.post("/login",
-                                    json={"login": exist_account.login,
-                                          "password": exist_account.password})
+        response = await async_client.post("/token",
+                                    data={"username": exist_account.login,
+                                          "password": exist_account.password},
+                                    headers={"Content-Type": "application/x-www-form-urlencoded"})
         
         assert response.status_code == status.HTTP_200_OK
     
@@ -77,12 +77,12 @@ class TestLoginAccountRoutes():
         Тестирование метода по авторизации с получением исключений
         '''
 
-        json = {"login": exist_account.login, "password": exist_account.password}
-        for item in json:
-            copy_json = copy(json)
-            copy_json[item]+=str(randrange(10))
+        data = {"username": exist_account.login, "password": exist_account.password}
+        for item in data:
+            copy_data = copy(data)
+            copy_data[item]+=str(randrange(10))
 
-            response = await async_client.post("/login", json=copy_json)
+            response = await async_client.post("/token", data=copy_data)
             
             assert response.status_code == status.HTTP_401_UNAUTHORIZED
     

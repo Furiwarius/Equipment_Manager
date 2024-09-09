@@ -3,13 +3,6 @@ from pydantic import BaseModel, field_validator, EmailStr, Field
 from fastapi import HTTPException
 
 
-class NewUser(BaseModel):
-    login: str = Field(..., min_length=8)
-    email: EmailStr
-    password: str = Field(..., min_length=8, max_length=64)
-    timezone: str
-
-
 
 class User(BaseModel):
     login: str = Field(..., min_length=8)
@@ -50,3 +43,13 @@ class UserEmail(BaseModel):
 
 class AuthToken(BaseModel):
     jwt:str
+
+
+class TokenData(BaseModel):
+    user_id: int
+
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

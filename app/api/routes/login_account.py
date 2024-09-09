@@ -2,12 +2,15 @@ from fastapi import APIRouter, Form, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import FileResponse
 from app.service.user_account.account import AccountManager, Account, AccountCRUD
-from app.api.dependencies import create_jwt_token, verify_jwt_token
+from app.api.dependencies import create_jwt_token, verify_jwt_token, to_exist_account, to_new_account
 from app.settings.settings import app_settings
-from app.api.models.models import NewUser, User, UserEmail, Code, AuthToken
+from app.api.models.models import User, UserEmail, Code, AuthToken, TokenData, Token
 from app.errors.service_error.account_error import (IncorrectInputData, LoginExists, CodeDoesntMatch, EmailExists)
+from app.errors.base_exception import BaseApplicationException
 from app.service.verification_code.code import SenderCode
 from time import time
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Annotated
 
 
 
@@ -24,38 +27,34 @@ async def index():
 
 
 @login_account.post("/registr")
-async def new_user(new_user: NewUser):
+async def new_user(new_user: Annotated[Account, Depends(to_new_account)]):
     '''
     Регистрация пользователя
     '''
     try:
-        account_manager = AccountManager(Account(login=new_user.login,
-                                                password=new_user.password,
-                                                email=new_user.email,
-                                                timezone=new_user.timezone), new=True)
+        AccountManager(account=new_user, new=True)
     
-    except EmailExists as err:
-        raise HTTPException(status_code=422, detail="This email is already in use") from err
-    except LoginExists as err:
-        raise HTTPException(status_code=422, detail="This login is already taken") from err
+    except BaseApplicationException as err:
+        raise HTTPException(status_code=422) from err
     
     return {"message": "Accaunt created"}
 
 
 
-@login_account.post("/login")
-async def login(user: User):
+@login_account.post("/token")
+async def login(user: Annotated[Account, Depends(to_exist_account)]) -> Token:
     '''
-    Вход
+    Получение токена для пользователя
     '''
     try:
-        account_manager = AccountManager(Account(login=user.login,
-                                                password=user.password))
+        acc: Account = AccountManager(account=user).account
+
     except IncorrectInputData as err:
         raise HTTPException(status_code=401, detail="Wrong login/password") from err
     
-    token = create_jwt_token({"user_id": account_manager.account.id})
-    return {"token": token}
+    token: str = create_jwt_token({"user_id": acc.id})
+
+    return Token(access_token=token, token_type="bearer")
 
 
 
@@ -103,10 +102,10 @@ async def private_office(token:AuthToken,
     Личный кабинет
     '''
     try:
-        acc_data = verify_jwt_token(token.jwt)
+        acc_data:TokenData = verify_jwt_token(token.jwt)
     except HTTPException:
         raise HTTPException(status_code=419, detail="Invalid token")
     
-    personal_data = acc_crud.get_by_id(acc_data["user_id"])
+    personal_data: Account = acc_crud.get_by_id(acc_data.user_id)
     
     return {"name":personal_data.login}
