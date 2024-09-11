@@ -2,27 +2,16 @@ from app.errors.base_exception import BaseApplicationException
 
 
 
-class IncorrectLogin(BaseApplicationException):
+class IncorrectInputData(BaseApplicationException):
     '''
-    Вызывается при попытке использовать несуществующий аккаунт
-    '''
-
-    def __init__(self):
-        
-        message = "Некорректный логин"
-        super().__init__(message)
-    
-
-class IncorrectPassword(BaseApplicationException):
-    '''
-    Вызывается, если при авторизации введенный 
-    пароль не совпадает с сохраненным
+    Вызывается при неправильном введенном логине или пароле
     '''
 
     def __init__(self):
         
-        message = "Неправильный пароль"
+        message = "Некорректный логин или пароль"
         super().__init__(message)
+
 
 
 class LoginExists(BaseApplicationException):

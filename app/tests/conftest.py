@@ -17,6 +17,10 @@ from app.database.crud.toolCRUD import ToolCRUD
 from app.database.crud.workerCRUD import WorkerCRUD
 from app.database.crud.firmCRUD import FirmCRUD
 from app.database.crud.accountCRUD import AccountCRUD
+from typing import AsyncGenerator, Generator
+from app import app
+from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from app.utilities.hashing import to_hash
 from copy import copy
 from app.service.construction.construction import ConstructionManager
@@ -24,10 +28,28 @@ from app.service.storage.storage import StorageManager
 
 
 
-
 # набор уникальных цифр
-numbers = set([number for number in range(1000)])
+numbers = set([number for number in range(100, 10000)])
 
+
+
+@pytest_asyncio.fixture(scope="session")
+def anyio_backend():
+    return "asyncio"
+
+
+
+@pytest_asyncio.fixture(scope="session")
+def client() -> Generator:
+    yield TestClient(app)
+
+
+
+@pytest_asyncio.fixture(scope="session", autouse=True)
+async def async_client(client) -> AsyncGenerator:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url=client.base_url) as ac:
+        yield ac
+        
 
 
 @pytest_asyncio.fixture(scope="session")

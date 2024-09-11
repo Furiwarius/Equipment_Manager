@@ -5,6 +5,7 @@ import functools
 from app.settings.settings import db_log_setting
 from datetime import datetime
 from app.clients.telegram_client.tg_client import TelegramClient
+import threading
 
 
 
@@ -17,11 +18,14 @@ class DatabaseLogger():
     отключен.
     '''
     
+
     if db_log_setting.SEND_BY_MAIL:
         email_sender = EmailClient() 
 
+
     if db_log_setting.SEND_BY_TELEGRAM:
         tg_sender = TelegramClient()
+
 
 
     def get_logger(self) -> log.StreamHandler|log.FileHandler|log.NullHandler:
@@ -73,9 +77,11 @@ class DatabaseLogger():
             except Exception as err:
                 self.logger.error(f"method: {func.__name__} : {err}")
                 
+
                 message = f"{datetime.now()} method: {func.__name__} : {err}"
-                self._send_message_for_email(message)
-                self._send_message_for_telergam(message)
+
+                threading.Thread(target=self._send_message_for_email, args=(message,)).start()
+                threading.Thread(target=self._send_message_for_telergam, args=(message,)).start()
                 
                 raise err
 
@@ -90,7 +96,7 @@ class DatabaseLogger():
         if db_log_setting.SEND_BY_TELEGRAM:
                     # Отправка сообщения в телеграм
                     self.tg_sender.send(message)
-    
+
 
 
     def _send_message_for_email(self, message:str) -> None:
@@ -101,4 +107,5 @@ class DatabaseLogger():
                     # Отправка на почту отчета об ошибке
                     self.email_sender.send(user_to=db_log_setting.DEVELOPER_EMAIL, 
                                     message=message,
-                                    template=db_log_setting.REPORT_TEMPLATE)
+                                    template=db_log_setting.REPORT_TEMPLATE,
+                                    subject=db_log_setting.SUBJECT_LETTER)

@@ -2,8 +2,7 @@ from app.database.crud.accountCRUD import AccountCRUD, Account
 from app.database.crud.firmCRUD import FirmCRUD, Roles
 from app.service.user_account.account import AccountManager
 from app.service.firm.firm import FirmManager, Firm
-from app.errors.service_error.account_error import (IncorrectLogin, 
-                                                    IncorrectPassword, 
+from app.errors.service_error.account_error import (IncorrectInputData, 
                                                     LoginExists, 
                                                     CodeDoesntMatch, 
                                                     EmailExists)
@@ -22,8 +21,8 @@ class TestUserRoles():
         '''
         Тестирование метода по добавлению нового аккаунта
         '''
+        account_m = AccountManager(account, new=True)
 
-        account_m:AccountManager = AccountManager(account, send_code=False, new=True)
 
         assert account_m.account.id
 
@@ -35,18 +34,16 @@ class TestUserRoles():
         '''
 
         account_m:AccountManager = AccountManager(copy(exist_account))
-
         assert exist_account.id == account_m.account.id
 
 
 
     def test_exception_IncorrectPassword(self, exist_account:Account):
         '''
-        Тестирование вызова исключения IncorrectPassword 
-        при работе с AccuntManager
+        Тестирование вызова исключения IncorrectInputData
+        неправильным паролем при работе с AccuntManager
         '''
-        
-        with pytest.raises(IncorrectPassword):
+        with pytest.raises(IncorrectInputData):
             exist_account.password+="string"
             AccountManager(exist_account)
 
@@ -54,11 +51,10 @@ class TestUserRoles():
 
     def test_exception_IncorrectLogin(self, exist_account:Account):
         '''
-        Тестирование вызова исключения IncorrectLogin 
-        при работе с AccuntManager
+        Тестирование вызова исключения IncorrectInputData
+        неправильным логином при работе с AccuntManager
         '''
-      
-        with pytest.raises(IncorrectLogin):
+        with pytest.raises(IncorrectInputData):
             exist_account.login+="string"
             AccountManager(exist_account)
 
@@ -69,10 +65,9 @@ class TestUserRoles():
         Тестирование вызова исключения EmailExists 
         при работе с AccuntManager
         '''
-
         with pytest.raises(EmailExists):
             exist_account.login+="string"
-            AccountManager(exist_account, send_code=False, new=True)
+            AccountManager(exist_account, new=True)
 
 
 
@@ -81,10 +76,9 @@ class TestUserRoles():
         Тестирование вызова исключения LoginExists 
         при работе с AccuntManager
         '''
-        
         with pytest.raises(LoginExists):
             exist_account.email+="string"
-            AccountManager(exist_account, send_code=False, new=True)
+            AccountManager(exist_account, new=True)
 
 
 

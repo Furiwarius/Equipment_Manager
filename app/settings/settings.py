@@ -1,9 +1,36 @@
 import dotenv
 import os
 from functools import lru_cache
+from datetime import timedelta
 
 
 dotenv.load_dotenv()
+
+
+
+class JWTSettings():
+    '''
+    Настройки для работы с токенами
+    '''
+
+    @lru_cache
+    def __init__(self) -> None:
+
+        self.JWT_KEY = os.getenv("JWT_KEY")
+
+        self.ALGORITHM = "HS256"
+
+        self.EXPIRATION_TIME = timedelta(minutes=30)
+
+
+
+class ApplicationSetting():
+    '''
+    Настройки приложения
+    '''
+
+    favicon_path = 'app/static/img/favicon.ico'
+
 
 
 class EmailClientSetting():
@@ -18,6 +45,12 @@ class EmailClientSetting():
         self.EMAIL = os.getenv("EMAIL")
         # Пароль приложения для автоматической отправки
         self.PASSWORD = os.getenv("PASSWORD")
+
+        self.mime = "MIME-Version: 1.0"
+        self.charset = "Content-Type: text/plain; charset=utf-8"
+        self.server = "smtp.yandex.ru"
+        self.port = 587
+        self.default_template = r"app\templates\default_template.txt"
 
 
 
@@ -76,8 +109,32 @@ class DatabaseLoggerSetting():
         # Токен для бота, который будет отправлять логи
         self.TELEGRAM_API_TOKEN = os.getenv("TELEGRAM_API_TOKEN")
 
+        # Тема письма
+        self.SUBJECT_LETTER = "Database Error"
+
+
+
+class ConfirmationCodeSetting():
+    '''
+    Класс для настройки отправителя кода 
+    подтверждения аккаунта при регистрации
+    '''
+
+    @lru_cache
+    def __init__(self) -> None:
+
+        # Время жизни кода
+        self.lifetime = 600
+
+        self.template_letter = r"app\templates\code.txt"
+
+        self.subject_letter = "Verification code"
+
 
 
 db_log_setting = DatabaseLoggerSetting()
+jwt_settings = JWTSettings()
+app_settings = ApplicationSetting()
 db_setting = DatabaseSetting()
 email_setting = EmailClientSetting()
+code_setting = ConfirmationCodeSetting()
